@@ -8,6 +8,7 @@ class DropdownCustom<T> extends StatelessWidget {
   final T? value;
   final ValueChanged<T?> onChanged;
   final DisplayBuilder<T>? displayBuilder;
+  final String? Function(T?)? validator;
 
   const DropdownCustom({
     super.key,
@@ -16,6 +17,7 @@ class DropdownCustom<T> extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.displayBuilder,
+    this.validator,
   });
 
   @override
@@ -24,14 +26,13 @@ class DropdownCustom<T> extends StatelessWidget {
       value: value,
       decoration: InputDecoration(labelText: label),
       items: items
-          .map(
-            (e) => DropdownMenuItem<T>(
-              value: e,
-              child: Text(displayBuilder != null ? displayBuilder!(e) : e.toString()),
-            ),
-          )
+          .map((e) => DropdownMenuItem<T>(
+                value: e,
+                child: Text(displayBuilder != null ? displayBuilder!(e) : e.toString()),
+              ))
           .toList(),
       onChanged: onChanged,
+      validator: validator,
     );
   }
 }
