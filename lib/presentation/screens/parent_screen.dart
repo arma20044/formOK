@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 
 import 'package:flutter/material.dart';
 
@@ -11,6 +11,8 @@ import '../components/components.dart';
 import '../forms/FormWrapper.dart';
 
 class ParentScreen extends StatefulWidget {
+  const ParentScreen({super.key});
+
   @override
   _ParentScreenState createState() => _ParentScreenState();
 }
@@ -45,11 +47,35 @@ class _ParentScreenState extends State<ParentScreen>
     final isValid = formKey.currentState?.validate() ?? false;
     // Envía los datos
     if (isValid) {
-      await _fetchReclamo();
+      ReclamoResponse result = await _fetchReclamo();
       limpiarTodo();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Formulario enviado correctamente!")),
+      //ScaffoldMessenger.of(context).showSnackBar(
+       // const SnackBar(content: Text("Formulario enviado correctamente!")),
+      //);
+
+      showDialog(context: context, builder: 
+       (BuildContext context) {
+      return 
+      AlertDialog(
+        title: Text(result.mensaje!.split('<h1>')[0]),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              // Cerrar el diálogo y devolver 'false' (cancelar)
+              Navigator.of(context).pop(false);
+            },
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Cerrar el diálogo y devolver 'true' (confirmar)
+              Navigator.of(context).pop(true);
+            },
+            child: const Text('Aceptar'),
+          ),
+        ],
       );
+    });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Complete todos los campos obligatorios")),
@@ -123,8 +149,10 @@ class _ParentScreenState extends State<ParentScreen>
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: enviarFormulario,
-          child: const Text("Enviar Reclamo"),
+          onPressed: _isLoadingReclamo ?  null : enviarFormulario,
+          child: _isLoadingReclamo ? const SizedBox(
+            child: CircularProgressIndicator(),
+          )  :  Text("Enviar Reclamo"),
         ),
       ),
     );

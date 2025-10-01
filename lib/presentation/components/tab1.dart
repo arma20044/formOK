@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 
 import '../../core/api/mi_ande_api.dart';
@@ -117,6 +119,12 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
       barrios = [];
       // listaTipoReclamo = [];
       telefonoController.clear();
+      nisController.clear();
+      nombreApellidoController.clear();
+      direccionController.clear();
+      correoController.clear();
+      referenciaController.clear();
+
     });
   }
 
@@ -240,6 +248,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
               return null;
             },
           ),
+           const SizedBox(height: 20),
           //CORREO
           TextFormField(
             controller: correoController,
@@ -254,6 +263,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
               return null;
             },
           ),
+           const SizedBox(height: 20),
           //REFERENCIA
           TextFormField(
             controller: referenciaController,
@@ -268,6 +278,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
               return null;
             },
           ),
+           const SizedBox(height: 20),
           DropdownCustom<TipoReclamo>(
             label: "Tipo Reclamo",
             items: listaTipoReclamo,
