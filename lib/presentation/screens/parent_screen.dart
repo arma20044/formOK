@@ -1,6 +1,5 @@
-
-
 import 'package:flutter/material.dart';
+import 'package:form/presentation/components/tab3.dart';
 
 import '../../core/api/mi_ande_api.dart';
 import '../../infrastructure/reclamo_datasource_impl.dart';
@@ -33,7 +32,7 @@ class _ParentScreenState extends State<ParentScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   void limpiarTodo() {
@@ -50,32 +49,33 @@ class _ParentScreenState extends State<ParentScreen>
       ReclamoResponse result = await _fetchReclamo();
       limpiarTodo();
       //ScaffoldMessenger.of(context).showSnackBar(
-       // const SnackBar(content: Text("Formulario enviado correctamente!")),
+      // const SnackBar(content: Text("Formulario enviado correctamente!")),
       //);
 
-      showDialog(context: context, builder: 
-       (BuildContext context) {
-      return 
-      AlertDialog(
-        title: Text(result.mensaje!.split('<h1>')[0]),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              // Cerrar el diálogo y devolver 'false' (cancelar)
-              Navigator.of(context).pop(false);
-            },
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Cerrar el diálogo y devolver 'true' (confirmar)
-              Navigator.of(context).pop(true);
-            },
-            child: const Text('Aceptar'),
-          ),
-        ],
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(result.mensaje!.split('<h1>')[0]),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  // Cerrar el diálogo y devolver 'false' (cancelar)
+                  Navigator.of(context).pop(false);
+                },
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Cerrar el diálogo y devolver 'true' (confirmar)
+                  Navigator.of(context).pop(true);
+                },
+                child: const Text('Aceptar'),
+              ),
+            ],
+          );
+        },
       );
-    });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Complete todos los campos obligatorios")),
@@ -104,9 +104,9 @@ class _ParentScreenState extends State<ParentScreen>
 
         _archivo,
         tab1Key.currentState!.selectedTipoReclamo!.adjuntoObligatorio,
+        _lat,
+        _lng
 
-        20,
-        20,
       );
 
       print(reclamoResponse);
@@ -120,6 +120,16 @@ class _ParentScreenState extends State<ParentScreen>
     }
   }
 
+  double? _lat;
+  double? _lng;
+
+  void _setLocation(double lat, double lng) {
+    setState(() {
+      _lat = lat;
+      _lng = lng;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,6 +140,7 @@ class _ParentScreenState extends State<ParentScreen>
           tabs: const [
             Tab(text: "Ubicación"),
             Tab(text: "Archivo"),
+            Tab(text: "Mapa"),
           ],
         ),
         actions: [
@@ -139,20 +150,22 @@ class _ParentScreenState extends State<ParentScreen>
       body: FormWrapper(
         formKey: formKey,
         child: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           controller: _tabController,
           children: [
             Tab1(key: tab1Key),
             Tab2(key: tab2Key, onSaved: (newValue) => {_archivo = newValue}),
+            Tab3(lat: _lat, lng: _lng, onLocationSelected: _setLocation),
           ],
         ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: _isLoadingReclamo ?  null : enviarFormulario,
-          child: _isLoadingReclamo ? const SizedBox(
-            child: CircularProgressIndicator(),
-          )  :  Text("Enviar Reclamo"),
+          onPressed: _isLoadingReclamo ? null : enviarFormulario,
+          child: _isLoadingReclamo
+              ? const SizedBox(child: CircularProgressIndicator())
+              : Text("Enviar Reclamo"),
         ),
       ),
     );
