@@ -140,6 +140,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
