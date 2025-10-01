@@ -5,9 +5,8 @@ import '../../core/validators/validators.dart';
 import '../../infrastructure/infrastructure.dart';
 import '../../model/model.dart';
 import '../../repositories/repositories.dart';
+import '../../repositories/tipo_reclamo_repository_impl.dart';
 import 'widgets/dropdown_custom.dart';
-
-
 
 class Tab1 extends StatefulWidget {
   const Tab1({super.key});
@@ -15,43 +14,53 @@ class Tab1 extends StatefulWidget {
   Tab1State createState() => Tab1State();
 }
 
-class Tab1State extends State<Tab1> {
+class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
 
+  @override
+  bool get wantKeepAlive => true;
   Departamento? selectedDept;
   Ciudad? selectedCiudad;
   Barrio? selectedBarrio;
+  TipoReclamo? selectedTipoReclamo;
 
   final TextEditingController telefonoController = TextEditingController();
+  final TextEditingController nisController = TextEditingController();
+  final TextEditingController nombreApellidoController = TextEditingController();
+  final TextEditingController direccionController = TextEditingController();
+  final TextEditingController correoController = TextEditingController();
+  final TextEditingController referenciaController = TextEditingController();
 
-    final repoDepartamento = DepartamentoRepositoryImpl(
+  final repoDepartamento = DepartamentoRepositoryImpl(
     DepartamentoDatasourceImpl(MiAndeApi()),
   );
-  final repoCiudad = CiudadRepositoryImpl(
-    CiudadDatasourceImpl(MiAndeApi()),
-  );
-  final repoBarrio = BarrioRepositoryImpl(
-    BarrioDatasourceImpl(MiAndeApi()),
+  final repoCiudad = CiudadRepositoryImpl(CiudadDatasourceImpl(MiAndeApi()));
+  final repoBarrio = BarrioRepositoryImpl(BarrioDatasourceImpl(MiAndeApi()));
+  final repoTipoReclamo = TipoReclamoRepositoryImpl(
+    TipoReclamoDatasourceImpl(),
   );
 
   List<Departamento> departamentos = [];
   List<Ciudad> ciudades = [];
   List<Barrio> barrios = [];
 
-   bool isLoadingDepartamentos = false;
+  bool isLoadingDepartamentos = false;
   bool isLoadingCiudades = false;
   bool isLoadingBarrios = false;
+  bool isLoadingTipoReclamo = false;
 
   List<Departamento> listaDepartamentos = [];
   List<Ciudad> listaCiudades = [];
   List<Barrio> listaBarrios = [];
+  List<TipoReclamo> listaTipoReclamo = [];
 
   @override
   void initState() {
     super.initState();
     _fetchDepartamentos();
+    _fetchTipoReclamo();
   }
 
-   Future<void> _fetchDepartamentos() async {
+  Future<void> _fetchDepartamentos() async {
     setState(() => isLoadingDepartamentos = true);
     try {
       listaDepartamentos = await repoDepartamento.getDepartamento();
@@ -61,7 +70,8 @@ class Tab1State extends State<Tab1> {
       setState(() => isLoadingDepartamentos = false);
     }
   }
-   Future<void> _fetchCiudades(num idDepartamento) async {
+
+  Future<void> _fetchCiudades(num idDepartamento) async {
     setState(() => isLoadingCiudades = true);
     try {
       listaCiudades = await repoCiudad.getCiudad(idDepartamento);
@@ -71,7 +81,8 @@ class Tab1State extends State<Tab1> {
       setState(() => isLoadingCiudades = false);
     }
   }
-   Future<void> _fetchBarrios(num idCiudad) async {
+
+  Future<void> _fetchBarrios(num idCiudad) async {
     setState(() => isLoadingBarrios = true);
     try {
       listaBarrios = await repoBarrio.getBarrio(idCiudad);
@@ -82,25 +93,30 @@ class Tab1State extends State<Tab1> {
     }
   }
 
- 
+  Future<void> _fetchTipoReclamo() async {
+    setState(() => isLoadingTipoReclamo = true);
+    try {
+      listaTipoReclamo = await repoTipoReclamo.getTipoReclamo();
+    } catch (e) {
+      print("Error al cargar tipo reclamo: $e");
+    } finally {
+      setState(() => isLoadingTipoReclamo = false);
+    }
+  }
 
   void limpiar() {
     setState(() {
       selectedDept = null;
       selectedCiudad = null;
       selectedBarrio = null;
-      //listaDepartamentos = [];
+      selectedTipoReclamo = null;
+      // listaDepartamentos = [];
       listaCiudades = [];
       listaBarrios = [];
       ciudades = [];
       barrios = [];
+      // listaTipoReclamo = [];
       telefonoController.clear();
-
-      
-        
-        
-        
-        
     });
   }
 
@@ -120,12 +136,59 @@ class Tab1State extends State<Tab1> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
+          //TELEFONO
+          TextFormField(
+            controller: telefonoController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              labelText: "Teléfono",
+              border: OutlineInputBorder(),
+            ),
+            validator: (val) {
+              if (val == null || val.isEmpty) return "Ingrese un teléfono";
+              if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
+          //NIS
+          TextFormField(
+            controller: nisController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: "NIS",
+              border: OutlineInputBorder(),
+            ),
+            validator: (val) {
+              if (val == null || val.isEmpty) return "Ingrese NIS";
+              if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
+          //NOMBRE Y APELLIDO
+          TextFormField(
+            controller: nombreApellidoController,
+            keyboardType: TextInputType.text,
+            decoration: const InputDecoration(
+              labelText: "Nombre y Apellido",
+              border: OutlineInputBorder(),
+            ),
+            validator: (val) {
+              if (val == null || val.isEmpty)
+                return "Ingrese Nombre y Apellido";
+              //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
           DropdownCustom<Departamento>(
             label: "Departamento",
             items: listaDepartamentos,
             value: selectedDept,
             displayBuilder: (d) => d.nombre!,
-            validator: (val) => val == null ? "Seleccione un departamento" : null,
+            validator: (val) =>
+                val == null ? "Seleccione un departamento" : null,
             onChanged: (val) {
               setState(() {
                 selectedDept = val;
@@ -163,18 +226,56 @@ class Tab1State extends State<Tab1> {
             onChanged: (val) => setState(() => selectedBarrio = val),
           ),
           const SizedBox(height: 20),
+          //DIRECCION
           TextFormField(
-            controller: telefonoController,
-            keyboardType: TextInputType.phone,
+            controller: direccionController,
+            keyboardType: TextInputType.text,
             decoration: const InputDecoration(
-              labelText: "Teléfono",
+              labelText: "Direccion",
               border: OutlineInputBorder(),
             ),
             validator: (val) {
-              if (val == null || val.isEmpty) return "Ingrese un teléfono";
-              if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              if (val == null || val.isEmpty) return "Ingrese Dirección";
+              //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
               return null;
             },
+          ),
+          //CORREO
+          TextFormField(
+            controller: correoController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              labelText: "Correo",
+              border: OutlineInputBorder(),
+            ),
+            validator: (val) {
+              if (val == null || val.isEmpty) return "Ingrese Correo";
+              //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              return null;
+            },
+          ),
+          //REFERENCIA
+          TextFormField(
+            controller: referenciaController,
+            keyboardType: TextInputType.text,
+            decoration: const InputDecoration(
+              labelText: "Referencia",
+              border: OutlineInputBorder(),
+            ),
+            validator: (val) {
+              if (val == null || val.isEmpty) return "Ingrese Referencia";
+              //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              return null;
+            },
+          ),
+          DropdownCustom<TipoReclamo>(
+            label: "Tipo Reclamo",
+            items: listaTipoReclamo,
+            value: selectedTipoReclamo,
+            displayBuilder: (b) => b.nombre!,
+            validator: (val) =>
+                val == null ? "Seleccione un tipo Reclamo" : null,
+            onChanged: (val) => setState(() => selectedTipoReclamo = val),
           ),
         ],
       ),

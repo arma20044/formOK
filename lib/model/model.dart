@@ -1,3 +1,5 @@
 export 'departamento.dart';
 export 'ciudad.dart';
 export 'barrio.dart';
+export 'tipo_reclamo_model.dart';
+export 'reclamo_model.dart';
