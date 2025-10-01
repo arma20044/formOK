@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import '../../model/archivo_adjunto_model.dart';
+import 'widgets/media/MediaPickerButton.dart';
+import 'widgets/media/MediaPreview.dart';
 
+/// FormField Tab2
 class Tab2 extends FormField<ArchivoAdjunto?> {
   Tab2({
     super.key,
@@ -34,6 +37,7 @@ class Tab2 extends FormField<ArchivoAdjunto?> {
         );
 }
 
+/// Media Picker principal
 class _MediaPicker extends StatefulWidget {
   final ArchivoAdjunto? file;
   final ValueChanged<ArchivoAdjunto?> onChanged;
@@ -77,42 +81,6 @@ class MediaPickerState extends State<_MediaPicker>
     setState(() {});
   }
 
-  void _showOptions() {
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_camera),
-              title: const Text("Tomar Foto"),
-              onTap: () {
-                Navigator.pop(context);
-                _pickMedia(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.videocam),
-              title: const Text("Grabar Video"),
-              onTap: () {
-                Navigator.pop(context);
-                _pickMedia(ImageSource.camera, isVideo: true);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text("Galería"),
-              onTap: () {
-                Navigator.pop(context);
-                _pickMedia(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void limpiar() {
     widget.onChanged(null);
     _videoThumbnail = null;
@@ -121,29 +89,20 @@ class MediaPickerState extends State<_MediaPicker>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // para AutomaticKeepAliveClientMixin
-    final archivo = widget.file;
-
-    Widget preview;
-    if (archivo == null) {
-      preview = const Text("Seleccione un adjunto para el reclamo");
-    } else if (archivo.file.path.endsWith(".mp4")) {
-      preview = _videoThumbnail != null
-          ? Image.memory(_videoThumbnail!, height: 150)
-          : const Text("Cargando vista previa del video...");
-    } else {
-      preview = Image.file(archivo.file, height: 150);
-    }
+    super.build(context);
 
     return Column(
       children: [
         const SizedBox(height: 16),
-        preview,
+        MediaPreview(
+          file: widget.file?.file,
+          videoThumbnail: _videoThumbnail,
+        ),
         const SizedBox(height: 10),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.attach_file),
-          label: const Text("Seleccionar archivo"),
-          onPressed: _showOptions,
+        MediaPickerButton(
+          onPickImage: () => _pickMedia(ImageSource.camera),
+          onPickVideo: () => _pickMedia(ImageSource.camera, isVideo: true),
+          onPickGallery: () => _pickMedia(ImageSource.gallery),
         ),
       ],
     );
