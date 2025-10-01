@@ -7,7 +7,11 @@ class Tab2 extends StatefulWidget {
   Tab2State createState() => Tab2State();
 }
 
-class Tab2State extends State<Tab2> {
+class Tab2State extends State<Tab2> with AutomaticKeepAliveClientMixin {
+
+  @override
+  bool get wantKeepAlive => true;
+  
   String? archivoSeleccionado;
 
   void limpiar() {

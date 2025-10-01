@@ -19,7 +19,12 @@ class Tab1 extends StatefulWidget {
   Tab1State createState() => Tab1State();
 }
 
-class Tab1State extends State<Tab1> {
+class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
+  
+  @override
+  bool get wantKeepAlive => true;
+
+
   Departamento? selectedDept;
   Ciudad? selectedCiudad;
   Barrio? selectedBarrio;
@@ -133,6 +138,7 @@ class Tab1State extends State<Tab1> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Padding(
       padding: const EdgeInsets.all(20),
       child: SingleChildScrollView(
