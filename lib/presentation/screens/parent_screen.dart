@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../core/validators/validators.dart';
 import '../components/tab1.dart';
 import '../components/tab2.dart';
-
 
 class ParentScreen extends StatefulWidget {
   @override
@@ -27,6 +27,30 @@ class _ParentScreenState extends State<ParentScreen>
     tab2Key.currentState?.limpiar();
   }
 
+   bool validar() {
+    return Validators.allValid([
+      Validators.notNull(tab1Key.currentState?.selectedDept),
+      Validators.notNull(tab1Key.currentState?.selectedCiudad),
+      Validators.notNull(tab1Key.currentState?.selectedBarrio),
+      Validators.notEmpty(tab1Key.currentState?.telefonoController.text),
+      Validators.isNumeric(tab1Key.currentState?.telefonoController.text),
+      Validators.notNull(tab2Key.currentState?.archivoSeleccionado)
+    ]);
+  }
+
+  void _enviar() {
+      
+      bool esValido = validar();
+
+      if(esValido){
+        print('TODO bien');
+      }
+      else{
+        print('falta algo');
+      }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,18 +64,23 @@ class _ParentScreenState extends State<ParentScreen>
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: limpiarTodo,
-          ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: limpiarTodo),
         ],
       ),
       body: TabBarView(
+        physics: NeverScrollableScrollPhysics(),
         controller: _tabController,
         children: [
           Tab1(key: tab1Key),
           Tab2(key: tab2Key),
         ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+          onPressed: () => _enviar(),
+          child: const Text("Enviar Formulario"),
+        ),
       ),
     );
   }
