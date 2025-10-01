@@ -1,5 +1,6 @@
 // lib/presentation/components/menu/menu_data.dart
 import 'package:flutter/material.dart';
+import 'package:form/presentation/screens/parent_screen.dart';
 import 'menu_models.dart';
 
 final List<MenuGroup> menuGroups = [
@@ -10,26 +11,30 @@ final List<MenuGroup> menuGroups = [
         id: 'fe',
         icon: Icons.fact_check,
         label: 'Falta de Energía',
-        onTap: () => debugPrint('Dashboard'),
+        onTap: (context) => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ParentScreen()),
+        )
+        ,
       ),
       MenuItemModel(
         id: 'co',
         icon: Icons.people,
         label: 'Comercial/Facturación',
         badge: '5',
-        onTap: () => debugPrint('Clientes'),
+       // onTap: () => debugPrint('Clientes'),
       ),
       MenuItemModel(
         id: 'map',
         icon: Icons.map,
         label: 'Alumbrado Público',
-        onTap: () => debugPrint('Mapa'),
+      //  onTap: () => debugPrint('Mapa'),
       ),
       MenuItemModel(
         id: 'map',
         icon: Icons.bolt,
         label: 'Denunciá el Robo de Energía',
-        onTap: () => debugPrint('Mapa'),
+       // onTap: () => debugPrint('Mapa'),
       ),
     ],
   ),
@@ -40,13 +45,13 @@ final List<MenuGroup> menuGroups = [
         id: 'new',
         icon: Icons.document_scanner,
         label: 'Consulta de Facturas',
-        onTap: () => debugPrint('Nuevo'),
+       // onTap: () => debugPrint('Nuevo'),
       ),
       MenuItemModel(
         id: 'history',
         icon: Icons.history,
         label: 'Historial',
-        onTap: () => debugPrint('Historial'),
+       // onTap: () => debugPrint('Historial'),
       ),
       MenuItemModel(
         id: 'reports',
@@ -64,7 +69,7 @@ final List<MenuGroup> menuGroups = [
         id: 'cuenta',
         icon: Icons.person,
         label: 'Mi Cuenta',
-        onTap: () => debugPrint('Configuración'),
+       // onTap: () => debugPrint('Configuración'),
       ),
      
     ],

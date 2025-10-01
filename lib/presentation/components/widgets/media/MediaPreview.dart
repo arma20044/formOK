@@ -12,7 +12,7 @@ class MediaPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (file == null) {
-      return const Text("Seleccione un adjunto para el reclamo");
+      return const Text("Seleccionar archivo desde la Galería o la Cámara");
     }
 
     if (file!.path.endsWith(".mp4")) {

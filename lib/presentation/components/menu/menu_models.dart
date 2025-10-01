@@ -5,9 +5,9 @@ class MenuItemModel {
   final String id;
   final IconData icon;
   final String label;
-  final VoidCallback? onTap;
   final bool enabled;
   final String? badge;
+  final void Function(BuildContext context)? onTap;
 
   MenuItemModel({
     required this.id,

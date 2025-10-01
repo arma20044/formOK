@@ -91,20 +91,22 @@ class MediaPickerState extends State<_MediaPicker>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-        MediaPreview(
-          file: widget.file?.file,
-          videoThumbnail: _videoThumbnail,
-        ),
-        const SizedBox(height: 10),
-        MediaPickerButton(
-          onPickImage: () => _pickMedia(ImageSource.camera),
-          onPickVideo: () => _pickMedia(ImageSource.camera, isVideo: true),
-          onPickGallery: () => _pickMedia(ImageSource.gallery),
-        ),
-      ],
+    return Center(
+      child: Column(
+        children: [
+          const SizedBox(height: 16),
+          MediaPreview(
+            file: widget.file?.file,
+            videoThumbnail: _videoThumbnail,
+          ),
+          const SizedBox(height: 10),
+          MediaPickerButton(
+            onPickImage: () => _pickMedia(ImageSource.camera),
+            onPickVideo: () => _pickMedia(ImageSource.camera, isVideo: true),
+            onPickGallery: () => _pickMedia(ImageSource.gallery),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -55,7 +55,7 @@ class MenuButton extends StatelessWidget {
       label: item.label,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: enabled ? item.onTap : null,
+        onTap: item.onTap != null ? () => item.onTap!(context) : null,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

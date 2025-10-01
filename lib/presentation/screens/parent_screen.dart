@@ -133,19 +133,20 @@ class _ParentScreenState extends State<ParentScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: Drawer(),
       appBar: AppBar(
-        title: const Text("Formulario con Tabs"),
+        title: const Text("Reclamos por Falta de Energía"),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: "Ubicación"),
-            Tab(text: "Archivo"),
-            Tab(text: "Mapa"),
+            Tab(text: "DATOS"),
+            Tab(text: "ADJUNTOS"),
+            Tab(text: "MAPA"),
           ],
         ),
-        actions: [
+        /* actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: limpiarTodo),
-        ],
+        ], */
       ),
       body: FormWrapper(
         formKey: formKey,
