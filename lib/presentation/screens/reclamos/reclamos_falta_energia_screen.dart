@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/tab3.dart';
 
 import '../../../core/api/mi_ande_api.dart';
@@ -135,7 +136,7 @@ class _ParentScreenState extends State<ParentScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: Drawer(),
+      endDrawer: CustomDrawer(),
       appBar: AppBar(
         title: const Text("Reclamos por Falta de Energía"),
         bottom: TabBar(

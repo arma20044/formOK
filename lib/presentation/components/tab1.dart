@@ -38,8 +38,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
   );
   final repoCiudad = CiudadRepositoryImpl(CiudadDatasourceImpl(MiAndeApi()));
   final repoBarrio = BarrioRepositoryImpl(BarrioDatasourceImpl(MiAndeApi()));
-  final repoTipoReclamo = TipoReclamoRepositoryImpl(
-    TipoReclamoDatasourceImpl(),
+  final repoTipoReclamo = TipoReclamoRepositoryImpl(TipoReclamoDatasourceImpl(MiAndeApi()),
   );
 
   List<Departamento> departamentos = [];

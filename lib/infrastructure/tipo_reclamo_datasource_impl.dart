@@ -2,6 +2,9 @@
 
 import 'package:dio/dio.dart';
 
+
+import '../core/api/mi_ande_api.dart';
+import '../core/enviromens/Enrivoment.dart';
 import '../datasources/datasources.dart';
 import '../model/model.dart';
 
@@ -10,20 +13,16 @@ class TipoReclamoDatasourceImpl extends TipoReclamoDatasource {
 
   late final Dio dio;
 
-  TipoReclamoDatasourceImpl() : dio = Dio(
-    BaseOptions()
-  );
+  TipoReclamoDatasourceImpl(MiAndeApi api) : dio = api.dio;
 
-    var data = FormData.fromMap({
-        'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
+    var data = FormData.fromMap({       
         'categoriaWebAppJsonArray': '["FE"]',
       });
 
   @override
   Future<List<TipoReclamo>> getTipoReclamo() async{
   
-    final response = await dio.post(
-      "https://desa1.ande.gov.py:8481/sigaWs/api/gra/v1/reclamo/listarTipoReclamoPorCategoria",
+    final response = await dio.post("${Environment.hostCtxGra}/v1/reclamo/listarTipoReclamoPorCategoria",
         data: data,
         options: Options(
           contentType: Headers.formUrlEncodedContentType, // 👈 importante
