@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/tab3.dart';
+import 'package:form/provider/theme_provider.dart';
 
 import '../../../core/api/mi_ande_api.dart';
 import '../../../infrastructure/reclamo_datasource_impl.dart';
@@ -135,41 +136,44 @@ class _ParentScreenState extends State<ParentScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      endDrawer: CustomDrawer(),
-      appBar: AppBar(
-        title: const Text("Reclamos por Falta de Energía"),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: "DATOS"),
-            Tab(text: "ADJUNTOS"),
-            Tab(text: "MAPA"),
-          ],
+    return MaterialApp(
+      theme: ThemeProvider().themeData,
+      home: Scaffold(
+        endDrawer: CustomDrawer(),
+        appBar: AppBar(
+          title: const Text("Reclamos por Falta de Energía"),
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: "DATOS"),
+              Tab(text: "ADJUNTOS"),
+              Tab(text: "MAPA"),
+            ],
+          ),
+          /* actions: [
+            IconButton(icon: const Icon(Icons.refresh), onPressed: limpiarTodo),
+          ], */
         ),
-        /* actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: limpiarTodo),
-        ], */
-      ),
-      body: FormWrapper(
-        formKey: formKey,
-        child: TabBarView(
-          physics: NeverScrollableScrollPhysics(),
-          controller: _tabController,
-          children: [
-            Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo,),
-            Tab2(key: tab2Key, onSaved: (newValue) => {_archivo = newValue}),
-            Tab3(lat: _lat, lng: _lng, onLocationSelected: _setLocation),
-          ],
+        body: FormWrapper(
+          formKey: formKey,
+          child: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
+            controller: _tabController,
+            children: [
+              Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo,),
+              Tab2(key: tab2Key, onSaved: (newValue) => {_archivo = newValue}),
+              Tab3(lat: _lat, lng: _lng, onLocationSelected: _setLocation),
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          onPressed: _isLoadingReclamo ? null : enviarFormulario,
-          child: _isLoadingReclamo
-              ? const SizedBox(child: CircularProgressIndicator())
-              : Text("Enviar Reclamo"),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton(
+            onPressed: _isLoadingReclamo ? null : enviarFormulario,
+            child: _isLoadingReclamo
+                ? const SizedBox(child: CircularProgressIndicator())
+                : Text("Enviar Reclamo"),
+          ),
         ),
       ),
     );

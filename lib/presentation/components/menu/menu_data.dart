@@ -12,10 +12,11 @@ final List<MenuGroup> menuGroups = [
         id: 'fe',
         icon: Icons.fact_check,
         label: 'Falta de Energía',
-        onTap: (context) => Navigator.push(
+        onTap: (context) =>  Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ParentScreen(tipoReclamo: 'FE'),
+            builder: (context) => ParentScreen(tipoReclamo: 'FE'),
+            
           ),
         ),
       ),

@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:form/core/auth/auth_provider.dart';
+import 'package:form/core/enviromens/enrivoment.dart';
+import 'package:form/presentation/auth/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,6 +27,7 @@ class CustomDrawer extends StatelessWidget {
     }
 
       final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
 
     return Drawer(
@@ -42,7 +46,7 @@ class CustomDrawer extends StatelessWidget {
             title: const Text('Acceder'),
             onTap: () {
               Navigator.pop(context); // cerrar el drawer
-              // acción para ir a Home
+              Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(),));
             },
           ),
           ListTile(
@@ -51,6 +55,14 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               // acción para ir a Configuración
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Cerrar Sesión'),
+            onTap: () {
+              Navigator.pop(context);
+                authProvider.logout();
             },
           ),
           Divider(),
@@ -92,6 +104,7 @@ class CustomDrawer extends StatelessWidget {
                   icon: const FaIcon(
                     FontAwesomeIcons.youtube,
                     color: Colors.red,
+                    size: 50,
                   ),
                   onPressed: () {
                     _launchUrl("YOUTUBE_URL");
@@ -101,6 +114,7 @@ class CustomDrawer extends StatelessWidget {
                   icon: const FaIcon(
                     FontAwesomeIcons.facebook,
                     color: Colors.blue,
+                    size: 50,
                   ),
                   onPressed: () {
                     _launchUrl("FACEBOOK_URL");
@@ -110,6 +124,7 @@ class CustomDrawer extends StatelessWidget {
                   icon: const FaIcon(
                     FontAwesomeIcons.xTwitter,
                     color: Colors.black,
+                    size: 50,
                   ),
                   onPressed: () {
                     _launchUrl("X_URL");
@@ -119,6 +134,7 @@ class CustomDrawer extends StatelessWidget {
                   icon: const FaIcon(
                     FontAwesomeIcons.instagram,
                     color: Colors.orange,
+                    size: 50,
                   ),
                   onPressed: () {
                     _launchUrl('INSTAGRAM_URL');
@@ -127,7 +143,7 @@ class CustomDrawer extends StatelessWidget {
               ],
             ),
           ),
-          // Text('Version ${app_version} - ${app_release_date}'),
+           Center(child: Text('Version ${Environment.appVersion.android.version} - ${Environment.appVersion.android.fecha}')),
         ],
       ),
     );

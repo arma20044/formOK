@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Definimos el tema oscuro de la aplicación
 final ThemeData darkTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.blue,
+    seedColor: Colors.green,
     brightness: Brightness.dark,
   ),
   appBarTheme: const AppBarTheme(
