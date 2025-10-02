@@ -51,7 +51,12 @@ final List<MenuGroup> menuGroups = [
         id: 'map',
         icon: Icons.bolt,
         label: 'Denunciá el Robo de Energía',
-        // onTap: () => debugPrint('Mapa'),
+        onTap: (context) => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ParentScreen(tipoReclamo: 'CX'),
+          ),
+        ),
       ),
     ],
   ),

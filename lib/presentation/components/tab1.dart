@@ -38,7 +38,8 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
   );
   final repoCiudad = CiudadRepositoryImpl(CiudadDatasourceImpl(MiAndeApi()));
   final repoBarrio = BarrioRepositoryImpl(BarrioDatasourceImpl(MiAndeApi()));
-  final repoTipoReclamo = TipoReclamoRepositoryImpl(TipoReclamoDatasourceImpl(MiAndeApi()),
+  final repoTipoReclamo = TipoReclamoRepositoryImpl(
+    TipoReclamoDatasourceImpl(MiAndeApi()),
   );
 
   List<Departamento> departamentos = [];
@@ -64,29 +65,40 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     _fetchTipoReclamo();
 
     validators = {
+      //VALIDA PARA TODOS
+      'direccion': (val) {
+        if (val == null || val.isEmpty) return "Ingrese una Dirección";
+        return null;
+      },
+
+      //SOLO FALTA DE ENERGIA FE
       'telefono': (val) {
-        if (val == null || val.isEmpty) return "Ingrese un teléfono";
-        if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
-        return null;
-      },
-      'nis': (val) {
-        if (val == null || val.isEmpty) return "Ingrese NIS";
-        return null;
-      },
-      'nombreApellido': (val) {
-        // solo obligatorio si tipoReclamo es "CO"
-        if (widget.tipoReclamo == "CO" && (val == null || val.isEmpty)) {
-          return "Ingrese Nombre y Apellido";
-        }
+        if ((selectedTipoReclamo!.nisObligatorio == 'S') &&
+            (val == null || val.isEmpty))
+          return "Ingrese un teléfono";
+        if (!RegExp(r'^\d+$').hasMatch(val!)) return "Solo números";
         return null;
       },
       'referencia': (val) {
         // solo obligatorio si tipoReclamo es "FE"
-        if (widget.tipoReclamo == "FE" && (val == null || val.isEmpty)) {
+        if (widget.tipoReclamo != "CX" && (val == null || val.isEmpty)) {
           return "Ingrese Referencia";
         }
         return null;
       },
+
+      //SOLO ALUMBRADO PUBLIC AP
+      'nombreApellido': (val) {
+        // solo obligatorio si tipoReclamo es "CO"
+        if ((widget.tipoReclamo == "FE" ||
+                widget.tipoReclamo == "CO" ||
+                widget.tipoReclamo == "AP") &&
+            (val == null || val.isEmpty)) {
+          return "Ingrese Nombre y Apellido";
+        }
+        return null;
+      },
+
       // más campos condicionales según tipoReclamo...
     };
   }
@@ -127,7 +139,9 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
   Future<void> _fetchTipoReclamo() async {
     setState(() => isLoadingTipoReclamo = true);
     try {
-      listaTipoReclamo = await repoTipoReclamo.getTipoReclamo();
+      listaTipoReclamo = await repoTipoReclamo.getTipoReclamo(
+        widget.tipoReclamo,
+      );
     } catch (e) {
       print("Error al cargar tipo reclamo: $e");
     } finally {
@@ -182,13 +196,16 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
               border: OutlineInputBorder(),
             ),
             validator: (val) {
-              if (val == null || val.isEmpty) return "Ingrese un teléfono";
-              if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              if (selectedTipoReclamo?.nisObligatorio == 'S') {
+                if (val == null || val.isEmpty) return "Ingrese un teléfono";
+                if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+                return null;
+              }
               return null;
             },
           ),
           const SizedBox(height: 20),
-           DropdownCustom<TipoReclamo>(
+          DropdownCustom<TipoReclamo>(
             label: "Tipo Reclamo",
             items: listaTipoReclamo,
             value: selectedTipoReclamo,
@@ -207,8 +224,11 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
               border: OutlineInputBorder(),
             ),
             validator: (val) {
-              if (val == null || val.isEmpty) return "Ingrese NIS";
-              if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              if (selectedTipoReclamo?.nisObligatorio == 'S') {
+                if (val == null || val.isEmpty) return "Ingrese NIS";
+                if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+                return null;
+              }
               return null;
             },
           ),
@@ -224,11 +244,10 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             // validator: (val) {
             //   if (val == null || val.isEmpty)
             //     return "Ingrese Nombre y Apellido";
-             
+
             //   return null;
             // },
-              validator: validators['nombreApellido'],
-
+            validator: validators['nombreApellido'],
           ),
           const SizedBox(height: 20),
           DropdownCustom<Departamento>(
@@ -237,7 +256,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             value: selectedDept,
             displayBuilder: (d) => d.nombre!,
             validator: (val) =>
-                val == null ? "Seleccione un departamento" : null,
+                val == null ? "Seleccione un Departamento" : null,
             onChanged: (val) {
               setState(() {
                 selectedDept = val;
@@ -299,8 +318,11 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
               border: OutlineInputBorder(),
             ),
             validator: (val) {
+              if (selectedTipoReclamo?.correoObligatorio == 'S') {
               if (val == null || val.isEmpty) return "Ingrese Correo";
               //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              return null;
+              }
               return null;
             },
           ),
@@ -313,14 +335,10 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
               labelText: "Referencia",
               border: OutlineInputBorder(),
             ),
-            validator: (val) {
-              if (val == null || val.isEmpty) return "Ingrese Referencia";
-              //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
-              return null;
-            },
+            validator: validators['referencia'],
+            
           ),
           const SizedBox(height: 20),
-         
         ],
       ),
     );

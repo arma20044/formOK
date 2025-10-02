@@ -15,12 +15,15 @@ class TipoReclamoDatasourceImpl extends TipoReclamoDatasource {
 
   TipoReclamoDatasourceImpl(MiAndeApi api) : dio = api.dio;
 
-    var data = FormData.fromMap({       
-        'categoriaWebAppJsonArray': '["FE"]',
-      });
+   
 
   @override
-  Future<List<TipoReclamo>> getTipoReclamo() async{
+  Future<List<TipoReclamo>> getTipoReclamo(String tipoReclamo) async{
+    
+
+     var data = FormData.fromMap({       
+        'categoriaWebAppJsonArray': '[\'${tipoReclamo}\']',
+      });
   
     final response = await dio.post("${Environment.hostCtxGra}/v1/reclamo/listarTipoReclamoPorCategoria",
         data: data,

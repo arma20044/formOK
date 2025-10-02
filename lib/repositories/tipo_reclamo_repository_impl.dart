@@ -15,8 +15,8 @@ class TipoReclamoRepositoryImpl extends TipoReclamoRepository{
   TipoReclamoRepositoryImpl(this.datasource);
 
   @override
-  Future<List<TipoReclamo>> getTipoReclamo() {
-    return datasource.getTipoReclamo();
+  Future<List<TipoReclamo>> getTipoReclamo(String tipoReclamo) {
+    return datasource.getTipoReclamo(tipoReclamo);
   }
 
 } 
