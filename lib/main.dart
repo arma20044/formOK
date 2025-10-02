@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:form/core/enviromens/Enrivoment.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/menu/main_menu.dart';
+import 'package:form/provider/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'presentation/components/menu/menu_data.dart';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() async{
-   await dotenv.load(fileName: ".env"); // Carga las variables
-  runApp(const MyApp());
+
+void main() {
+  runApp(ChangeNotifierProvider(
+    create: (context) => ThemeProvider(),
+    child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -17,9 +20,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+     final themeProvider = Provider.of<ThemeProvider>(context);
+
+
     return MaterialApp(
       title: 'Menú Principal 3 Columnas',
-      theme: ThemeData(primarySwatch: Colors.green),
+      theme: themeProvider.themeData,
       home: const HomeScreen(),
     );
   }
@@ -28,16 +35,12 @@ class MyApp extends StatelessWidget {
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  
-
   @override
   Widget build(BuildContext context) {
+    const String environmentActual = "desarrollo";
+    final EnvironmentConfig Environment = Environments[environmentActual]!;
 
-const String environmentActual = "desarrollo";
-final EnvironmentConfig Environment = Environments[environmentActual]!;
-
-print(Environment.hostCtxSiga);
-
+    print(Environment.hostCtxSiga);
 
     return Scaffold(
       endDrawer: const CustomDrawer(),
@@ -47,7 +50,7 @@ print(Environment.hostCtxSiga);
         ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 12),
-          child: Icon(Icons.star,color: Colors.yellow[600],size: 60),
+          child: Icon(Icons.star, color: Colors.yellow[600], size: 60),
         ),
       ),
       body: SingleChildScrollView(

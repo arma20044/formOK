@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../provider/theme_provider.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -19,6 +22,9 @@ class CustomDrawer extends StatelessWidget {
         throw Exception('No se pudo abrir $url');
       }
     }
+
+      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+
 
     return Drawer(
       child: ListView(
@@ -54,6 +60,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               // acción para ir a About
+              themeProvider.toggleTheme();
             },
           ),
           ListTile(
