@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/model/model.dart';
 
 import '../core/api/mi_ande_api.dart';
@@ -35,7 +36,7 @@ class ReclamoDatasourceImpl extends ReclamoDatasource {
     double? longitud
   ) async {
     final formMap = {
-      'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
+      
 
       'telefono': telefono,
       'idTipoReclamoCliente': tipoReclamo,
@@ -69,8 +70,7 @@ class ReclamoDatasourceImpl extends ReclamoDatasource {
     // Crear FormData
     final data = FormData.fromMap(formMap);
 
-    final response = await dio.post(
-      "/gra/v1/reclamo/nuevoViaApp",
+    final response = await dio.post("${Environment.hostCtxGra}/v1/reclamo/nuevoViaApp",
       data: data,
      // options: Options(contentType: Headers.formUrlEncodedContentType),
     );

@@ -314,13 +314,14 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             controller: correoController,
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
-              labelText: "Correo",
+              labelText: "Correo Electrónico",
               border: OutlineInputBorder(),
             ),
             validator: (val) {
               if (selectedTipoReclamo?.correoObligatorio == 'S') {
-              if (val == null || val.isEmpty) return "Ingrese Correo";
-              //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              if (val == null || val.isEmpty) return "Ingrese Correo Electrónico";
+              if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val)) return "Verifique el formato del correo.";
+
               return null;
               }
               return null;

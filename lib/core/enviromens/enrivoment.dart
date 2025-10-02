@@ -113,7 +113,7 @@ const Environments = {
 };
 
 // ----------------- USO -----------------
-const String environmentActual = "produccion";
+const String environmentActual = "desarrollo";
 
 final EnvironmentConfig Environment = Environments[environmentActual]!;
 

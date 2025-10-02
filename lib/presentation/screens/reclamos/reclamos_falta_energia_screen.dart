@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/tab3.dart';
 
-
 import '../../../core/api/mi_ande_api.dart';
 import '../../../infrastructure/reclamo_datasource_impl.dart';
 import '../../../model/archivo_adjunto_model.dart';
@@ -14,11 +13,10 @@ import '../../forms/FormWrapper.dart';
 class ParentScreen extends StatefulWidget {
   const ParentScreen({
     super.key,
-    required this.tipoReclamo, 
+    required this.tipoReclamo,
     //required String tipo
-    });
-    final String tipoReclamo; // FE, CO, AP
-
+  });
+  final String tipoReclamo; // FE, CO, AP
 
   @override
   _ParentScreenState createState() => _ParentScreenState();
@@ -51,10 +49,27 @@ class _ParentScreenState extends State<ParentScreen>
 
   void enviarFormulario() async {
     print(formKey);
+
+    //validar adjuntos si es el caso
+    if (tab1Key.currentState?.selectedTipoReclamo?.adjuntoObligatorio == 'S') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Es necesario anexar foto o video.")),
+      );
+      return;
+    }
+
     final isValid = formKey.currentState?.validate() ?? false;
     // Envía los datos
     if (isValid) {
       ReclamoResponse result = await _fetchReclamo();
+      if (!mounted) return;
+      if (result.error) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(result.errorValList![0])));
+        return;
+      }
+
       limpiarTodo();
       //ScaffoldMessenger.of(context).showSnackBar(
       // const SnackBar(content: Text("Formulario enviado correctamente!")),
@@ -113,8 +128,7 @@ class _ParentScreenState extends State<ParentScreen>
         _archivo,
         tab1Key.currentState!.selectedTipoReclamo!.adjuntoObligatorio,
         _lat,
-        _lng
-
+        _lng,
       );
 
       print(reclamoResponse);
@@ -164,7 +178,7 @@ class _ParentScreenState extends State<ParentScreen>
             physics: NeverScrollableScrollPhysics(),
             controller: _tabController,
             children: [
-              Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo,),
+              Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo),
               Tab2(key: tab2Key, onSaved: (newValue) => {_archivo = newValue}),
               Tab3(lat: _lat, lng: _lng, onLocationSelected: _setLocation),
             ],
