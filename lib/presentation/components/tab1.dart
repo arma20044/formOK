@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 
 import '../../core/api/mi_ande_api.dart';
@@ -11,13 +9,15 @@ import '../../repositories/tipo_reclamo_repository_impl.dart';
 import 'widgets/dropdown_custom.dart';
 
 class Tab1 extends StatefulWidget {
-  const Tab1({super.key});
+  const Tab1({super.key, required this.tipoReclamo});
+
+  final String tipoReclamo; // FE, CO, AP
+
   @override
   Tab1State createState() => Tab1State();
 }
 
-class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
-
+class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
   Departamento? selectedDept;
@@ -27,7 +27,8 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
 
   final TextEditingController telefonoController = TextEditingController();
   final TextEditingController nisController = TextEditingController();
-  final TextEditingController nombreApellidoController = TextEditingController();
+  final TextEditingController nombreApellidoController =
+      TextEditingController();
   final TextEditingController direccionController = TextEditingController();
   final TextEditingController correoController = TextEditingController();
   final TextEditingController referenciaController = TextEditingController();
@@ -55,11 +56,40 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
   List<Barrio> listaBarrios = [];
   List<TipoReclamo> listaTipoReclamo = [];
 
+  late Map<String, String? Function(String?)> validators;
+
   @override
   void initState() {
     super.initState();
     _fetchDepartamentos();
     _fetchTipoReclamo();
+
+    validators = {
+      'telefono': (val) {
+        if (val == null || val.isEmpty) return "Ingrese un teléfono";
+        if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+        return null;
+      },
+      'nis': (val) {
+        if (val == null || val.isEmpty) return "Ingrese NIS";
+        return null;
+      },
+      'nombreApellido': (val) {
+        // solo obligatorio si tipoReclamo es "CO"
+        if (widget.tipoReclamo == "CO" && (val == null || val.isEmpty)) {
+          return "Ingrese Nombre y Apellido";
+        }
+        return null;
+      },
+      'referencia': (val) {
+        // solo obligatorio si tipoReclamo es "FE"
+        if (widget.tipoReclamo == "FE" && (val == null || val.isEmpty)) {
+          return "Ingrese Referencia";
+        }
+        return null;
+      },
+      // más campos condicionales según tipoReclamo...
+    };
   }
 
   Future<void> _fetchDepartamentos() async {
@@ -124,7 +154,6 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
       direccionController.clear();
       correoController.clear();
       referenciaController.clear();
-
     });
   }
 
@@ -183,12 +212,14 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
               labelText: "Nombre y Apellido",
               border: OutlineInputBorder(),
             ),
-            validator: (val) {
-              if (val == null || val.isEmpty)
-                return "Ingrese Nombre y Apellido";
-              //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
-              return null;
-            },
+            // validator: (val) {
+            //   if (val == null || val.isEmpty)
+            //     return "Ingrese Nombre y Apellido";
+             
+            //   return null;
+            // },
+              validator: validators['nombreApellido'],
+
           ),
           const SizedBox(height: 20),
           DropdownCustom<Departamento>(
@@ -249,7 +280,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
               return null;
             },
           ),
-           const SizedBox(height: 20),
+          const SizedBox(height: 20),
           //CORREO
           TextFormField(
             controller: correoController,
@@ -264,7 +295,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
               return null;
             },
           ),
-           const SizedBox(height: 20),
+          const SizedBox(height: 20),
           //REFERENCIA
           TextFormField(
             controller: referenciaController,
@@ -279,7 +310,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin{
               return null;
             },
           ),
-           const SizedBox(height: 20),
+          const SizedBox(height: 20),
           DropdownCustom<TipoReclamo>(
             label: "Tipo Reclamo",
             items: listaTipoReclamo,

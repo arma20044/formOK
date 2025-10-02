@@ -15,7 +15,7 @@ final List<MenuGroup> menuGroups = [
         onTap: (context) => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ReclamosScreen(tipo: 'Caso1'),
+            builder: (_) => const ParentScreen(tipoReclamo: 'FE'),
           ),
         ),
       ),
@@ -27,7 +27,7 @@ final List<MenuGroup> menuGroups = [
         onTap: (context) => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ReclamosScreen(tipo: 'Caso2'),
+            builder: (_) => const ParentScreen(tipoReclamo: 'CO',),
           ),
         ),
       ),
@@ -38,7 +38,7 @@ final List<MenuGroup> menuGroups = [
         onTap: (context) => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ReclamosScreen(tipo: 'Caso3'),
+            builder: (_) => const ParentScreen(tipoReclamo: 'AP'),
           ),
         ),
       ),

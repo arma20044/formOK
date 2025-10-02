@@ -10,7 +10,9 @@ import '../../components/components.dart';
 import '../../forms/FormWrapper.dart';
 
 class ParentScreen extends StatefulWidget {
-  const ParentScreen({super.key});
+  const ParentScreen({super.key, required this.tipoReclamo});
+    final String tipoReclamo; // FE, CO, AP
+
 
   @override
   _ParentScreenState createState() => _ParentScreenState();
@@ -154,7 +156,7 @@ class _ParentScreenState extends State<ParentScreen>
           physics: NeverScrollableScrollPhysics(),
           controller: _tabController,
           children: [
-            Tab1(key: tab1Key),
+            Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo,),
             Tab2(key: tab2Key, onSaved: (newValue) => {_archivo = newValue}),
             Tab3(lat: _lat, lng: _lng, onLocationSelected: _setLocation),
           ],
