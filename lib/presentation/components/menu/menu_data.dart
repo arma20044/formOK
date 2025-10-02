@@ -1,5 +1,6 @@
 // lib/presentation/components/menu/menu_data.dart
 import 'package:flutter/material.dart';
+import 'package:form/presentation/components/reclamos/reclamo_screen_padre.dart';
 import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen.dart';
 import 'menu_models.dart';
 
@@ -13,31 +14,39 @@ final List<MenuGroup> menuGroups = [
         label: 'Falta de Energía',
         onTap: (context) => Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ParentScreen()),
-        )
-        ,
+          MaterialPageRoute(
+            builder: (_) => const ReclamosScreen(tipo: 'Caso1'),
+          ),
+        ),
       ),
       MenuItemModel(
         id: 'co',
         icon: Icons.people,
         label: 'Comercial/Facturación',
         badge: '5',
-      //  onTap: (context) => Navigator.push(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => {}),
-      //   )
+        onTap: (context) => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ReclamosScreen(tipo: 'Caso2'),
+          ),
+        ),
       ),
       MenuItemModel(
         id: 'map',
         icon: Icons.map,
         label: 'Alumbrado Público',
-      //  onTap: () => debugPrint('Mapa'),
+        onTap: (context) => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ReclamosScreen(tipo: 'Caso3'),
+          ),
+        ),
       ),
       MenuItemModel(
         id: 'map',
         icon: Icons.bolt,
         label: 'Denunciá el Robo de Energía',
-       // onTap: () => debugPrint('Mapa'),
+        // onTap: () => debugPrint('Mapa'),
       ),
     ],
   ),
@@ -48,13 +57,13 @@ final List<MenuGroup> menuGroups = [
         id: 'new',
         icon: Icons.document_scanner,
         label: 'Consulta de Facturas',
-       // onTap: () => debugPrint('Nuevo'),
+        // onTap: () => debugPrint('Nuevo'),
       ),
       MenuItemModel(
         id: 'history',
         icon: Icons.history,
         label: 'Historial',
-       // onTap: () => debugPrint('Historial'),
+        // onTap: () => debugPrint('Historial'),
       ),
       MenuItemModel(
         id: 'reports',
@@ -66,15 +75,13 @@ final List<MenuGroup> menuGroups = [
   ),
   MenuGroup(
     title: 'Otros',
-    items: 
-    [
+    items: [
       MenuItemModel(
         id: 'cuenta',
         icon: Icons.person,
         label: 'Mi Cuenta',
-       // onTap: () => debugPrint('Configuración'),
+        // onTap: () => debugPrint('Configuración'),
       ),
-     
     ],
   ),
 ];
