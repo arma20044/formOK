@@ -104,7 +104,7 @@ const Environments = {
     hostCtxAndroid: "https://desa1.ande.gov.py:8481/sigaWs/api/android",
     tigoCallback: "https://www.ande.gov.py/desarrollo/servicios/tigoMoney.html",
     keyGoogleMaps: "AIzaSyBZgldJmaElcgbgWVt8gFBrdsybsMIKHVg",
-    hostCtxRegistroUnico: "https://desa1.ande.gov.py:8481/gcWs/api/registroUnico",
+    hostCtxRegistroUnico: "https://desa1.ande.gov.py:8481/sigaWs/api/registroUnico",
     appVersion: appVersions,
     mensajeErrorRequestStatus: "No se pudo realizar la acción, intente de nuevo.",
     mensajeErrorRequestGrave: "NO se pudo realizar la acción, intente de nuevo.",

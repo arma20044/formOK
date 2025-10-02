@@ -10,6 +10,7 @@ import 'package:form/presentation/auth/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/auth/auth_notifier.dart';
 import '../../../provider/theme_provider.dart';
 
 class CustomDrawer extends ConsumerWidget {
@@ -17,8 +18,8 @@ class CustomDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final theme = ref.watch(themeProvider);
+    final authState = ref.watch(authProvider);
 
     Future<void> _launchUrl(String key) async {
       final url = dotenv.env[key]; // leer del .env
@@ -30,9 +31,8 @@ class CustomDrawer extends ConsumerWidget {
       }
     }
 
-      //final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-     // final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
+    //final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    // final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     return Drawer(
       child: ListView(
@@ -45,14 +45,31 @@ class CustomDrawer extends ConsumerWidget {
               style: TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
-          ListTile(
+          authState.when(
+            data: (user) {
+              if (user != null) {
+                return Text("Usuario: ${user.jWTtoken}");
+              } else {
+                return const Text("No logueado");
+              }
+            },
+            loading: () => const CircularProgressIndicator(),
+            error: (e, _) => Text("Error: $e"),
+          ),
+         authState.asData?.value?.jWTtoken == null ?
+ ListTile(
             leading: const Icon(Icons.login),
             title: const Text('Acceder'),
             onTap: () {
               Navigator.pop(context); // cerrar el drawer
-              Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(),));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+              );
             },
-          ),
+          ) : Text(''),
+        
+         authState.asData?.value?.jWTtoken == null ?
           ListTile(
             leading: const Icon(Icons.manage_accounts_outlined),
             title: const Text('Registrate'),
@@ -60,15 +77,15 @@ class CustomDrawer extends ConsumerWidget {
               Navigator.pop(context);
               // acción para ir a Configuración
             },
-          ),
-          ListTile(
+          ): Text(''),
+          authState.asData?.value?.jWTtoken != null ? ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Cerrar Sesión'),
             onTap: () {
               Navigator.pop(context);
-                //authProvider.logout();
+              //authProvider.logout();
             },
-          ),
+          ):Text(''),
           Divider(),
           ListTile(
             leading: const Icon(Icons.color_lens),
@@ -76,8 +93,8 @@ class CustomDrawer extends ConsumerWidget {
             onTap: () {
               Navigator.pop(context);
               // acción para ir a About
-             // themeProvider.toggleTheme();
-             ref.read(themeProvider.notifier).toggleTheme();
+              // themeProvider.toggleTheme();
+              ref.read(themeProvider.notifier).toggleTheme();
             },
           ),
           ListTile(
@@ -148,7 +165,11 @@ class CustomDrawer extends ConsumerWidget {
               ],
             ),
           ),
-           Center(child: Text('Version ${Environment.appVersion.android.version} - ${Environment.appVersion.android.fecha}')),
+          Center(
+            child: Text(
+              'Version ${Environment.appVersion.android.version} - ${Environment.appVersion.android.fecha}',
+            ),
+          ),
         ],
       ),
     );

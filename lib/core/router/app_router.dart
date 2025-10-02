@@ -1,4 +1,5 @@
 import 'package:form/main.dart';
+import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/reclamos/reclamo_screen_padre.dart';
 import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -6,9 +7,12 @@ import 'package:go_router/go_router.dart';
 
 // GoRouter configuration
 final appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/login',
   routes: [
-
+GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
     GoRoute(
       path: '/',
       //name: HomeScreen.name,

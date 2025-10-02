@@ -74,8 +74,9 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
       //SOLO FALTA DE ENERGIA FE
       'telefono': (val) {
         if ((selectedTipoReclamo!.nisObligatorio == 'S') &&
-            (val == null || val.isEmpty))
+            (val == null || val.isEmpty)) {
           return "Ingrese un teléfono";
+        }
         if (!RegExp(r'^\d+$').hasMatch(val!)) return "Solo números";
         return null;
       },
@@ -319,10 +320,14 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             ),
             validator: (val) {
               if (selectedTipoReclamo?.correoObligatorio == 'S') {
-              if (val == null || val.isEmpty) return "Ingrese Correo Electrónico";
-              if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val)) return "Verifique el formato del correo.";
+                if (val == null || val.isEmpty)
+                  return "Ingrese Correo Electrónico";
+                if (!RegExp(
+                  r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                ).hasMatch(val))
+                  return "Verifique el formato del correo.";
 
-              return null;
+                return null;
               }
               return null;
             },
@@ -337,7 +342,6 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
               border: OutlineInputBorder(),
             ),
             validator: validators['referencia'],
-            
           ),
           const SizedBox(height: 20),
         ],
