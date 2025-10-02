@@ -188,6 +188,16 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             },
           ),
           const SizedBox(height: 20),
+           DropdownCustom<TipoReclamo>(
+            label: "Tipo Reclamo",
+            items: listaTipoReclamo,
+            value: selectedTipoReclamo,
+            displayBuilder: (b) => b.nombre!,
+            validator: (val) =>
+                val == null ? "Seleccione un tipo Reclamo" : null,
+            onChanged: (val) => setState(() => selectedTipoReclamo = val),
+          ),
+          const SizedBox(height: 20),
           //NIS
           TextFormField(
             controller: nisController,
@@ -310,15 +320,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             },
           ),
           const SizedBox(height: 20),
-          DropdownCustom<TipoReclamo>(
-            label: "Tipo Reclamo",
-            items: listaTipoReclamo,
-            value: selectedTipoReclamo,
-            displayBuilder: (b) => b.nombre!,
-            validator: (val) =>
-                val == null ? "Seleccione un tipo Reclamo" : null,
-            onChanged: (val) => setState(() => selectedTipoReclamo = val),
-          ),
+         
         ],
       ),
     );
