@@ -20,7 +20,9 @@ final List<MenuGroup> menuGroups = [
             
         //   ),
         // ),
-        onTap: (context) => context.push('/reclamosFaltaEnergia'),
+        onTap: (context) => context.push('/reclamosFaltaEnergia',extra: {
+          'tipoReclamo' : 'CO'
+        }),
       ),
       MenuItemModel(
         id: 'co',

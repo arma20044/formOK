@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../core/theme/dark_theme.dart';
 import '../core/theme/light_theme.dart';
 
-// 1. Creamos un Notifier que maneja el estado del ThemeData
-class ThemeNotifier extends Notifier<ThemeData> {
+class ThemeNotifier extends AsyncNotifier<ThemeData> {
+  static const _themeKey = 'selectedTheme';
+  final _storage = const FlutterSecureStorage();
+
   @override
-  ThemeData build() {
-    // Estado inicial
-    return lightTheme;
+  Future<ThemeData> build() async {
+    final themeValue = await _storage.read(key: _themeKey);
+    if (themeValue == 'dark') {
+      return darkTheme;
+    } else {
+      return lightTheme;
+    }
   }
 
-  // Método para alternar el tema
-  void toggleTheme() {
-    state = state == lightTheme ? darkTheme : lightTheme;
+  Future<void> toggleTheme() async {
+    final current = state.value ?? lightTheme;
+    if (current == lightTheme) {
+      state = AsyncData(darkTheme);
+      await _storage.write(key: _themeKey, value: 'dark');
+    } else {
+      state = AsyncData(lightTheme);
+      await _storage.write(key: _themeKey, value: 'light');
+    }
   }
 }
 
-// 2. Creamos el provider
-final themeProvider = NotifierProvider<ThemeNotifier, ThemeData>(() {
-  return ThemeNotifier();
-});
+final themeProvider =
+    AsyncNotifierProvider<ThemeNotifier, ThemeData>(ThemeNotifier.new);

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/router/app_router.dart';
+import 'package:form/core/theme/light_theme.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/menu/main_menu.dart';
+import 'package:form/presentation/screens/splash_screen.dart';
 import 'package:form/provider/theme_provider.dart';
 
 import 'presentation/components/menu/menu_data.dart';
@@ -18,10 +20,26 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeProvider);
 
-    return MaterialApp.router(
-      routerConfig: appRouter,
-      title: 'Flutter Auth',
-      theme: theme,
+   return theme.when(
+      data: (t) {
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          theme: t,
+          routerConfig: appRouter, // tu configuración de GoRouter
+        );
+      },
+      loading: () {
+        // 👇 Mostrar un splash o pantalla de carga mientras se lee el tema
+        return const SplashScreen();
+      },
+      error: (e, _) {
+        // Si falla, usar tema claro por defecto
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          theme: lightTheme,
+          routerConfig: appRouter,
+        );
+      },
     );
   }
 }
