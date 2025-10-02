@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/dark_theme.dart';
 import '../core/theme/light_theme.dart';
 
+// 1. Creamos un Notifier que maneja el estado del ThemeData
+class ThemeNotifier extends Notifier<ThemeData> {
+  @override
+  ThemeData build() {
+    // Estado inicial
+    return lightTheme;
+  }
 
-class ThemeProvider extends ChangeNotifier {
-  ThemeData _themeData = lightTheme;
-
-  ThemeData get themeData => _themeData;
-
-  // Método para cambiar el tema
+  // Método para alternar el tema
   void toggleTheme() {
-    if (_themeData == lightTheme) {
-      _themeData = darkTheme;
-    } else {
-      _themeData = lightTheme;
-    }
-    notifyListeners(); // Notifica a los oyentes del cambio de estado
+    state = state == lightTheme ? darkTheme : lightTheme;
   }
 }
+
+// 2. Creamos el provider
+final themeProvider = NotifierProvider<ThemeNotifier, ThemeData>(() {
+  return ThemeNotifier();
+});

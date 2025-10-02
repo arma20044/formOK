@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form/core/auth/auth_provider.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
@@ -11,11 +12,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../provider/theme_provider.dart';
 
-class CustomDrawer extends StatelessWidget {
+class CustomDrawer extends ConsumerWidget {
   const CustomDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    final theme = ref.watch(themeProvider);
+
     Future<void> _launchUrl(String key) async {
       final url = dotenv.env[key]; // leer del .env
       if (url == null) return;
@@ -26,8 +30,8 @@ class CustomDrawer extends StatelessWidget {
       }
     }
 
-      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      //final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+     // final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
 
     return Drawer(
@@ -62,7 +66,7 @@ class CustomDrawer extends StatelessWidget {
             title: const Text('Cerrar Sesión'),
             onTap: () {
               Navigator.pop(context);
-                authProvider.logout();
+                //authProvider.logout();
             },
           ),
           Divider(),
@@ -72,7 +76,8 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               // acción para ir a About
-              themeProvider.toggleTheme();
+             // themeProvider.toggleTheme();
+             ref.read(themeProvider.notifier).toggleTheme();
             },
           ),
           ListTile(

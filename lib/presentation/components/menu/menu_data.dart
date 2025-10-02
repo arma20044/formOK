@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:form/presentation/components/reclamos/reclamo_screen_padre.dart';
 import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'menu_models.dart';
 
 final List<MenuGroup> menuGroups = [
@@ -12,13 +13,14 @@ final List<MenuGroup> menuGroups = [
         id: 'fe',
         icon: Icons.fact_check,
         label: 'Falta de Energía',
-        onTap: (context) =>  Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ParentScreen(tipoReclamo: 'FE'),
+        // onTap: (context) =>  Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => ParentScreen(tipoReclamo: 'FE'),
             
-          ),
-        ),
+        //   ),
+        // ),
+        onTap: (context) => context.push('/reclamosFaltaEnergia'),
       ),
       MenuItemModel(
         id: 'co',

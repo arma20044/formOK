@@ -12,7 +12,11 @@ import '../../components/components.dart';
 import '../../forms/FormWrapper.dart';
 
 class ParentScreen extends StatefulWidget {
-  const ParentScreen({super.key, required this.tipoReclamo});
+  const ParentScreen({
+    super.key,
+    required this.tipoReclamo, 
+    //required String tipo
+    });
     final String tipoReclamo; // FE, CO, AP
 
 
@@ -136,9 +140,9 @@ class _ParentScreenState extends State<ParentScreen>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeProvider().themeData,
-      home: Scaffold(
+    return Scaffold(
+      //theme: ThemeProvider().themeData,
+      body: Scaffold(
         endDrawer: CustomDrawer(),
         appBar: AppBar(
           title: const Text("Reclamos por Falta de Energía"),
