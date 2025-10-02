@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../core/api/mi_ande_api.dart';
+import '../core/enviromens/Enrivoment.dart';
 import '../datasources/barrio_datasource.dart';
 
 import '../model/barrio.dart';
@@ -14,15 +15,13 @@ class BarrioDatasourceImpl extends BarrioDatasource {
 
   @override
   Future<List<Barrio>> getBarrio(num idCiudad) async {
-    var data = FormData.fromMap({
-      'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
+    var data = FormData.fromMap({     
       'idCiudad': idCiudad,
       'tipoLista' : 2,
       'filtro': idCiudad
     });
 
-    final response = await dio.post(
-      "/gra/v1/reclamo/listarBarrios",
+    final response = await dio.post("${Environment.hostCtxGra}/v1/reclamo/listarBarrios",
       data: data,
       options: Options(
         contentType: Headers.formUrlEncodedContentType, // 👈 importante

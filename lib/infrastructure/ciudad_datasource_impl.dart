@@ -4,6 +4,7 @@
 import 'package:dio/dio.dart';
 
 import '../core/api/mi_ande_api.dart';
+import '../core/enviromens/Enrivoment.dart';
 import '../datasources/ciudad_datasource.dart';
 import '../model/ciudad.dart';
 
@@ -23,15 +24,13 @@ class CiudadDatasourceImpl extends CiudadDatasource {
   @override
   Future<List<Ciudad>> getCiudad(num idDepartamento) async{
 
-   var data = FormData.fromMap({
-        'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
+   var data = FormData.fromMap({      
         'idDepartamento': idDepartamento,
       });
 
     
   
-    final response = await dio.post(
-      "/gra/v1/reclamo/listarCiudades",
+    final response = await dio.post("${Environment.hostCtxGra}/v1/reclamo/listarCiudades",
         data: data,
         options: Options(
           contentType: Headers.formUrlEncodedContentType, // 👈 importante

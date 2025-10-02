@@ -3,6 +3,7 @@
 
 
 import 'package:dio/dio.dart';
+import 'package:form/core/enviromens/Enrivoment.dart';
 
 import '../core/api/mi_ande_api.dart';
 import '../datasources/departamento_datasource.dart';
@@ -20,8 +21,8 @@ class DepartamentoDatasourceImpl extends DepartamentoDatasource {
   
 
     var data = FormData.fromMap({
-        'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
-        'categoriaWebAppJsonArray': '["FE"]',
+        //'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
+        //'categoriaWebAppJsonArray': '["FE"]',
       });
 
   @override
@@ -31,8 +32,7 @@ class DepartamentoDatasourceImpl extends DepartamentoDatasource {
 
     
   
-    final response = await dio.post(
-      "/gra/v1/reclamo/listarDepartamentos",
+    final response = await dio.post("${Environment.hostCtxGra}/v1/reclamo/listarDepartamentos",
         data: data,
         options: Options(
           contentType: Headers.formUrlEncodedContentType, // 👈 importante
