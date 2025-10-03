@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/main.dart';
 import 'package:go_router/go_router.dart';
 
@@ -44,7 +45,7 @@ class LoginScreen extends ConsumerWidget {
         },
       );
     }); */
-    ref.listen<AsyncValue<AuthState>>(authProvider, (previous, next) {
+    ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
       next.whenOrNull(
         data: (state) {
           if (state == AuthState.authenticated) {

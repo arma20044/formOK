@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/core/auth/model/auth_state_data.dart';
 
 import 'package:form/main.dart';
 
@@ -11,14 +12,14 @@ import 'package:go_router/go_router.dart';
 
 
 
-import '../auth/model/auth_state.dart';
+
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   // Notifier simple que usaremos para "refrescar" GoRouter
   final refreshListenable = ValueNotifier<int>(0);
 
   // Cuando cambie el authProvider, incrementamos el ValueNotifier
-  ref.listen<AsyncValue<AuthState>>(authProvider, (previous, next) {
+  ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
     refreshListenable.value++; // notifica a GoRouter
   });
 

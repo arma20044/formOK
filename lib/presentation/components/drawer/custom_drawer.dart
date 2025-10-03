@@ -42,11 +42,9 @@ class CustomDrawer extends ConsumerWidget {
     //final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     // final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-        final _storage = const FlutterSecureStorage();
+    
 
-
-        final nombre =  _storage.read(key: 'nombre');
-
+    
 
     return Drawer(
       child: ListView(
@@ -56,7 +54,8 @@ class CustomDrawer extends ConsumerWidget {
             decoration: const BoxDecoration(color: Colors.blue),
             child: Column(
               children: [
-                Text('${nombre}'),
+                if(authState.value?.state == AuthState.authenticated)
+                Text(authState.value!.user!.nombre),
                 const Text(
                   'Mi Cuenta',
                   style: TextStyle(color: Colors.white, fontSize: 24),
@@ -67,8 +66,9 @@ class CustomDrawer extends ConsumerWidget {
           authState.when(
             data: (state) => Column(
               children: [
-                if (state == AuthState.authenticated) const Text('Bienvenido!'),
-                if (state != AuthState.authenticated)
+                if (authState.value?.state == AuthState.authenticated)
+                  const Text('Bienvenido!'),
+                if (authState.value?.state == AuthState.unauthenticated)
                   const Text('Debes iniciar sesión'),
               ],
             ),
@@ -83,44 +83,28 @@ class CustomDrawer extends ConsumerWidget {
           //authState.asData?.value?.jWTtoken == null ?
 
           //: Text(''),
-          authState.when(
-            data: (state) => Column(
-              children: [
-                if (state == AuthState.authenticated)
-                  ListTile(
-                    leading: const Icon(Icons.exit_to_app),
-                    title: const Text('Cerrar Sesión'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      ref.read(authProvider.notifier).logout();
-                    },
-                  ),
-                if (state == AuthState.unauthenticated)
-                  ListTile(
-                    leading: const Icon(Icons.login),
-                    title: const Text('Acceder'),
-                    onTap: () {
-                      Navigator.pop(context); // cerrar el drawer
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
-                      );
-                    },
-                  ),
-                  if (state == AuthState.unauthenticated)
-                  ListTile(
-                        leading: const Icon(Icons.manage_accounts_outlined),
-                        title: const Text('Registrate'),
-                        onTap: () {
-                          Navigator.pop(context);
-                          // acción para ir a Configuración
-                        },
-                      ),
-              ],
+          if (authState.value?.state == AuthState.authenticated)
+            ListTile(
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text('Cerrar Sesión'),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(authProvider.notifier).logout();
+              },
             ),
-            loading: () => const CircularProgressIndicator(),
-            error: (err, stack) => Text('Error: $err'),
-          ),
+
+          if (authState.value?.state == AuthState.unauthenticated)
+            ListTile(
+              leading: const Icon(Icons.login),
+              title: const Text('Acceder'),
+              onTap: () {
+                Navigator.pop(context); // cerrar el drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+            ),
 
           //:Text(''),
           Divider(),
