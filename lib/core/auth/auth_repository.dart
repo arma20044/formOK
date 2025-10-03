@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:form/model/login_model.dart';
 
 import '../../infrastructure/login_datasource_impl.dart';
@@ -7,12 +9,22 @@ import '../api/mi_ande_api.dart';
 
 class AuthRepository {
   Future<bool> login(String numeroDocumento, String password, String tipoDocumento) async {
+
+    final _storage = const FlutterSecureStorage();
     
     try{
     //llamada API
     final repoLogin = LoginRepositoryImpl(LoginDatasourceImpl(MiAndeApi()));
 
-    final responseLogin = repoLogin.getLogin(numeroDocumento, password, tipoDocumento);
+    Login responseLogin = await repoLogin.getLogin(numeroDocumento, password, tipoDocumento);
+
+      if (responseLogin.error ) {
+        throw Exception(responseLogin.errorValList);
+       
+      }else{
+        _storage.write(key: 'nombre', value: responseLogin.resultado?.nombre);
+      }
+      
 
     return true;
     }

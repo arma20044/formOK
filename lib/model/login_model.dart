@@ -4,7 +4,7 @@ class Login {
   final List<dynamic>? mensajeList;
   final String? mensaje;
   final bool? login;
-  final bool? error;
+  final bool error;
   final String? token;
   final List<dynamic>? errorValList;
 
@@ -14,7 +14,7 @@ class Login {
     this.mensajeList,
     this.mensaje,
     this.login,
-    this.error,
+    required this.error,
     this.token,
     this.errorValList,
   });

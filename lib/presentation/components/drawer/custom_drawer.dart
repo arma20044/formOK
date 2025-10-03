@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form/core/auth/auth_repository.dart';
 import 'package:form/core/auth/model/auth_state.dart';
@@ -41,15 +42,26 @@ class CustomDrawer extends ConsumerWidget {
     //final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     // final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
+        final _storage = const FlutterSecureStorage();
+
+
+        final nombre =  _storage.read(key: 'nombre');
+
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero, // elimina el padding superior
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue),
-            child: Text(
-              'Mi Cuenta',
-              style: TextStyle(color: Colors.white, fontSize: 24),
+          DrawerHeader(
+            decoration: const BoxDecoration(color: Colors.blue),
+            child: Column(
+              children: [
+                Text('${nombre}'),
+                const Text(
+                  'Mi Cuenta',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
+              ],
             ),
           ),
           authState.when(
