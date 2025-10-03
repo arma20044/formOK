@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form/core/auth/auth_provider.dart';
-import 'package:form/model/login_model.dart';
-import 'package:go_router/go_router.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
-
-  @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
-}
+import '../../features/auth/presentation/providers/providers.dart';
+import '../../model/auth_state.dart';
 
 class DropdownItem {
   final String id;
@@ -23,50 +16,25 @@ List<DropdownItem> dropDownItems = [
   DropdownItem(id: 'TD004', name: 'Pasaporte'),
 ];
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final emailController = TextEditingController();
+class LoginScreen extends ConsumerWidget {
+  const LoginScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+
+    final emailController = TextEditingController();
   final passwordController = TextEditingController();
   DropdownItem? selectedTipDocumento;
 
-  @override
-  void initState() {
-    super.initState();
-
-  
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-
-     // Listener para cambios en el estado de login
-  ref.listen<AsyncValue<Login?>>(authProvider, (previous, next) {
-  next.whenOrNull(
-    data: (user) {
-      if (user != null) {
-        // Espera al siguiente frame para que el context esté listo
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go('/'); // Navega al HomeScreen
-        });
-      }
-    },
-    error: (error, _) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toString())));
-      });
-    },
-  );
-});
-
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            DropdownButtonFormField<DropdownItem>(
+      body: Center(
+        child: authState is AuthChecking
+            ? const CircularProgressIndicator()
+            : authState is AuthUnauthenticated
+                ? Column(
+                  children: [
+                    DropdownButtonFormField<DropdownItem>(
               value: selectedTipDocumento,
               hint: const Text("Seleccionar Tipo de Documento"),
               items: dropDownItems
@@ -76,9 +44,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ))
                   .toList(),
               onChanged: (value) {
-                setState(() {
+               
                   selectedTipDocumento = value;
-                });
+               
               },
             ),
             TextField(
@@ -91,30 +59,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               obscureText: true,
             ),
             const SizedBox(height: 20),
-            authState.isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: () {
-                      if (selectedTipDocumento != null) {
-                        ref
-                            .read(authProvider.notifier)
-                            .login(
-                              emailController.text,
-                              passwordController.text,
-                              selectedTipDocumento!.id,
-                            );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content:
-                                  Text("Debe seleccionar un tipo de documento")),
-                        );
-                      }
-                    },
-                    child: const Text('Login'),
-                  ),
-          ],
-        ),
+                    ElevatedButton(
+                        onPressed: () {
+                          ref.read(authProvider.notifier).login(
+                                emailController.text,
+                                passwordController.text,
+                                selectedTipDocumento!.id,
+                              );
+                        },
+                        child: const Text("Login"),
+                      ),
+                  ],
+                )
+                : authState is AuthAuthenticated
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Token: ${authState.token}"),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              ref.read(authProvider.notifier).logout();
+                            },
+                            child: const Text("Logout"),
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
       ),
     );
   }
