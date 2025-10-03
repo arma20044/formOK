@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/main.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../features/auth/presentation/providers/providers.dart';
-import '../../model/auth_state.dart';
+import '../../core/auth/model/auth_state.dart';
 
 class DropdownItem {
   final String id;
@@ -23,35 +25,62 @@ class LoginScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
-    final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  DropdownItem? selectedTipDocumento;
+    final numeroDocumentoController = TextEditingController();
+    final passwordController = TextEditingController();
+    DropdownItem? selectedTipDocumento;
+
+    /* ref.listen<AsyncValue<AuthState>>(authProvider, (previous, next) {
+      next.whenOrNull(
+        data: (state) {
+          if (state == AuthState.authenticated) {
+            // Navigate to home screen
+            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
+          } else if (state == AuthState.error) {
+            // Show error message
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Login failed')),
+            );
+          }
+        },
+      );
+    }); */
+    ref.listen<AsyncValue<AuthState>>(authProvider, (previous, next) {
+      next.whenOrNull(
+        data: (state) {
+          if (state == AuthState.authenticated) {
+            // ✅ Navegación declarativa usando GoRouter
+            GoRouter.of(context).go('/');
+          } else if (state == AuthState.error) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Login failed')));
+          }
+        },
+      );
+    });
 
     return Scaffold(
       body: Center(
-        child: authState is AuthChecking
-            ? const CircularProgressIndicator()
-            : authState is AuthUnauthenticated
-                ? Column(
-                  children: [
-                    DropdownButtonFormField<DropdownItem>(
+        child: Column(
+          children: [
+            DropdownButtonFormField<DropdownItem>(
               value: selectedTipDocumento,
               hint: const Text("Seleccionar Tipo de Documento"),
               items: dropDownItems
-                  .map((item) => DropdownMenuItem(
-                        value: item,
-                        child: Text(item.name),
-                      ))
+                  .map(
+                    (item) =>
+                        DropdownMenuItem(value: item, child: Text(item.name)),
+                  )
                   .toList(),
               onChanged: (value) {
-               
-                  selectedTipDocumento = value;
-               
+                selectedTipDocumento = value;
               },
             ),
             TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              controller: numeroDocumentoController,
+              decoration: const InputDecoration(
+                labelText: 'Numero de Documento',
+              ),
             ),
             TextField(
               controller: passwordController,
@@ -59,33 +88,29 @@ class LoginScreen extends ConsumerWidget {
               obscureText: true,
             ),
             const SizedBox(height: 20),
-                    ElevatedButton(
-                        onPressed: () {
-                          ref.read(authProvider.notifier).login(
-                                emailController.text,
-                                passwordController.text,
-                                selectedTipDocumento!.id,
-                              );
-                        },
-                        child: const Text("Login"),
+            ElevatedButton(
+              onPressed: () {
+                ref
+                    .read(authProvider.notifier)
+                    .login(
+                      numeroDocumentoController.text,
+                      passwordController.text,
+                      selectedTipDocumento!.id,
+                    );
+              },
+              child: authState.isLoading
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
                       ),
-                  ],
-                )
-                : authState is AuthAuthenticated
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Token: ${authState.token}"),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              ref.read(authProvider.notifier).logout();
-                            },
-                            child: const Text("Logout"),
-                          ),
-                        ],
-                      )
-                    : const SizedBox.shrink(),
+                    )
+                  : const Text("Login"),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -19,13 +19,14 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeProvider);
+    final router = ref.watch(goRouterProvider);
 
    return theme.when(
       data: (t) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           theme: t,
-          routerConfig: appRouter, // tu configuración de GoRouter
+          routerConfig: router // tu configuración de GoRouter
         );
       },
       loading: () {
@@ -37,7 +38,7 @@ class MyApp extends ConsumerWidget {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           theme: lightTheme,
-          routerConfig: appRouter,
+          routerConfig: router,
         );
       },
     );

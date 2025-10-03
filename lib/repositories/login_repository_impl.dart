@@ -14,8 +14,8 @@ class LoginRepositoryImpl extends LoginRepository{
   LoginRepositoryImpl(this.datasource);
 
   @override
-  Future<Login> getLogin(String username, String password, String tipoDocumento ) {
-    return datasource.getLogin( username, password, tipoDocumento);
+  Future<Login> getLogin(String numeroDocumento, String password, String tipoDocumento ) {
+    return datasource.getLogin( numeroDocumento, password, tipoDocumento);
   }
 
 } 

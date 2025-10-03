@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:form/core/auth/auth_provider.dart';
+
 import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/presentation/auth/login_screen.dart';
-import 'package:provider/provider.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/auth/auth_notifier.dart';
@@ -48,7 +48,7 @@ class CustomDrawer extends ConsumerWidget {
           authState.when(
             data: (user) {
               if (user != null) {
-                return Text("Usuario: ${user.jWTtoken}");
+                return Text("Usuario: {user.jWTtoken}");
               } else {
                 return const Text("No logueado");
               }
@@ -56,7 +56,7 @@ class CustomDrawer extends ConsumerWidget {
             loading: () => const CircularProgressIndicator(),
             error: (e, _) => Text("Error: $e"),
           ),
-         authState.asData?.value?.jWTtoken == null ?
+         //authState.asData?.value?.jWTtoken == null ?
  ListTile(
             leading: const Icon(Icons.login),
             title: const Text('Acceder'),
@@ -67,9 +67,10 @@ class CustomDrawer extends ConsumerWidget {
                 MaterialPageRoute(builder: (context) => LoginScreen()),
               );
             },
-          ) : Text(''),
+          ) ,
+          //: Text(''),
         
-         authState.asData?.value?.jWTtoken == null ?
+         //authState.asData?.value?.jWTtoken == null ?
           ListTile(
             leading: const Icon(Icons.manage_accounts_outlined),
             title: const Text('Registrate'),
@@ -77,16 +78,19 @@ class CustomDrawer extends ConsumerWidget {
               Navigator.pop(context);
               // acción para ir a Configuración
             },
-          ): Text(''),
-          authState.asData?.value?.jWTtoken != null ? ListTile(
+          ),
+          //: Text(''),
+          //authState.asData?.value?.jWTtoken != null ? 
+          ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Cerrar Sesión'),
             onTap: () {
               Navigator.pop(context);
               //authProvider.logout();
             },
-          ):Text(''),
-          Divider(),
+          )
+          //:Text(''),
+          ,Divider(),
           ListTile(
             leading: const Icon(Icons.color_lens),
             title: const Text('Modo Oscuro'),
