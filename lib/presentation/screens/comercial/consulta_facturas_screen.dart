@@ -1,36 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/core/api/mi_ande_api.dart';
+import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/model/model.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 
-class ConsultaFacturasScreen extends StatefulWidget {
+import '../../../infrastructure/infrastructure.dart';
+import '../../../repositories/repositories.dart';
+
+class ConsultaFacturasScreen extends ConsumerWidget {
   const ConsultaFacturasScreen({super.key});
 
-  @override
-  State<ConsultaFacturasScreen> createState() => _ConsultaFacturasScreenState();
-}
+  
 
-class _ConsultaFacturasScreenState extends State<ConsultaFacturasScreen> {
-  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+
+ final _formKey = GlobalKey<FormState>();
   final TextEditingController _nisController = TextEditingController();
 
-  @override
-  void dispose() {
-    _nisController.dispose();
-    super.dispose();
-  }
+    final authState = ref.watch(authProvider);
 
-  void _consultar() {
+    final token = authState.value?.user?.token;
+
+
+    void _consultar() async {
     if (_formKey.currentState!.validate()) {
       final nis = _nisController.text;
       // Aquí puedes llamar tu API o lógica con el NIS
+      final repoConsultaFacturas = ConsultaFacturasRepositoryImpl(
+        ConsultaFacturasDatasourceImpl(MiAndeApi()),
+      );
+
+      if(token == null){
+          ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Su sesion ha expirado, debe volver a logearse')));
+        throw Exception('Su sesion ha expirado, debe volver a logearse');
+      }
+
+      ConsultaFacturas consultaFacturasResponse = await repoConsultaFacturas
+          .getConsultaFacturas(nis, 15.toString(),token!);
+      
+      if (consultaFacturasResponse.error!) {
+         ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(consultaFacturasResponse.errorValList![0])));
+        return;
+      }
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Consultando NIS: $nis')));
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+   return Scaffold(
       endDrawer: CustomDrawer(),
       appBar: AppBar(title: const Text('Consulta NIS')),
       body: Padding(
@@ -71,3 +97,4 @@ class _ConsultaFacturasScreenState extends State<ConsultaFacturasScreen> {
     );
   }
 }
+

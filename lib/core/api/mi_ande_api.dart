@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 import '../enviromens/Enrivoment.dart';
@@ -12,6 +14,9 @@ class MiAndeApi {
           //baseUrl: Environment.hostCtxSiga, // 👈 usa el Environment global
           connectTimeout: const Duration(seconds: 5),
           receiveTimeout: const Duration(seconds: 3),
+          headers: {
+            'x-so' : Platform.isAndroid ? 'android': 'ios'
+          }
           //queryParameters: {'clientKey':Environment.clientKey}
         ),
       ) {
