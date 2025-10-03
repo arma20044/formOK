@@ -34,6 +34,11 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         final user = UserModel(
           nombre: responseLogin.resultado!.nombre!,
           apellido: responseLogin.resultado!.apellido!,
+          numeroDocumento: numeroDocumento,
+          tipoDocumento: tipoDocumento,
+          password: password,
+          cedulaRepresentante: '', //LLEGARA DESDE EL FORM
+          tipoSolicitante: '', //LLEGARA DESDE EL FORM
           token: responseLogin.token!,
         );
 

@@ -55,7 +55,7 @@ class CustomDrawer extends ConsumerWidget {
             child: Column(
               children: [
                 if(authState.value?.state == AuthState.authenticated)
-                Text(authState.value!.user!.nombre),
+                Text('${authState.value!.user!.nombre} ${authState.value!.user!.apellido}'),
                 const Text(
                   'Mi Cuenta',
                   style: TextStyle(color: Colors.white, fontSize: 24),
