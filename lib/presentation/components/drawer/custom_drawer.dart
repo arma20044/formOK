@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:form/core/auth/auth_repository.dart';
+import 'package:form/core/auth/model/auth_state.dart';
 
 import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/presentation/auth/login_screen.dart';
@@ -20,6 +22,11 @@ class CustomDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authProvider);
+
+    ref.listen(authProvider, (previous, next) {
+      print(previous);
+      print(next);
+    });
 
     Future<void> _launchUrl(String key) async {
       final url = dotenv.env[key]; // leer del .env
@@ -46,51 +53,65 @@ class CustomDrawer extends ConsumerWidget {
             ),
           ),
           authState.when(
-            data: (user) {
-              if (user != null) {
-                return Text("Usuario: {user.jWTtoken}");
-              } else {
-                return const Text("No logueado");
-              }
-            },
+            data: (state) => Column(
+              children: [
+                if (state == AuthState.authenticated) const Text('Bienvenido!'),
+                if (state != AuthState.authenticated)
+                  const Text('Debes iniciar sesión'),
+              ],
+            ),
             loading: () => const CircularProgressIndicator(),
-            error: (e, _) => Text("Error: $e"),
+            error: (err, stack) => Text('Error: $err'),
           ),
-         //authState.asData?.value?.jWTtoken == null ?
- ListTile(
-            leading: const Icon(Icons.login),
-            title: const Text('Acceder'),
-            onTap: () {
-              Navigator.pop(context); // cerrar el drawer
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            },
-          ) ,
+
+          //authState.asData?.value?.jWTtoken == null ?
+
           //: Text(''),
-        
-         //authState.asData?.value?.jWTtoken == null ?
-          ListTile(
-            leading: const Icon(Icons.manage_accounts_outlined),
-            title: const Text('Registrate'),
-            onTap: () {
-              Navigator.pop(context);
-              // acción para ir a Configuración
-            },
+
+          //authState.asData?.value?.jWTtoken == null ?
+
+          //: Text(''),
+          authState.when(
+            data: (state) => Column(
+              children: [
+                if (state == AuthState.authenticated)
+                  ListTile(
+                    leading: const Icon(Icons.exit_to_app),
+                    title: const Text('Cerrar Sesión'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      ref.read(authProvider.notifier).logout();
+                    },
+                  ),
+                if (state == AuthState.unauthenticated)
+                  ListTile(
+                    leading: const Icon(Icons.login),
+                    title: const Text('Acceder'),
+                    onTap: () {
+                      Navigator.pop(context); // cerrar el drawer
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
+                    },
+                  ),
+                  if (state == AuthState.unauthenticated)
+                  ListTile(
+                        leading: const Icon(Icons.manage_accounts_outlined),
+                        title: const Text('Registrate'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          // acción para ir a Configuración
+                        },
+                      ),
+              ],
+            ),
+            loading: () => const CircularProgressIndicator(),
+            error: (err, stack) => Text('Error: $err'),
           ),
-          //: Text(''),
-          //authState.asData?.value?.jWTtoken != null ? 
-          ListTile(
-            leading: const Icon(Icons.exit_to_app),
-            title: const Text('Cerrar Sesión'),
-            onTap: () {
-              Navigator.pop(context);
-              //authProvider.logout();
-            },
-          )
+
           //:Text(''),
-          ,Divider(),
+          Divider(),
           ListTile(
             leading: const Icon(Icons.color_lens),
             title: const Text('Modo Oscuro'),
