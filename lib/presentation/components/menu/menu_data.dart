@@ -1,6 +1,7 @@
 // lib/presentation/components/menu/menu_data.dart
 import 'package:flutter/material.dart';
 import 'package:form/presentation/components/reclamos/reclamo_screen_padre.dart';
+import 'package:form/presentation/screens/comercial/consulta_facturas_screen.dart';
 import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'menu_models.dart';
@@ -64,10 +65,15 @@ final List<MenuGroup> menuGroups = [
     title: 'Comercial',
     items: [
       MenuItemModel(
-        id: 'new',
+        id: 'consulta_factura',
         icon: Icons.document_scanner,
         label: 'Consulta de Facturas',
-        // onTap: () => debugPrint('Nuevo'),
+           onTap: (context) => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ConsultaFacturasScreen(),
+          ),
+        ),
       ),
       MenuItemModel(
         id: 'history',
