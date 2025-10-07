@@ -93,12 +93,12 @@ class Lista {
   final String? estado;
   final num? nirSecuencial;
   final num? secRec;
-  final String? fechaVencimiento;
+  final String fechaVencimiento;
   final String? estadoFactura;
   final String? fechaEmision;
   final bool? esPagado;
   final String? codigoEstado;
-  final num? secNis;
+  final num secNis;
   final num? importe;
   final num? cantidadImpresion;
   final String? numeroTimbrado;
@@ -110,12 +110,12 @@ class Lista {
     this.estado,
     this.nirSecuencial,
     this.secRec,
-    this.fechaVencimiento,
+    required this.fechaVencimiento,
     this.estadoFactura,
     this.fechaEmision,
     this.esPagado,
     this.codigoEstado,
-    this.secNis,
+    required this.secNis,
     this.importe,
     this.cantidadImpresion,
     this.numeroTimbrado,

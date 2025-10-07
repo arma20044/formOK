@@ -1,11 +1,96 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/model/consulta_facturas.dart';
+import 'package:form/presentation/components/common/pad_viewer.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+
+/*
+const uriPdf = 
+    facturaItem.facturaElectronica
+    ?
+    Environment.HOST_CTX_OPEN + "/v5/suministro/facturaElectronicaPdfMobile?"
+    + "nro_nis=" + nis
+        + "&sec_nis=" + sec_nis
+        + "&sec_rec=" + sec_rec
+        + "&f_fact=" + fechaAAAAMMDD_toDDMMAAAA( fechaFacturacion )
+        + "&clientKey=" + Environment.CLIENT_KEY
+        + "&value=" + cifra
+        + "&fecha=" + fechaVencimiento
+    :
+    Environment.HOST_CTX_OPEN + "/v4/suministro/facturaPdfMobile?"
+        + "nro_nis=" + nis
+        + "&sec_nis=" + sec_nis
+        + "&sec_rec=" + sec_rec
+        + "&f_fact=" + fechaAAAAMMDD_toDDMMAAAA( fechaFacturacion )
+        + "&clientKey=" + Environment.CLIENT_KEY
+        + "&value=" + cifra
+        + "&fecha=" + fechaVencimiento;
+        */
 
 class FacturaScrollHorizontal extends StatelessWidget {
   final List<Lista?>? facturas;
+  final TextEditingController nis;
 
-  const FacturaScrollHorizontal({super.key, required this.facturas});
+  const FacturaScrollHorizontal({
+    super.key,
+    required this.facturas,
+    required this.nis,
+  });
+
+  Future<File> descargarPdfConPipe(String url, String nombreArchivo) async {
+    Dio dio = Dio();
+
+    Directory dir = await getTemporaryDirectory();
+    String ruta = '${dir.path}/$nombreArchivo';
+    File archivo = File(ruta);
+
+    try {
+      final response = await dio.get(
+        url,
+        options: Options(
+          responseType: ResponseType.stream,
+          headers: {'Accept': 'application/pdf','x-so': Platform.isAndroid ? 'Android': 'IOS'},
+        ),
+      );
+
+      final body = response.data as ResponseBody;
+
+      final total = body.contentLength ?? -1;
+      int recibido = 0;
+
+      print('Status code: ${response.statusCode}');
+      print('Headers: ${response.headers}');
+
+      final sink = archivo.openWrite();
+
+      // Esto descarga y escribe automáticamente el stream en el archivo
+      await for (final chunk in body.stream) {
+        recibido += chunk.length;
+        if (total != -1) {
+          print('Descargando: ${(recibido / total * 100).toStringAsFixed(0)}%');
+        }
+        sink.add(chunk);
+      }
+
+      await sink.close();
+      print('Descarga completada: ${archivo.path}');
+
+      print('Tamaño del archivo: ${await archivo.length()} bytes');
+
+      final bytes = await archivo.readAsBytes();
+      print('Primeros bytes: ${String.fromCharCodes(bytes.take(100))}');
+
+      return archivo;
+    } catch (e) {
+      throw Exception('Error al descargar PDF: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +104,35 @@ class FacturaScrollHorizontal extends StatelessWidget {
         itemCount: facturas!.length,
         itemBuilder: (context, index) {
           final factura = facturas![index];
+
+          num nisParcial = int.parse(nis.text.toString().substring(0, 3));
+          List<String> fechaObtenida = factura!.fechaVencimiento.split('-');
+          num dia = int.parse(fechaObtenida[2]);
+          num mes = int.parse(fechaObtenida[1]);
+          num anho = int.parse(fechaObtenida[0]);
+          num mejunje = (anho - (dia * mes));
+          num oper =
+              (((int.parse(nis.text) * nisParcial) + int.parse(nis.text)));
+          num res = oper * mejunje;
+          String cifra = res.toString();
+
+          String urlFinal =
+              "${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?" +
+              "nro_nis=" +
+              nis.text +
+              "&sec_nis=" +
+              factura!.secNis.toString() +
+              "&sec_rec=" +
+              factura.secRec.toString() +
+              "&f_fact=" +
+              formatoFecha.format(DateTime.parse(factura.fechaFacturacion!)) +
+              "&clientKey=" +
+              Environment.clientKey +
+              "&value=" +
+              cifra +
+              "&fecha=" +
+              factura.fechaVencimiento;
+
           return Container(
             width: 300,
             margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -73,7 +187,27 @@ class FacturaScrollHorizontal extends StatelessWidget {
                     const Spacer(),
 
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        try {
+                          final File archivoDescargado =
+                              await descargarPdfConPipe(
+                                urlFinal, // URL del PDF
+                                'factura_${factura.nirSecuencial}.pdf',
+                              );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  PdfViewerScreen(stringPdf: archivoDescargado),
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error al abrir PDF: $e')),
+                          );
+                        }
+                      },
+
                       child: Text(
                         "Ver Comprobante",
                         style: TextStyle(fontSize: 14),

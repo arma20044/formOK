@@ -145,7 +145,7 @@ class _ConsultaFacturasScreenState
                 ),
                 const SizedBox(height: 20),
                 if (facturas != null && facturas!.isNotEmpty) ...[
-                  FacturaScrollHorizontal(facturas: facturas),
+                  FacturaScrollHorizontal(facturas: facturas,nis:_nisController),
                   const SizedBox(height: 16),
                   //InfoCardHorizontalList(cards: cards),
                 ],
