@@ -3,7 +3,7 @@ import 'package:form/model/consulta_facturas.dart';
 import 'package:intl/intl.dart';
 
 class FacturaScrollHorizontal extends StatelessWidget {
-  final   List<Lista?>? facturas;
+  final List<Lista?>? facturas;
 
   const FacturaScrollHorizontal({super.key, required this.facturas});
 
@@ -20,7 +20,7 @@ class FacturaScrollHorizontal extends StatelessWidget {
         itemBuilder: (context, index) {
           final factura = facturas![index];
           return Container(
-            width: 250,
+            width: 300,
             margin: const EdgeInsets.symmetric(horizontal: 8),
             child: Card(
               elevation: 4,
@@ -33,27 +33,52 @@ class FacturaScrollHorizontal extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Fecha: ${formatoFecha.format(DateTime.parse(factura!.fechaFacturacion!))}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 6),
-                    Text('Estado: ${factura.estadoFactura}'),
-                    Text('Importe: ${formatoMoneda.format(factura.importe)}'),
-                    Text('Vencimiento: ${formatoFecha.format(DateTime.parse(factura.fechaVencimiento!))}'),
-                    const Spacer(),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Chip(
-                        label: Text(
-                          factura.esPagado! ? 'Pagado' : 'Pendiente',
-                          style: const TextStyle(color: Colors.white),
+                    Row(
+                      children: [
+                        Text(
+                          formatoMoneda.format(factura!.importe),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
-                        backgroundColor: factura.esPagado!
-                            ? Colors.green
-                            : Colors.orange,
+                        Spacer(),
+                        Chip(
+                          label: Text(
+                            factura.esPagado! ? 'Pagado' : 'Pendiente de Pago',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                          backgroundColor: factura.esPagado!
+                              ? Colors.green
+                              : Colors.orange,
+                        ),
+                      ],
+                    ),
+
+                    Text(
+                      'Emisión: ${formatoFecha.format(DateTime.parse(factura.fechaEmision!))}',
+                      //style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+
+                    Text(
+                      'Vencimiento: ${formatoFecha.format(DateTime.parse(factura.fechaVencimiento!))}',
+                      style: const TextStyle(
+                        //fontWeight: FontWeight.bold,
+                        //fontSize: 12,
                       ),
-                    )
+                    ),
+                    const Spacer(),
+
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: Text(
+                        "Ver Comprobante",
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
                   ],
                 ),
               ),
