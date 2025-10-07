@@ -55,7 +55,10 @@ class FacturaScrollHorizontal extends StatelessWidget {
         url,
         options: Options(
           responseType: ResponseType.stream,
-          headers: {'Accept': 'application/pdf','x-so': Platform.isAndroid ? 'Android': 'IOS'},
+          headers: {
+            'Accept': 'application/pdf',
+            'x-so': Platform.isAndroid ? 'Android' : 'IOS',
+          },
         ),
       );
 
@@ -209,7 +212,7 @@ class FacturaScrollHorizontal extends StatelessWidget {
                       },
 
                       child: Text(
-                        "Ver Comprobante",
+                        "Ver Factura",
                         style: TextStyle(fontSize: 14),
                       ),
                     ),

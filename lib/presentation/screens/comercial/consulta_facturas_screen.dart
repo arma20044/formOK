@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/model/model.dart';
+import 'package:form/presentation/components/common/datos_card.dart';
 import 'package:form/presentation/components/common/factura_scroll_horizontal.dart';
-import 'package:form/presentation/components/common/horizontal_grid.dart';
 import 'package:form/presentation/components/common/info_card.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import '../../../infrastructure/infrastructure.dart';
@@ -24,6 +24,7 @@ class _ConsultaFacturasScreenState
   final TextEditingController _nisController = TextEditingController();
 
   List<Lista?>? facturas; // <-- aquí guardamos los resultados
+  DatosCliente? datosCliente;
 
   bool isLoading = false;
 
@@ -66,6 +67,7 @@ class _ConsultaFacturasScreenState
 
       setState(() {
         facturas = consultaFacturasResponse.resultado?.lista;
+        datosCliente = consultaFacturasResponse.resultado?.datosCliente;
         isLoading = false;
       });
 
@@ -145,6 +147,7 @@ class _ConsultaFacturasScreenState
                 ),
                 const SizedBox(height: 20),
                 if (facturas != null && facturas!.isNotEmpty) ...[
+                  DatosCard(datosCliente: datosCliente,nis: _nisController.text,),
                   FacturaScrollHorizontal(facturas: facturas,nis:_nisController),
                   const SizedBox(height: 16),
                   //InfoCardHorizontalList(cards: cards),
