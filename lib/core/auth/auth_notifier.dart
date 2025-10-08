@@ -20,6 +20,9 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     // Check initial authentication status (e.g., from stored tokens)
     _authRepository = ref.read(authRepositoryProvider);
 
+      // 👇 Marca el estado inicial como "loading" antes de cualquier lógica
+  state = const AsyncLoading();
+
     // Intentar login automático al inicializar
     String? datosSesion = await _storage.read(key: 'user_data');
 

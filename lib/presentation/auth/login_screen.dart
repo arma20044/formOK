@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/core/auth/model/auth_state_data.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form/core/auth/auth_notifier.dart';
-import 'package:form/core/auth/model/auth_state.dart';
-import 'package:go_router/go_router.dart';
 
 class DropdownItem {
   final String id;
@@ -15,7 +11,7 @@ class DropdownItem {
   DropdownItem({required this.id, required this.name});
 }
 
-List<DropdownItem> dropDownItems = [
+final List<DropdownItem> dropDownItems = [
   DropdownItem(id: 'TD001', name: 'C.I. Civil'),
   DropdownItem(id: 'TD002', name: 'RUC'),
   DropdownItem(id: 'TD004', name: 'Pasaporte'),
@@ -31,7 +27,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final numeroController = TextEditingController();
   final passwordController = TextEditingController();
-  DropdownItem? selectedTipDocumento;
+  DropdownItem? selectedTipoDocumento;
 
   @override
   void dispose() {
@@ -44,53 +40,82 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    // ✅ ref.listen dentro del build
+    // ✅ ref.listen para manejar navegación y mensajes
     ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
       next.whenOrNull(
         data: (authData) {
           if (authData.state == AuthState.authenticated) {
-            GoRouter.of(context).go('/');
+            // Navegación segura después del build
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.go('/');
+            });
           } else if (authData.state == AuthState.error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Login fallido')),
-            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Login fallido')),
+              );
+            });
           }
         },
       );
     });
 
+    final isLoading = authState.isLoading;
+
     return Scaffold(
       appBar: AppBar(title: const Text("Mi Cuenta - Acceder")),
       body: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(16),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             DropdownButtonFormField<DropdownItem>(
-              value: selectedTipDocumento,
+              value: selectedTipoDocumento,
               hint: const Text("Seleccionar Tipo de Documento"),
               items: dropDownItems
-                  .map((item) =>
-                      DropdownMenuItem(value: item, child: Text(item.name)))
+                  .map((item) => DropdownMenuItem(
+                        value: item,
+                        child: Text(item.name),
+                      ))
                   .toList(),
               onChanged: (value) {
-                setState(() => selectedTipDocumento = value);
+                setState(() => selectedTipoDocumento = value);
               },
             ),
-            TextField(controller: numeroController, decoration: const InputDecoration(labelText: 'Numero de Documento')),
-            TextField(controller: passwordController, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
-            ElevatedButton(
-              onPressed: selectedTipDocumento == null || authState.isLoading
-                  ? null
-                  : () {
-                      ref.read(authProvider.notifier).login(
-                            numeroController.text,
-                            passwordController.text,
-                            selectedTipDocumento!.id,
-                          );
-                    },
-              child: authState.isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text('Login'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: numeroController,
+              decoration: const InputDecoration(labelText: 'Número de Documento'),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: passwordController,
+              decoration: const InputDecoration(labelText: 'Contraseña'),
+              obscureText: true,
+            ),
+            const SizedBox(height: 24),
+
+            // ✅ Spinner en el botón
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isLoading || selectedTipoDocumento == null
+                    ? null
+                    : () {
+                        ref.read(authProvider.notifier).login(
+                              numeroController.text.trim(),
+                              passwordController.text.trim(),
+                              selectedTipoDocumento!.id,
+                            );
+                      },
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Login'),
+              ),
             ),
           ],
         ),
