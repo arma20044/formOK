@@ -7,6 +7,7 @@ import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/main.dart';
 
 import 'package:form/presentation/auth/login_screen.dart';
+import 'package:form/presentation/screens/mi_cuenta/mi_cuenta.dart';
 import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen.dart';
 import 'package:form/presentation/screens/splash_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+      GoRoute(path: '/miCuenta', builder: (context, state) => const MiCuenta()),
     ],
     redirect: (context, state) {
       // Si está cargando, no redirige
@@ -39,7 +41,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final loggingIn = state.uri.path == '/login';
 
       //if (!isLoggedIn && !loggingIn) return '/login';
-      if (isLoggedIn && loggingIn) return '/';
+      if (isLoggedIn && loggingIn) return '/miCuenta';
       return null;
     },
   );
