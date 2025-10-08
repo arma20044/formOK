@@ -4,11 +4,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/presentation/auth/login_screen.dart';
+import 'package:form/presentation/components/drawer/auth_drawer_section.dart';
+import 'package:form/presentation/components/drawer/auth_header_section.dart';
+import '../../../provider/theme_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
-import 'package:form/presentation/auth/login_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../../provider/theme_provider.dart';
 
 class CustomDrawer extends ConsumerWidget {
   const CustomDrawer({super.key});
@@ -16,7 +18,6 @@ class CustomDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeProvider);
-    final authState = ref.watch(authProvider);
 
     Future<void> _launchUrl(String key) async {
       final url = dotenv.env[key];
@@ -32,65 +33,11 @@ class CustomDrawer extends ConsumerWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          // DrawerHeader
-          DrawerHeader(
-            decoration: const BoxDecoration(color: Colors.blue),
-            child: authState.when(
-              data: (state) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (state.state == AuthState.authenticated)
-                    Text(
-                      '${state.user?.nombre} ${state.user?.apellido}',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Mi Cuenta',
-                    style: TextStyle(color: Colors.white, fontSize: 24),
-                  ),
-                ],
-              ),
-              loading: () => const Center(child: CircularProgressIndicator(color: Colors.white)),
-              error: (_, __) => const Text('Error cargando usuario', style: TextStyle(color: Colors.white)),
-            ),
-          ),
+          // Header separado
+          const AuthHeaderSection(),
 
-          // Estado de autenticación
-          authState.when(
-            data: (state) => Column(
-              children: [
-                if (state.state == AuthState.authenticated)
-                  ListTile(
-                    leading: const Icon(Icons.exit_to_app),
-                    title: const Text('Cerrar Sesión'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      ref.read(authProvider.notifier).logout();
-                    },
-                  ),
-                if (state.state == AuthState.unauthenticated ||
-                    state.state == AuthState.error)
-                  ListTile(
-                    leading: const Icon(Icons.login),
-                    title: const Text('Acceder'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const LoginScreen()),
-                      );
-                    },
-                  ),
-              ],
-            ),
-            loading: () => const SizedBox(),
-            error: (_, __) => const SizedBox(),
-          ),
+          // Login / Logout
+          const AuthDrawerSection(),
 
           const Divider(),
 
