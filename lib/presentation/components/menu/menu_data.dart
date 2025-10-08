@@ -1,7 +1,7 @@
 // lib/presentation/components/menu/menu_data.dart
 import 'package:flutter/material.dart';
-import 'package:form/presentation/components/reclamos/reclamo_screen_padre.dart';
 import 'package:form/presentation/screens/comercial/consulta_facturas_screen.dart';
+import 'package:form/presentation/screens/mi_cuenta/mi_cuenta_screen.dart';
 import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'menu_models.dart';
@@ -18,12 +18,11 @@ final List<MenuGroup> menuGroups = [
         //   context,
         //   MaterialPageRoute(
         //     builder: (context) => ParentScreen(tipoReclamo: 'FE'),
-            
+
         //   ),
         // ),
-        onTap: (context) => context.push('/reclamosFaltaEnergia',extra: {
-          'tipoReclamo' : 'CO'
-        }),
+        onTap: (context) =>
+            context.push('/reclamosFaltaEnergia', extra: {'tipoReclamo': 'CO'}),
       ),
       MenuItemModel(
         id: 'co',
@@ -33,7 +32,7 @@ final List<MenuGroup> menuGroups = [
         onTap: (context) => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ParentScreen(tipoReclamo: 'CO',),
+            builder: (_) => const ParentScreen(tipoReclamo: 'CO'),
           ),
         ),
       ),
@@ -68,11 +67,9 @@ final List<MenuGroup> menuGroups = [
         id: 'consulta_factura',
         icon: Icons.document_scanner,
         label: 'Consulta de Facturas',
-           onTap: (context) => Navigator.push(
+        onTap: (context) => Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => const ConsultaFacturasScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => const ConsultaFacturasScreen()),
         ),
       ),
       MenuItemModel(
@@ -96,7 +93,10 @@ final List<MenuGroup> menuGroups = [
         id: 'cuenta',
         icon: Icons.person,
         label: 'Mi Cuenta',
-        // onTap: () => debugPrint('Configuración'),
+            onTap: (context) => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MiCuentaScreen()),
+        ),
       ),
     ],
   ),

@@ -8,11 +8,7 @@ import 'package:form/core/auth/auth_repository.dart';
 import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/core/auth/model/user_model.dart';
 
-import '../../infrastructure/infrastructure.dart';
 
-import '../../model/login_model.dart';
-import '../../repositories/login_repository_impl.dart';
-import '../api/mi_ande_api.dart';
 import 'model/auth_state.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthStateData> {
