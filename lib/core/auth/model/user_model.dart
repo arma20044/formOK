@@ -8,6 +8,17 @@ class UserModel {
   final String tipoSolicitante;
   final String token;
 
+factory UserModel.empty() => const UserModel(
+        nombre: '',
+        apellido: '',
+        numeroDocumento: '',
+        tipoDocumento: '',
+        password: '',
+        cedulaRepresentante: '',
+        tipoSolicitante: '',
+        token: '',
+      );
+  
   const UserModel({
     required this.nombre,
     required this.apellido,

@@ -1,17 +1,13 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
-
 import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/presentation/auth/login_screen.dart';
-
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../../core/auth/auth_notifier.dart';
 import '../../../provider/theme_provider.dart';
 
 class CustomDrawer extends ConsumerWidget {
@@ -22,13 +18,8 @@ class CustomDrawer extends ConsumerWidget {
     final theme = ref.watch(themeProvider);
     final authState = ref.watch(authProvider);
 
-    ref.listen(authProvider, (previous, next) {
-      print(previous);
-      print(next);
-    });
-
     Future<void> _launchUrl(String key) async {
-      final url = dotenv.env[key]; // leer del .env
+      final url = dotenv.env[key];
       if (url == null) return;
 
       final uri = Uri.parse(url);
@@ -37,89 +28,83 @@ class CustomDrawer extends ConsumerWidget {
       }
     }
 
-    //final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    // final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    
-
-    
-
     return Drawer(
       child: ListView(
-        padding: EdgeInsets.zero, // elimina el padding superior
+        padding: EdgeInsets.zero,
         children: [
+          // DrawerHeader
           DrawerHeader(
-            //decoration: const BoxDecoration(color: ),
-            child: Column(
-              children: [
-                if(authState.value?.state == AuthState.authenticated)
-                Text('${authState.value!.user!.nombre} ${authState.value!.user!.apellido}'),
-                const Text(
-                  'Mi Cuenta',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
-              ],
+            decoration: const BoxDecoration(color: Colors.blue),
+            child: authState.when(
+              data: (state) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (state.state == AuthState.authenticated)
+                    Text(
+                      '${state.user?.nombre} ${state.user?.apellido}',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Mi Cuenta',
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
+                ],
+              ),
+              loading: () => const Center(child: CircularProgressIndicator(color: Colors.white)),
+              error: (_, __) => const Text('Error cargando usuario', style: TextStyle(color: Colors.white)),
             ),
           ),
+
+          // Estado de autenticación
           authState.when(
             data: (state) => Column(
               children: [
-                if (authState.value?.state == AuthState.authenticated)
-                  const Text('Bienvenido!'),
-                if (authState.value?.state == AuthState.unauthenticated)
-                  const Text('Debes iniciar sesión'),
+                if (state.state == AuthState.authenticated)
+                  ListTile(
+                    leading: const Icon(Icons.exit_to_app),
+                    title: const Text('Cerrar Sesión'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      ref.read(authProvider.notifier).logout();
+                    },
+                  ),
+                if (state.state == AuthState.unauthenticated ||
+                    state.state == AuthState.error)
+                  ListTile(
+                    leading: const Icon(Icons.login),
+                    title: const Text('Acceder'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const LoginScreen()),
+                      );
+                    },
+                  ),
               ],
             ),
-            loading: () => const CircularProgressIndicator(),
-            error: (err, stack) =>
-              
-               Text(authState.value!.state.toString())
-              //print('Error: $err')
-            ,
+            loading: () => const SizedBox(),
+            error: (_, __) => const SizedBox(),
           ),
 
-          //authState.asData?.value?.jWTtoken == null ?
+          const Divider(),
 
-          //: Text(''),
-
-          //authState.asData?.value?.jWTtoken == null ?
-
-          //: Text(''),
-          if (authState.value?.state == AuthState.authenticated)
-            ListTile(
-              leading: const Icon(Icons.exit_to_app),
-              title: const Text('Cerrar Sesión'),
-              onTap: () {
-                Navigator.pop(context);
-                ref.read(authProvider.notifier).logout();
-              },
-            ),
-
-          if (authState.value?.state == AuthState.unauthenticated || authState.value?.state == AuthState.error)
-            ListTile(
-              leading: const Icon(Icons.login),
-              title: const Text('Acceder'),
-              onTap: () {
-                Navigator.pop(context); // cerrar el drawer
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
-              },
-            ),
-
-          //:Text(''),
-          Divider(),
+          // Modo Oscuro
           ListTile(
             leading: const Icon(Icons.color_lens),
             title: const Text('Modo Oscuro'),
             onTap: () {
               Navigator.pop(context);
-              // acción para ir a About
-              // themeProvider.toggleTheme();
               ref.read(themeProvider.notifier).toggleTheme();
             },
           ),
+
+          // Valorar App
           ListTile(
             leading: const Icon(Icons.app_blocking),
             title: const Text('Valorar App'),
@@ -132,6 +117,8 @@ class CustomDrawer extends ConsumerWidget {
               }
             },
           ),
+
+          // Políticas de Privacidad
           ListTile(
             leading: const Icon(Icons.app_blocking),
             title: const Text('Políticas de Privacidad'),
@@ -140,54 +127,38 @@ class CustomDrawer extends ConsumerWidget {
               _launchUrl("POLITICAS_PRIVACIDAD");
             },
           ),
+
+          // Redes sociales
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: const FaIcon(
-                    FontAwesomeIcons.youtube,
-                    color: Colors.red,
-                    size: 50,
-                  ),
-                  onPressed: () {
-                    _launchUrl("YOUTUBE_URL");
-                  },
+                  icon: const FaIcon(FontAwesomeIcons.youtube,
+                      color: Colors.red, size: 50),
+                  onPressed: () => _launchUrl("YOUTUBE_URL"),
                 ),
                 IconButton(
-                  icon: const FaIcon(
-                    FontAwesomeIcons.facebook,
-                    color: Colors.blue,
-                    size: 50,
-                  ),
-                  onPressed: () {
-                    _launchUrl("FACEBOOK_URL");
-                  },
+                  icon: const FaIcon(FontAwesomeIcons.facebook,
+                      color: Colors.blue, size: 50),
+                  onPressed: () => _launchUrl("FACEBOOK_URL"),
                 ),
                 IconButton(
-                  icon: const FaIcon(
-                    FontAwesomeIcons.xTwitter,
-                    color: Colors.black,
-                    size: 50,
-                  ),
-                  onPressed: () {
-                    _launchUrl("X_URL");
-                  },
+                  icon: const FaIcon(FontAwesomeIcons.xTwitter,
+                      color: Colors.black, size: 50),
+                  onPressed: () => _launchUrl("X_URL"),
                 ),
                 IconButton(
-                  icon: const FaIcon(
-                    FontAwesomeIcons.instagram,
-                    color: Colors.orange,
-                    size: 50,
-                  ),
-                  onPressed: () {
-                    _launchUrl('INSTAGRAM_URL');
-                  },
+                  icon: const FaIcon(FontAwesomeIcons.instagram,
+                      color: Colors.orange, size: 50),
+                  onPressed: () => _launchUrl('INSTAGRAM_URL'),
                 ),
               ],
             ),
           ),
+
+          // Version
           Center(
             child: Text(
               'Version ${Environment.appVersion.android.version} - ${Environment.appVersion.android.fecha}',
