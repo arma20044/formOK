@@ -51,7 +51,7 @@ class CustomDrawer extends ConsumerWidget {
         padding: EdgeInsets.zero, // elimina el padding superior
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(color: Colors.blue),
+            //decoration: const BoxDecoration(color: ),
             child: Column(
               children: [
                 if(authState.value?.state == AuthState.authenticated)
@@ -73,7 +73,11 @@ class CustomDrawer extends ConsumerWidget {
               ],
             ),
             loading: () => const CircularProgressIndicator(),
-            error: (err, stack) => Text('Error: $err'),
+            error: (err, stack) =>
+              
+               Text(authState.value!.state.toString())
+              //print('Error: $err')
+            ,
           ),
 
           //authState.asData?.value?.jWTtoken == null ?
@@ -93,7 +97,7 @@ class CustomDrawer extends ConsumerWidget {
               },
             ),
 
-          if (authState.value?.state == AuthState.unauthenticated)
+          if (authState.value?.state == AuthState.unauthenticated || authState.value?.state == AuthState.error)
             ListTile(
               leading: const Icon(Icons.login),
               title: const Text('Acceder'),

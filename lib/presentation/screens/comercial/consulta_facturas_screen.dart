@@ -37,7 +37,9 @@ class _ConsultaFacturasScreenState
 
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Su sesión ha expirado, debe volver a logearse')),
+        const SnackBar(
+          content: Text('Su sesión ha expirado, debe volver a logearse'),
+        ),
       );
       return;
     }
@@ -51,12 +53,14 @@ class _ConsultaFacturasScreenState
         ConsultaFacturasDatasourceImpl(MiAndeApi()),
       );
 
-      final consultaFacturasResponse =
-          await repoConsultaFacturas.getConsultaFacturas(nis, '15', token);
+      final consultaFacturasResponse = await repoConsultaFacturas
+          .getConsultaFacturas(nis, '15', token);
 
       if (consultaFacturasResponse.error == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(consultaFacturasResponse.errorValList?[0] ?? 'Error')),
+          SnackBar(
+            content: Text(consultaFacturasResponse.errorValList?[0] ?? 'Error'),
+          ),
         );
         setState(() {
           facturas = [];
@@ -71,15 +75,16 @@ class _ConsultaFacturasScreenState
         isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      /*ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Consultando NIS: $nis')),
-      );
+      );*/
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -88,23 +93,25 @@ class _ConsultaFacturasScreenState
     // Generar cards de InfoCard a partir de facturas
     final List<InfoCard> cards = facturas != null
         ? facturas!
-            .asMap()
-            .entries
-            .map(
-              (entry) => InfoCard(
-                title: 'Factura ${entry.key + 1}',
-                subtitle: 'Importe: ${entry.value?.importeCuenta ?? 0}',
-                buttonText: 'Ver',
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content:
-                            Text('Presionaste la factura ${entry.key + 1}')),
-                  );
-                },
-              ),
-            )
-            .toList()
+              .asMap()
+              .entries
+              .map(
+                (entry) => InfoCard(
+                  title: 'Factura ${entry.key + 1}',
+                  subtitle: 'Importe: ${entry.value?.importeCuenta ?? 0}',
+                  buttonText: 'Ver',
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Presionaste la factura ${entry.key + 1}',
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )
+              .toList()
         : [];
 
     return Scaffold(
@@ -140,15 +147,19 @@ class _ConsultaFacturasScreenState
                 ElevatedButton(
                   onPressed: isLoading ? null : _consultar,
                   child: isLoading
-                      ? const CircularProgressIndicator(
-                          color: Colors.white,
-                        )
+                      ? const CircularProgressIndicator(color: Colors.white)
                       : const Text('Consultar'),
                 ),
                 const SizedBox(height: 20),
                 if (facturas != null && facturas!.isNotEmpty) ...[
-                  DatosCard(datosCliente: datosCliente,nis: _nisController.text,),
-                  FacturaScrollHorizontal(facturas: facturas,nis:_nisController),
+                  DatosCard(
+                    datosCliente: datosCliente,
+                    nis: _nisController.text,
+                  ),
+                  FacturaScrollHorizontal(
+                    facturas: facturas,
+                    nis: _nisController,
+                  ),
                   const SizedBox(height: 16),
                   //InfoCardHorizontalList(cards: cards),
                 ],

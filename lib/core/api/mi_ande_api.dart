@@ -12,8 +12,8 @@ class MiAndeApi {
     : dio = Dio(
         BaseOptions(
           //baseUrl: Environment.hostCtxSiga, // 👈 usa el Environment global
-          connectTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 3),
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
           headers: {
             'x-so' : Platform.isAndroid ? 'android': 'ios'
           }

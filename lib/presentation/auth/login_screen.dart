@@ -61,56 +61,74 @@ class LoginScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            DropdownButtonFormField<DropdownItem>(
-              value: selectedTipDocumento,
-              hint: const Text("Seleccionar Tipo de Documento"),
-              items: dropDownItems
-                  .map(
-                    (item) =>
-                        DropdownMenuItem(value: item, child: Text(item.name)),
-                  )
-                  .toList(),
-              onChanged: (value) {
-                selectedTipDocumento = value;
-              },
-            ),
-            TextField(
-              controller: numeroDocumentoController,
-              decoration: const InputDecoration(
-                labelText: 'Numero de Documento',
-              ),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                ref
-                    .read(authProvider.notifier)
-                    .login(
-                      numeroDocumentoController.text,
-                      passwordController.text,
-                      selectedTipDocumento!.id,
-                    );
-              },
-              child: authState.isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
+      appBar: AppBar(
+        title: Text("Mi Cuenta - Acceder"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Column(
+            children: [
+              DropdownButtonFormField<DropdownItem>(
+                initialValue: selectedTipDocumento,
+                hint: const Text("Seleccionar Tipo de Documento"),
+                items: dropDownItems
+                    .map(
+                      (item) =>
+                          DropdownMenuItem(value: item, child: Text(item.name)),
                     )
-                  : const Text("Login"),
-            ),
-          ],
+                    .toList(),
+                onChanged: (value) {
+                  selectedTipDocumento = value;
+                },
+              ),
+              TextField(
+                controller: numeroDocumentoController,
+                decoration: const InputDecoration(
+                  labelText: 'Numero de Documento',
+                ),
+              ),
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  ref
+                      .read(authProvider.notifier)
+                      .login(
+                        numeroDocumentoController.text,
+                        passwordController.text,
+                        selectedTipDocumento!.id,
+                      );
+                },
+                child: authState.isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text("Login"),
+
+                    
+              ),
+              if(authState.error == null) 
+                Text("")
+              
+              else if(authState.value?.state == AuthState.error || authState.value?.state == AuthState.unauthenticated)
+               Text("Error al iniciar sesión: ${authState.error}")
+
+,
+             
+               
+            ],
+            
+          ),
         ),
       ),
     );
