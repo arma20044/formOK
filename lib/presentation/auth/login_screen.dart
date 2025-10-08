@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/core/auth/model/auth_state.dart';
+import 'package:form/core/auth/model/auth_state_data.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/auth/auth_notifier.dart';
-import 'package:form/core/auth/model/auth_state_data.dart';
-import 'package:form/main.dart';
+import 'package:form/core/auth/model/auth_state.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../core/auth/model/auth_state.dart';
 
 class DropdownItem {
   final String id;
@@ -19,116 +21,78 @@ List<DropdownItem> dropDownItems = [
   DropdownItem(id: 'TD004', name: 'Pasaporte'),
 ];
 
-class LoginScreen extends ConsumerWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final numeroController = TextEditingController();
+  final passwordController = TextEditingController();
+  DropdownItem? selectedTipDocumento;
+
+  @override
+  void dispose() {
+    numeroController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    final numeroDocumentoController = TextEditingController();
-    final passwordController = TextEditingController();
-    DropdownItem? selectedTipDocumento;
-
-    /* ref.listen<AsyncValue<AuthState>>(authProvider, (previous, next) {
-      next.whenOrNull(
-        data: (state) {
-          if (state == AuthState.authenticated) {
-            // Navigate to home screen
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
-          } else if (state == AuthState.error) {
-            // Show error message
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Login failed')),
-            );
-          }
-        },
-      );
-    }); */
+    // ✅ ref.listen dentro del build
     ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
       next.whenOrNull(
-        data: (state) {
-          if (state == AuthState.authenticated) {
-            // ✅ Navegación declarativa usando GoRouter
+        data: (authData) {
+          if (authData.state == AuthState.authenticated) {
             GoRouter.of(context).go('/');
-          } else if (state == AuthState.error) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Login failed')));
+          } else if (authData.state == AuthState.error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Login fallido')),
+            );
           }
         },
       );
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Mi Cuenta - Acceder"),
-      ),
+      appBar: AppBar(title: const Text("Mi Cuenta - Acceder")),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Column(
-            children: [
-              DropdownButtonFormField<DropdownItem>(
-                initialValue: selectedTipDocumento,
-                hint: const Text("Seleccionar Tipo de Documento"),
-                items: dropDownItems
-                    .map(
-                      (item) =>
-                          DropdownMenuItem(value: item, child: Text(item.name)),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  selectedTipDocumento = value;
-                },
-              ),
-              TextField(
-                controller: numeroDocumentoController,
-                decoration: const InputDecoration(
-                  labelText: 'Numero de Documento',
-                ),
-              ),
-              TextField(
-                controller: passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  ref
-                      .read(authProvider.notifier)
-                      .login(
-                        numeroDocumentoController.text,
-                        passwordController.text,
-                        selectedTipDocumento!.id,
-                      );
-                },
-                child: authState.isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text("Login"),
-
-                    
-              ),
-              if(authState.error == null) 
-                Text("")
-              
-              else if(authState.value?.state == AuthState.error || authState.value?.state == AuthState.unauthenticated)
-               Text("Error al iniciar sesión: ${authState.error}")
-
-,
-             
-               
-            ],
-            
-          ),
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: [
+            DropdownButtonFormField<DropdownItem>(
+              value: selectedTipDocumento,
+              hint: const Text("Seleccionar Tipo de Documento"),
+              items: dropDownItems
+                  .map((item) =>
+                      DropdownMenuItem(value: item, child: Text(item.name)))
+                  .toList(),
+              onChanged: (value) {
+                setState(() => selectedTipDocumento = value);
+              },
+            ),
+            TextField(controller: numeroController, decoration: const InputDecoration(labelText: 'Numero de Documento')),
+            TextField(controller: passwordController, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
+            ElevatedButton(
+              onPressed: selectedTipDocumento == null || authState.isLoading
+                  ? null
+                  : () {
+                      ref.read(authProvider.notifier).login(
+                            numeroController.text,
+                            passwordController.text,
+                            selectedTipDocumento!.id,
+                          );
+                    },
+              child: authState.isLoading
+                  ? const CircularProgressIndicator()
+                  : const Text('Login'),
+            ),
+          ],
         ),
       ),
     );

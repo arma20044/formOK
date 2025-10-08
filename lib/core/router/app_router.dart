@@ -13,12 +13,9 @@ import 'package:go_router/go_router.dart';
 
 
 
-
-
 final goRouterProvider = Provider<GoRouter>((ref) {
   final refreshListenable = ValueNotifier<int>(0);
 
-  // Notificar GoRouter cuando cambie authProvider
   ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
     refreshListenable.value++;
   });
@@ -28,46 +25,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/login',
     refreshListenable: refreshListenable,
     routes: [
-      // Ruta login
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-
-      // Home pública
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const HomeScreen(),
-      ),
-
-      // Ruta privada opcional
-      GoRoute(
-        path: '/reclamosFaltaEnergia',
-        builder: (context, state) {
-          final isLoggedIn = authState.value != null;
-          if (isLoggedIn) {
-            return const ParentScreen(tipoReclamo: 'FE'); // versión completa
-          } else {
-            //return const GuestScreen(); // versión limitada si no está logueado
-            return Text("data");
-          }
-        },
-      ),
+      GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
     ],
-
-    // Redireccionamiento general
     redirect: (context, state) {
+      // Si está cargando, no redirige
       if (authState.isLoading) return null;
 
-      final isLoggedIn = authState.value != null;
+      final isLoggedIn = authState.value?.state == AuthState.authenticated;
       final loggingIn = state.uri.path == '/login';
 
-      // ⚡ Aquí quitamos el "forzar login" para rutas públicas
-      // Solo redirigir si el usuario intenta acceder a rutas privadas (ej: /admin)
-      // En este ejemplo, permitimos que '/reclamosFaltaEnergia' sea opcional
-
-      if (isLoggedIn && loggingIn) return '/'; // si ya logueado, ir al home
-      return null; // null = no hay redirección
+      //if (!isLoggedIn && !loggingIn) return '/login';
+      if (isLoggedIn && loggingIn) return '/';
+      return null;
     },
   );
 });

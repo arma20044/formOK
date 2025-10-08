@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/model/model.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/common/datos_card.dart';
 import 'package:form/presentation/components/common/factura_scroll_horizontal.dart';
 import 'package:form/presentation/components/common/info_card.dart';
@@ -57,11 +58,17 @@ class _ConsultaFacturasScreenState
           .getConsultaFacturas(nis, '15', token);
 
       if (consultaFacturasResponse.error == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        /*ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(consultaFacturasResponse.errorValList?[0] ?? 'Error'),
+            content: Text("Favor intente nuevamente la consulta"),
           ),
+        );*/
+        CustomSnackbar.show(
+          context,
+          message: "Ocurrió un error, Favor intente nuevamente la consulta",
+          type: MessageType.error,
         );
+
         setState(() {
           facturas = [];
           isLoading = false;
