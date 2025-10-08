@@ -16,8 +16,8 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   @override
   Widget build(BuildContext context) {
     final params = ShareParams(
-    //  uri: widget.stringPdf.uri,
-     // text: 'Great picture',
+      //  uri: widget.stringPdf.uri,
+      // text: 'Great picture',
       files: [XFile(widget.stringPdf.path)],
     );
 

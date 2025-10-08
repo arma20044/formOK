@@ -7,7 +7,7 @@ import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/model/consulta_facturas.dart';
 import 'package:form/presentation/components/common/custom_ask_modal.dart';
 import 'package:form/presentation/components/common/custom_pdf_modal.dart';
-import 'package:form/presentation/components/common/pad_viewer.dart';
+import 'package:form/presentation/components/common/pdf_viewer.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -192,27 +192,23 @@ class FacturaScrollHorizontal extends StatelessWidget {
                     const Spacer(),
 
                     ElevatedButton(
-                      /*onPressed: () async {
+                      onPressed: () async {
                         try {
                           final File archivoDescargado =
                               await descargarPdfConPipe(
                                 urlFinal, // URL del PDF
                                 'factura_${factura.nirSecuencial}.pdf',
                               );
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  PdfViewerScreen(stringPdf: archivoDescargado),
-                            ),
-                          );
+
+                              mostrarCustomModal(context,archivoDescargado);
+                        
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Error al abrir PDF: $e')),
                           );
                         }
-                      },*/
-                      onPressed: () => mostrarCustomModal(context),
+                      },
+                     // onPressed: () => mostrarCustomModal(context),
 
                       child: Text(
                         "Ver Factura",
@@ -230,11 +226,12 @@ class FacturaScrollHorizontal extends StatelessWidget {
   }
 }
 
-void mostrarCustomModal(BuildContext context) {
+void mostrarCustomModal(BuildContext context, File pdfFile) {
   showDialog(
     context: context,
     builder: (context) {
       return CustomPdfModal(
+        pdfFile: pdfFile ,
         title: 'Confirmar acción',
         content: const Text(
           '¿Deseas continuar con esta acción?',
