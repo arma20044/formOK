@@ -101,8 +101,15 @@ class CustomPdfModal extends StatelessWidget {
       insetPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Scaffold(
-        appBar: AppBar(title: const Text('PDF'),leading: Text("data"),actions: [
-          Text("data")
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          actions: [
+          IconButton(onPressed: (){
+            Navigator.pop(context);
+          }, icon: Icon(Icons.close), style: ButtonStyle(
+            iconColor:  WidgetStateProperty.all(Colors.white),
+            backgroundColor: WidgetStateProperty.all(Colors.red),
+          ),)
         ],),
         
         floatingActionButton: FloatingActionButton(
