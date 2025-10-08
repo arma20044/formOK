@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ListaBotones extends StatelessWidget {
   final List<BotonNavegacion> botones;
@@ -35,7 +36,8 @@ class ListaBotones extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              Navigator.pushNamed(context, boton.ruta);
+              //Navigator.pushNamed(context, boton.ruta);
+              context.push(boton.ruta);
             },
           ),
         );

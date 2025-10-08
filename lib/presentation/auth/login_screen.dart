@@ -44,16 +44,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
       next.whenOrNull(
         data: (authData) {
+          if (!mounted) {
+            return; // 🔹 Evita ejecutar si el widget ya fue desmontado
+          }
+
           if (authData.state == AuthState.authenticated) {
             // Navegación segura después del build
             WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+
               context.go('/');
             });
           } else if (authData.state == AuthState.error) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Login fallido')),
-              );
+              if (!mounted) return;
+
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Login fallido')));
             });
           }
         },
@@ -73,10 +81,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               value: selectedTipoDocumento,
               hint: const Text("Seleccionar Tipo de Documento"),
               items: dropDownItems
-                  .map((item) => DropdownMenuItem(
-                        value: item,
-                        child: Text(item.name),
-                      ))
+                  .map(
+                    (item) =>
+                        DropdownMenuItem(value: item, child: Text(item.name)),
+                  )
                   .toList(),
               onChanged: (value) {
                 setState(() => selectedTipoDocumento = value);
@@ -85,7 +93,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: numeroController,
-              decoration: const InputDecoration(labelText: 'Número de Documento'),
+              decoration: const InputDecoration(
+                labelText: 'Número de Documento',
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -102,7 +112,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 onPressed: isLoading || selectedTipoDocumento == null
                     ? null
                     : () {
-                        ref.read(authProvider.notifier).login(
+                        ref
+                            .read(authProvider.notifier)
+                            .login(
                               numeroController.text.trim(),
                               passwordController.text.trim(),
                               selectedTipoDocumento!.id,

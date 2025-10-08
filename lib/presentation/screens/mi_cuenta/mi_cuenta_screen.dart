@@ -4,6 +4,7 @@ import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/common/lista_botones.dart';
+import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:go_router/go_router.dart';
 
 class MiCuentaScreen extends ConsumerWidget {
@@ -20,11 +21,21 @@ class MiCuentaScreen extends ConsumerWidget {
     }
 
     final botones = [
-      BotonNavegacion(icon: Icons.abc, texto: 'Inicio', ruta: '/inicio'),
-      BotonNavegacion(icon: Icons.person, texto: 'Perfil', ruta: '/perfil'),
+      BotonNavegacion(icon: Icons.electric_meter, texto: 'Suministros', ruta: '/inicio'),
+      BotonNavegacion(icon: Icons.article, texto: 'Solicitudes', ruta: '/perfil'),
       BotonNavegacion(
-        icon: Icons.settings,
-        texto: 'Configuración',
+        icon: Icons.folder,
+        texto: 'Expedientes',
+        ruta: '/configuracion',
+      ),
+      BotonNavegacion(
+        icon: Icons.person,
+        texto: 'Mis Datos',
+        ruta: '/misDatos',
+      ),
+      BotonNavegacion(
+        icon: Icons.delete,
+        texto: 'Eliminar Cuenta',
         ruta: '/configuracion',
       ),
       BotonNavegacion(
@@ -35,6 +46,7 @@ class MiCuentaScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
+      endDrawer: CustomDrawer(),
       appBar: AppBar(title: Text("Mi Cuenta")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

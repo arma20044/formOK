@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/presentation/screens/mi_cuenta/mis_datos.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:form/core/auth/auth_notifier.dart';
@@ -29,8 +30,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     refreshListenable: refreshListenable,
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(path: '/misDatos', builder: (context, state) => const MisDatos()),
       GoRoute(
         path: '/miCuenta',
         builder: (context, state) => const MiCuentaScreen(),
