@@ -53,7 +53,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final loggingIn = state.uri.path == '/login';
 
       // 🔹 No logueado → se queda o va al login
-      if (!isLoggedIn && !loggingIn) return '/login';
+      //if (!isLoggedIn && !loggingIn) return '/login';
 
       // 🔹 Logueado e intenta entrar al login → redirigir a home
       if (isLoggedIn && loggingIn) return '/';
