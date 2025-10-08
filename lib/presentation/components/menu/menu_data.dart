@@ -22,7 +22,7 @@ final List<MenuGroup> menuGroups = [
         //   ),
         // ),
         onTap: (context) =>
-            context.push('/reclamosFaltaEnergia', extra: {'tipoReclamo': 'CO'}),
+            context.push('/reclamosFaltaEnergia', extra: {'tipoReclamo': 'FE'}),
       ),
       MenuItemModel(
         id: 'co',
@@ -93,7 +93,8 @@ final List<MenuGroup> menuGroups = [
         id: 'cuenta',
         icon: Icons.person,
         label: 'Mi Cuenta',
-            onTap: (context) => Navigator.push(
+            onTap: (context) => 
+            Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const MiCuentaScreen()),
         ),

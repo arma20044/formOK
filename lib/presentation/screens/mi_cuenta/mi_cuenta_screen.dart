@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/core/auth/model/auth_state.dart';
+import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/common/lista_botones.dart';
+import 'package:go_router/go_router.dart';
 
-class MiCuentaScreen extends StatelessWidget {
+class MiCuentaScreen extends ConsumerWidget {
   const MiCuentaScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+
+    if (authState.value?.state == AuthState.unauthenticated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/login'); // o context.push('/login');
+      });
+    }
+
     final botones = [
       BotonNavegacion(icon: Icons.abc, texto: 'Inicio', ruta: '/inicio'),
       BotonNavegacion(icon: Icons.person, texto: 'Perfil', ruta: '/perfil'),

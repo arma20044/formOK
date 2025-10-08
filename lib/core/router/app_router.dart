@@ -8,6 +8,7 @@ import 'package:form/main.dart';
 
 import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/mi_cuenta_screen.dart';
+import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen.dart';
 import 'package:go_router/go_router.dart';
 
 
@@ -30,6 +31,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
       GoRoute(path: '/miCuenta', builder: (context, state) => const MiCuentaScreen()),
+      GoRoute(path: '/reclamosFaltaEnergia', builder: (context, state) => const ParentScreen(tipoReclamo: 'FE',))
     ],
     redirect: (context, state) {
       // Si está cargando, no redirige
