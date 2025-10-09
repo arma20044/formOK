@@ -26,7 +26,7 @@ class MiCuentaScreen extends ConsumerWidget {
       BotonNavegacion(
         icon: Icons.folder,
         texto: 'Expedientes',
-        ruta: '/configuracion',
+        ruta: '/expediente',
       ),
       BotonNavegacion(
         icon: Icons.person,

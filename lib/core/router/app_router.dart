@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/presentation/screens/expedientes/expedientes_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/mis_datos.dart';
 import 'package:go_router/go_router.dart';
 
@@ -33,6 +34,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/misDatos', builder: (context, state) => const MisDatos()),
+      GoRoute(path: '/expediente', builder: (context, state) => const ExpedienteScreen()),
       GoRoute(
         path: '/miCuenta',
         builder: (context, state) => const MiCuentaScreen(),
