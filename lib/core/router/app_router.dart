@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/presentation/screens/expedientes/expedientes_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/mis_datos.dart';
+import 'package:form/presentation/screens/mi_cuenta/registro/registro_mi_cuenta_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:form/core/auth/auth_notifier.dart';
@@ -35,6 +36,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/misDatos', builder: (context, state) => const MisDatos()),
       GoRoute(path: '/expediente', builder: (context, state) => const ExpedienteScreen()),
+      GoRoute(path: '/registroMiCuenta', builder: (context, state) => const RegistroMiCuentaScreen()),
       GoRoute(
         path: '/miCuenta',
         builder: (context, state) => const MiCuentaScreen(),
@@ -50,7 +52,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         // 👇 Si ya está en login, no se mueve
         if (state.uri.path == '/login') return null;
         // 👇 Si está en otra pantalla, lo mandamos al login temporalmente
-        return '/login';
+        //return '/login';
       }
 
       final isLoggedIn = authState.value?.state == AuthState.authenticated;

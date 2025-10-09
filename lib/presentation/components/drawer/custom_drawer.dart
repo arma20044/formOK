@@ -39,7 +39,7 @@ class CustomDrawer extends ConsumerWidget {
           // Login / Logout
           const AuthDrawerSection(),
 
-          const Divider(),
+         
 
           // Modo Oscuro
           ListTile(

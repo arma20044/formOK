@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/presentation/auth/login_screen.dart';
+import 'package:form/presentation/screens/mi_cuenta/registro/registro_mi_cuenta_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class AuthDrawerSection extends ConsumerWidget {
@@ -52,22 +53,37 @@ class AuthDrawerSection extends ConsumerWidget {
             ],
           );
         } else {
-          return ListTile(
-            leading: const Icon(Icons.login),
-            title: const Text('Acceder'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              );
-            },
+          return Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.login),
+                title: const Text('Acceder'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.person_add_alt_outlined),
+                title: const Text('Regístrate'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RegistroMiCuentaScreen()),
+                  );
+                },
+              ),
+              const Divider(),
+            ],
           );
         }
       },
-      loading: () => const ListTile(
-        title: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          const ListTile(title: Center(child: CircularProgressIndicator())),
       error: (_, __) => const SizedBox(),
     );
   }

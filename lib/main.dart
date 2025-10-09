@@ -4,6 +4,7 @@ import 'package:form/config/theme/app_theme.dart';
 import 'package:form/core/router/app_router.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/menu/main_menu.dart';
+import 'package:form/presentation/screens/splash_screen.dart';
 import 'package:form/provider/theme_provider.dart';
 
 import 'presentation/components/menu/menu_data.dart';
@@ -30,7 +31,7 @@ class MyApp extends ConsumerWidget {
           routerConfig: router,
         );
       },
-      loading: () => const CircularProgressIndicator(), // O un splash screen
+      loading: () => const SplashScreen(), // O un splash screen
       error: (e, st) => const Center(child: Text('Error cargando tema')),
     );
 
