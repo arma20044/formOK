@@ -49,6 +49,14 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
             cedulaRepresentante: loginExitoso.cedulaRepresentante,
             tipoSolicitante: loginExitoso.tipoSolicitante,
             token: loginExitoso.token,
+            correo: loginExitoso.correo,
+            direccion: loginExitoso.direccion,
+            pais: loginExitoso.pais,
+            departamento: loginExitoso.departamento,
+            ciudad: loginExitoso.ciudad,
+            telefonoCelular: loginExitoso.telefonoCelular,
+            tipoCliente: loginExitoso.tipoCliente,
+            
           ),
         );
       } else {
@@ -99,6 +107,13 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
           cedulaRepresentante: '', //LLEGARA DESDE EL FORM
           tipoSolicitante: '', //LLEGARA DESDE EL FORM
           token: responseLogin.token!,
+          correo: responseLogin.resultado!.correo!,
+          direccion: responseLogin.resultado!.direccion!,
+          pais: responseLogin.resultado!.pais!,
+          departamento: responseLogin.resultado!.departamento!,
+          ciudad: responseLogin.resultado!.ciudad!,
+          telefonoCelular: responseLogin.resultado!.telefonoCelular!,
+          tipoCliente: responseLogin.resultado!.tipoCliente!,
         );
 
         await _storage.write(key: _userKey, value: jsonEncode(user.toMap()));
