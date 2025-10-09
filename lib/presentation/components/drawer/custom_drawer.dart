@@ -17,7 +17,8 @@ class CustomDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ref.watch(themeProvider);
+     final themeNotifier = ref.watch(themeNotifierProvider.notifier);
+    final themeState = ref.watch(themeNotifierProvider);
 
     Future<void> _launchUrl(String key) async {
       await dotenv.load(fileName: ".env");
@@ -46,10 +47,10 @@ class CustomDrawer extends ConsumerWidget {
           // Modo Oscuro
           ListTile(
             leading: const Icon(Icons.contrast),
-            title: const Text('Modo Oscuro'),
+            title: themeState.isDarkMode ? Text('Modo Claro') : Text("Modo Oscuro"),
             onTap: () {
               Navigator.pop(context);
-              ref.read(themeProvider.notifier).toggleTheme();
+              themeNotifier.toggleDarkMode();
             },
           ),
 

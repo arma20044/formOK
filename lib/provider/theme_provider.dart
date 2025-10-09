@@ -1,35 +1,43 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:form/config/theme/app_theme.dart';
 
-import '../core/theme/dark_theme.dart';
-import '../core/theme/light_theme.dart';
 
-class ThemeNotifier extends AsyncNotifier<ThemeData> {
-  static const _themeKey = 'selectedTheme';
-  final _storage = const FlutterSecureStorage();
+/// Estado del tema (color + modo oscuro)
+class ThemeState {
+  final bool isDarkMode;
+  final int selectedColor;
 
-  @override
-  Future<ThemeData> build() async {
-    final themeValue = await _storage.read(key: _themeKey);
-    if (themeValue == 'dark') {
-      return darkTheme;
-    } else {
-      return lightTheme;
-    }
-  }
+  const ThemeState({
+    this.isDarkMode = false,
+    this.selectedColor = 0,
+  });
 
-  Future<void> toggleTheme() async {
-    final current = state.value ?? lightTheme;
-    if (current == lightTheme) {
-      state = AsyncData(darkTheme);
-      await _storage.write(key: _themeKey, value: 'dark');
-    } else {
-      state = AsyncData(lightTheme);
-      await _storage.write(key: _themeKey, value: 'light');
-    }
-  }
+  ThemeState copyWith({bool? isDarkMode, int? selectedColor}) => ThemeState(
+        isDarkMode: isDarkMode ?? this.isDarkMode,
+        selectedColor: selectedColor ?? this.selectedColor,
+      );
 }
 
-final themeProvider =
-    AsyncNotifierProvider<ThemeNotifier, ThemeData>(ThemeNotifier.new);
+/// Notifier para manejar el tema global
+class ThemeNotifier extends Notifier<ThemeState> {
+  @override
+  ThemeState build() => const ThemeState();
+
+  void toggleDarkMode() {
+    state = state.copyWith(isDarkMode: !state.isDarkMode);
+  }
+
+  void changeColor(int index) {
+    state = state.copyWith(selectedColor: index);
+  }
+
+  ThemeData get theme => AppTheme(
+        selectedColor: state.selectedColor,
+        isDarkMode: state.isDarkMode,
+      ).getTheme();
+}
+
+/// Provider global
+final themeNotifierProvider =
+    NotifierProvider<ThemeNotifier, ThemeState>(ThemeNotifier.new);

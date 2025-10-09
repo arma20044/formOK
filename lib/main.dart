@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/config/theme/app_theme.dart';
 import 'package:form/core/router/app_router.dart';
 import 'package:form/core/theme/light_theme.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
@@ -18,29 +19,18 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ref.watch(themeProvider);
+    final themeNotifier = ref.watch(themeNotifierProvider.notifier);
+    final themeState = ref.watch(themeNotifierProvider);
     final router = ref.watch(goRouterProvider);
 
-   return theme.when(
-      data: (t) {
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          theme: t,
-          routerConfig: router // tu configuración de GoRouter
-        );
-      },
-      loading: () {
-        // 👇 Mostrar un splash o pantalla de carga mientras se lee el tema
-        return const SplashScreen();
-      },
-      error: (e, _) {
-        // Si falla, usar tema claro por defecto
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          theme: lightTheme,
-          routerConfig: router,
-        );
-      },
+   return MaterialApp(
+      title: 'App Verde',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme(
+        selectedColor: themeState.selectedColor,
+        isDarkMode: themeState.isDarkMode,
+      ).getTheme(),
+      home: const HomeScreen(),
     );
   }
 }

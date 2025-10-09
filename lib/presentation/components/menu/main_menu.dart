@@ -101,7 +101,12 @@ class MainMenu extends StatelessWidget {
             children: [
               if (group.title != null) ...[
                 Text(group.title!, style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 8),
+                Divider(
+                   //color: theme.dividerColor,
+                  thickness: 1,
+                  height: 16,
+                ),
+                //const SizedBox(height: 4),
               ],
               GridView.count(
                 crossAxisCount: 3, // 👈 siempre 3 columnas
