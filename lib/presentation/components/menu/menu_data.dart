@@ -32,7 +32,7 @@ final List<MenuGroup> menuGroups = [
         onTap: (context) => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ParentScreen(tipoReclamo: 'CO'),
+            builder: (_) => const ReclamosScreen(tipoReclamo: 'CO'),
           ),
         ),
       ),
@@ -43,7 +43,7 @@ final List<MenuGroup> menuGroups = [
         onTap: (context) => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ParentScreen(tipoReclamo: 'AP'),
+            builder: (_) => const ReclamosScreen(tipoReclamo: 'AP'),
           ),
         ),
       ),
@@ -54,7 +54,7 @@ final List<MenuGroup> menuGroups = [
         onTap: (context) => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ParentScreen(tipoReclamo: 'CX'),
+            builder: (_) => const ReclamosScreen(tipoReclamo: 'CX'),
           ),
         ),
       ),

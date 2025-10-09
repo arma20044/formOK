@@ -10,8 +10,8 @@ import '../../../repositories/reclamo_repository_impl.dart';
 import '../../components/components.dart';
 import '../../forms/FormWrapper.dart';
 
-class ParentScreen extends StatefulWidget {
-  const ParentScreen({
+class ReclamosScreen extends StatefulWidget {
+  const ReclamosScreen({
     super.key,
     required this.tipoReclamo,
     //required String tipo
@@ -22,7 +22,7 @@ class ParentScreen extends StatefulWidget {
   _ParentScreenState createState() => _ParentScreenState();
 }
 
-class _ParentScreenState extends State<ParentScreen>
+class _ParentScreenState extends State<ReclamosScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 

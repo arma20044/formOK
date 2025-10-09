@@ -43,7 +43,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/reclamosFaltaEnergia',
-        builder: (context, state) => const ParentScreen(tipoReclamo: 'FE'),
+        builder: (context, state) => const ReclamosScreen(tipoReclamo: 'FE'),
       ),
     ],
     redirect: (context, state) {
