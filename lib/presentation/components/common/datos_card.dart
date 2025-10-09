@@ -9,20 +9,29 @@ class DatosCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
+    return Container(
       alignment: Alignment.topLeft,
-      child: Column(
-        children: [
-          Text('NIS: $nis', style: TextStyle(fontWeight: FontWeight.bold)),
-          Text(
-            'NIS: ${datosCliente?.nombre}',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Text(
-            'RUC/CI: ${datosCliente?.ruc}',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
+      child: Container(
+        alignment: Alignment.bottomLeft,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'NIS: $nis',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              textAlign: TextAlign.left,
+            ),
+            Text(
+              '${datosCliente?.nombre}',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21),
+            ),
+            Text(
+              'RUC/CI: ${datosCliente?.ruc}',
+              style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30),
+            ),
+          ],
+        ),
       ),
     );
   }

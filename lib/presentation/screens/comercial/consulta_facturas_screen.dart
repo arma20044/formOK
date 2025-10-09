@@ -191,6 +191,11 @@ class _ConsultaFacturasScreenState
                     datosCliente: datosCliente,
                     nis: _nisController.text,
                   ),
+                  const SizedBox(height: 16),
+                  Text("Historico de Comprobantes", style: TextStyle(
+                    color: Colors.green, fontWeight: FontWeight.bold
+                  ),),
+                  Text("Deslice hacia la izquierda o derecha para ver más comprobantes"),
                   FacturaScrollHorizontal(
                     facturas: facturas,
                     nis: _nisController,

@@ -3,39 +3,20 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/model/consulta_facturas.dart';
 import 'package:form/presentation/components/common/custom_ask_modal.dart';
 import 'package:form/presentation/components/common/custom_pdf_modal.dart';
 import 'package:form/presentation/components/common/pdf_viewer.dart';
+import 'package:form/provider/theme_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 
-/*
-const uriPdf = 
-    facturaItem.facturaElectronica
-    ?
-    Environment.HOST_CTX_OPEN + "/v5/suministro/facturaElectronicaPdfMobile?"
-    + "nro_nis=" + nis
-        + "&sec_nis=" + sec_nis
-        + "&sec_rec=" + sec_rec
-        + "&f_fact=" + fechaAAAAMMDD_toDDMMAAAA( fechaFacturacion )
-        + "&clientKey=" + Environment.CLIENT_KEY
-        + "&value=" + cifra
-        + "&fecha=" + fechaVencimiento
-    :
-    Environment.HOST_CTX_OPEN + "/v4/suministro/facturaPdfMobile?"
-        + "nro_nis=" + nis
-        + "&sec_nis=" + sec_nis
-        + "&sec_rec=" + sec_rec
-        + "&f_fact=" + fechaAAAAMMDD_toDDMMAAAA( fechaFacturacion )
-        + "&clientKey=" + Environment.CLIENT_KEY
-        + "&value=" + cifra
-        + "&fecha=" + fechaVencimiento;
-        */
 
-class FacturaScrollHorizontal extends StatelessWidget {
+
+class FacturaScrollHorizontal extends ConsumerWidget {
   final List<Lista?>? facturas;
   final TextEditingController nis;
 
@@ -98,9 +79,11 @@ class FacturaScrollHorizontal extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final formatoMoneda = NumberFormat.currency(locale: 'es_PY', symbol: '₲');
     final formatoFecha = DateFormat('dd/MM/yyyy');
+        final themeState = ref.watch(themeNotifierProvider);
+
 
     return SizedBox(
       height: 180, // altura del scroll
@@ -144,6 +127,10 @@ class FacturaScrollHorizontal extends StatelessWidget {
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color: themeState.value!.isDarkMode ? Colors.white : Colors.black,
+                  width: 0.5, // Set your desired border width here
+                ),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Padding(
@@ -200,16 +187,15 @@ class FacturaScrollHorizontal extends StatelessWidget {
                                 'factura_${factura.nirSecuencial}.pdf',
                               );
 
-                              mostrarCustomModal(context,archivoDescargado);
-                        
+                          mostrarCustomModal(context, archivoDescargado);
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Error al abrir PDF: $e')),
                           );
                         }
                       },
-                     // onPressed: () => mostrarCustomModal(context),
 
+                      // onPressed: () => mostrarCustomModal(context),
                       child: Text(
                         "Ver Factura",
                         style: TextStyle(fontSize: 14),
@@ -231,7 +217,7 @@ void mostrarCustomModal(BuildContext context, File pdfFile) {
     context: context,
     builder: (context) {
       return CustomPdfModal(
-        pdfFile: pdfFile ,
+        pdfFile: pdfFile,
         title: 'Confirmar acción',
         content: const Text(
           '¿Deseas continuar con esta acción?',
