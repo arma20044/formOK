@@ -3,13 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:form/core/auth/auth_notifier.dart';
-import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/drawer/auth_drawer_section.dart';
 import 'package:form/presentation/components/drawer/auth_header_section.dart';
 import '../../../provider/theme_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
 
 class CustomDrawer extends ConsumerWidget {
@@ -47,7 +44,7 @@ class CustomDrawer extends ConsumerWidget {
           // Modo Oscuro
           ListTile(
             leading: const Icon(Icons.contrast),
-            title: themeState.isDarkMode ? Text('Modo Claro') : Text("Modo Oscuro"),
+            title: themeState.value!.isDarkMode ? Text('Modo Claro') : Text("Modo Oscuro"),
             onTap: () {
               Navigator.pop(context);
               themeNotifier.toggleDarkMode();

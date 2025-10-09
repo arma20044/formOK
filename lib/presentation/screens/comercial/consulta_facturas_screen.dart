@@ -123,7 +123,7 @@ class _ConsultaFacturasScreenState
 
     return Scaffold(
       endDrawer: const CustomDrawer(),
-      appBar: AppBar(title: const Text('Consulta NIS')),
+      appBar: AppBar(title: const Text('Consulta de Facturas')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -133,23 +133,51 @@ class _ConsultaFacturasScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextFormField(
-                  controller: _nisController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'NIS',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa un NIS';
-                    }
-                    if (!RegExp(r'^\d+$').hasMatch(value)) {
-                      return 'Solo números permitidos';
-                    }
-                    return null;
-                  },
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 8, // 80% del espacio
+                      child: TextFormField(
+                        controller: _nisController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'NIS',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor ingresa un NIS';
+                          }
+                          if (!RegExp(r'^\d+$').hasMatch(value)) {
+                            return 'Solo números permitidos';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8), // separación entre input y botón
+                    Expanded(
+                      flex: 2, // 20% del espacio
+                      child: Container(
+                        height:
+                            60, // opcional: para igualar altura del TextFormField
+                        decoration: BoxDecoration(
+                          //color: Colors.blue,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.star_border_sharp,
+                            color: Colors.green,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: isLoading ? null : _consultar,

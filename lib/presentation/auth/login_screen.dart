@@ -28,6 +28,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final numeroController = TextEditingController();
   final passwordController = TextEditingController();
   DropdownItem? selectedTipoDocumento;
+  final loginFormKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -53,7 +54,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
 
-              context.go('/');
+             context.go('/');
+              //GoRouter.of(context).go('/');
             });
           } else if (authData.state == AuthState.error) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -70,66 +72,100 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     final isLoading = authState.isLoading;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Mi Cuenta - Acceder")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            DropdownButtonFormField<DropdownItem>(
-              value: selectedTipoDocumento,
-              hint: const Text("Seleccionar Tipo de Documento"),
-              items: dropDownItems
-                  .map(
-                    (item) =>
-                        DropdownMenuItem(value: item, child: Text(item.name)),
-                  )
-                  .toList(),
-              onChanged: (value) {
-                setState(() => selectedTipoDocumento = value);
-              },
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: numeroController,
-              decoration: const InputDecoration(
-                labelText: 'Número de Documento',
+    return Form(
+      key: loginFormKey,
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Mi Cuenta - Acceder")),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              DropdownButtonFormField<DropdownItem>(
+                value: selectedTipoDocumento,
+                hint: const Text("Seleccionar Tipo de Documento"),
+                items: dropDownItems
+                    .map(
+                      (item) =>
+                          DropdownMenuItem(value: item, child: Text(item.name)),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  setState(() => selectedTipoDocumento = value);
+                },
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Contraseña'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: numeroController,
+                decoration: const InputDecoration(
+                  labelText: 'Número de CI, RUC o Pasaporte',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Ingrese Número de CI, RUC o Pasaporte';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: passwordController,
+                decoration: const InputDecoration(labelText: 'Contraseña'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Ingrese Contraseña';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
 
-            // ✅ Spinner en el botón
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isLoading || selectedTipoDocumento == null
-                    ? null
-                    : () {
-                        ref
-                            .read(authProvider.notifier)
-                            .login(
-                              numeroController.text.trim(),
-                              passwordController.text.trim(),
-                              selectedTipoDocumento!.id,
-                            );
-                      },
-                child: isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Login'),
+              // ✅ Spinner en el botón
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: (isLoading || selectedTipoDocumento == null)
+                      ? null
+                      : () {
+                          // Valida el formulario
+                          if (loginFormKey.currentState!.validate()) {
+                            // Llama al login solo si el formulario es válido
+                            ref
+                                .read(authProvider.notifier)
+                                .login(
+                                  numeroController.text.trim(),
+                                  passwordController.text.trim(),
+                                  selectedTipoDocumento!.id,
+                                );
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(
+                      double.infinity,
+                      50,
+                    ), // botón ancho completo
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Acceder',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
