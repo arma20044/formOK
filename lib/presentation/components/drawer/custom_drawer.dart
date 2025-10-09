@@ -20,6 +20,8 @@ class CustomDrawer extends ConsumerWidget {
     final theme = ref.watch(themeProvider);
 
     Future<void> _launchUrl(String key) async {
+      await dotenv.load(fileName: ".env");
+
       final url = dotenv.env[key];
       if (url == null) return;
 
@@ -43,7 +45,7 @@ class CustomDrawer extends ConsumerWidget {
 
           // Modo Oscuro
           ListTile(
-            leading: const Icon(Icons.color_lens),
+            leading: const Icon(Icons.contrast),
             title: const Text('Modo Oscuro'),
             onTap: () {
               Navigator.pop(context);
@@ -53,7 +55,7 @@ class CustomDrawer extends ConsumerWidget {
 
           // Valorar App
           ListTile(
-            leading: const Icon(Icons.app_blocking),
+            leading: const Icon(Icons.favorite_border_outlined),
             title: const Text('Valorar App'),
             onTap: () {
               Navigator.pop(context);
@@ -67,7 +69,7 @@ class CustomDrawer extends ConsumerWidget {
 
           // Políticas de Privacidad
           ListTile(
-            leading: const Icon(Icons.app_blocking),
+            leading: const Icon(Icons.info_outline),
             title: const Text('Políticas de Privacidad'),
             onTap: () {
               Navigator.pop(context);

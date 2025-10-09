@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
+import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../core/enviromens/enrivoment.dart';
 
@@ -40,8 +41,9 @@ String url = '${Environment.hostSitioAnde}/expedientes/';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: CustomDrawer(),
       appBar: AppBar(
-        title: Text(url),
+        title: Text('Expedientes'),
       ),
       body: Stack(
         children: [

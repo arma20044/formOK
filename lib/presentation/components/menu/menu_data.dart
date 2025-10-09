@@ -12,7 +12,7 @@ final List<MenuGroup> menuGroups = [
     items: [
       MenuItemModel(
         id: 'fe',
-        icon: Icons.fact_check,
+        icon: Icons.campaign,
         label: 'Falta de Energía',
         // onTap: (context) =>  Navigator.push(
         //   context,
@@ -26,9 +26,9 @@ final List<MenuGroup> menuGroups = [
       ),
       MenuItemModel(
         id: 'co',
-        icon: Icons.people,
+        icon: Icons.request_quote,
         label: 'Comercial/Facturación',
-        badge: '5',
+        //badge: '5',
         onTap: (context) => Navigator.push(
           context,
           MaterialPageRoute(
@@ -38,7 +38,7 @@ final List<MenuGroup> menuGroups = [
       ),
       MenuItemModel(
         id: 'map',
-        icon: Icons.map,
+        icon: Icons.light,
         label: 'Alumbrado Público',
         onTap: (context) => Navigator.push(
           context,
@@ -49,7 +49,7 @@ final List<MenuGroup> menuGroups = [
       ),
       MenuItemModel(
         id: 'map',
-        icon: Icons.bolt,
+        icon: Icons.flash_off,
         label: 'Denunciá el Robo de Energía',
         onTap: (context) => Navigator.push(
           context,
@@ -74,14 +74,14 @@ final List<MenuGroup> menuGroups = [
       ),
       MenuItemModel(
         id: 'history',
-        icon: Icons.history,
-        label: 'Historial',
+        icon: Icons.edit_document,
+        label: 'Solicitudes',
         // onTap: () => debugPrint('Historial'),
       ),
       MenuItemModel(
-        id: 'reports',
-        icon: Icons.bar_chart,
-        label: 'Reportes',
+        id: 'yoFacturoMiLuz',
+        icon: Icons.electric_meter,
+        label: 'Yo Facturo mi Luz',
         enabled: false,
       ),
     ],
