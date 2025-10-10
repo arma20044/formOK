@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/config/tipo_tramite_model.dart';
 import 'package:form/model/model.dart';
+import 'package:form/presentation/components/common/info_card_simple.dart';
 import 'package:form/presentation/components/widgets/dropdown_custom.dart';
 
 import '../../../../../core/api/mi_ande_api.dart';
@@ -51,6 +52,11 @@ class _Paso1TabState extends State<Paso1Tab>
   final TextEditingController numeroDocumentoController =
       TextEditingController();
   final TextEditingController correoController = TextEditingController();
+  final TextEditingController direccionController = TextEditingController();
+  final TextEditingController numeroTelefonoFijoController =
+      TextEditingController();
+  final TextEditingController numeroTelefonoCelularController =
+      TextEditingController();
 
   final FocusNode _focusNode = FocusNode();
 
@@ -295,7 +301,26 @@ class _Paso1TabState extends State<Paso1Tab>
                       ],
                     )
                   : Text(""),
-              
+
+              TextFormField(
+                //focusNode: _focusNode,
+                controller: direccionController,
+                keyboardType: TextInputType.text,
+                decoration: const InputDecoration(
+                  labelText: "Dirección",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (val) {
+                  //if (selectedTipoReclamo?.nisObligatorio == 'S') {
+                  if (val == null || val.isEmpty) {
+                    return "Ingrese Dirección";
+                  }
+                  //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+                  return null;
+                  //}
+                },
+              ),
+              const SizedBox(height: 20),
               TextFormField(
                 //focusNode: _focusNode,
                 controller: correoController,
@@ -313,6 +338,46 @@ class _Paso1TabState extends State<Paso1Tab>
                   return null;
                   //}
                 },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                //focusNode: _focusNode,
+                controller: numeroTelefonoFijoController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(
+                  labelText: "Número de Teléfono Fijo",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (val) {
+                  /*if (val == null || val.isEmpty) {
+                    return "Ingrese Número Fijo";
+                  }*/
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                //focusNode: _focusNode,
+                controller: numeroTelefonoCelularController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(
+                  labelText: "Número Teléfono Celular",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (val) {
+                  if (val == null || val.isEmpty) {
+                    return "Ingrese Número Teléfono Celular";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+
+              InfoCardSimple(
+                title: "Se utilizará para validar la cuenta vía SMS",
+                subtitle: "",
+                icon: Icons.info,
+                color: Colors.blue,
               ),
               const SizedBox(height: 20),
             ],
