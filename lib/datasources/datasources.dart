@@ -3,3 +3,4 @@ export 'ciudad_datasource.dart';
 export 'barrio_datasource.dart';
 export 'tipo_reclamo_datasource.dart';
 export 'login_datasource.dart';
+export 'consulta_documento_datasource.dart';

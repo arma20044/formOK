@@ -4,3 +4,4 @@ export 'barrio_datasource_impl.dart';
 export 'tipo_reclamo_datasource_impl.dart';
 export 'login_datasource_impl.dart';
 export 'consulta_facturas_datasource_impl.dart';
+export 'consulta_documento_datasource_impl.dart';

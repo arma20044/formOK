@@ -53,11 +53,27 @@ final dataTipoSolicitanteArray = [
 ];
 
 
- const dataPaisArray = [
-    { "id": "Paraguay", "descripcion": "Paraguay" },
+ final dataPaisArray = [
+    ModalModel(
+    id: "Paraguay",
+    descripcion: "Paraguay"
+  ),
+    ModalModel(
+    id: "Brasil",
+    descripcion: "Brasil"
+  ),
+    ModalModel(
+    id: "Argentina",
+    descripcion: "Argentina"
+  ),
+    ModalModel(
+    id: "Bolivia",
+    descripcion: "Bolivia"
+  ),
+  /*  { "id": "Paraguay", "descripcion": "Paraguay" },
     { "id": "Brasil", "descripcion": "Brasil" },
     { "id": "Argentina", "descripcion": "Argentina" },
-    { "id": "Bolivia", "descripcion": "Bolivia" }
+    { "id": "Bolivia", "descripcion": "Bolivia" }*/
 ];
 
  const dataTipoDocumentoActArray = [
