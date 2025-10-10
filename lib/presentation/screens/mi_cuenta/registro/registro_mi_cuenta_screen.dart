@@ -24,6 +24,13 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: _formKeys.length, vsync: this);
+    // Listener para actualizar la UI cuando cambia el tab
+    _tabController.addListener(() {
+      // Solo cuando terminó la animación y no está en el medio de un swipe
+      if (!_tabController.indexIsChanging) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -92,12 +99,11 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     }
   }
 
-
   Future<bool> _validarTabActual() async {
-  // 🔹 ejemplo simple
-  // si querés validar un Form: if (_formKey.currentState!.validate()) return true;
-  return Future.value(true);
-}
+    // 🔹 ejemplo simple
+    // si querés validar un Form: if (_formKey.currentState!.validate()) return true;
+    return Future.value(true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +111,11 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
 
     return Scaffold(
       endDrawer: const CustomDrawer(),
-      appBar: RegistroAppBar(controller: _tabController),
+      appBar: RegistroAppBar(
+        controller: _tabController,
+        onNextTab: _nextTab,
+        onPreviousTab: _previousTab,
+      ),
 
       body: SafeArea(
         child: Column(
@@ -148,14 +158,13 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
               if (_tabController.index > 0)
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: _isLoadingReclamo
-                      ? null: _previousTab,
+                    onPressed: _isLoadingReclamo ? null : _previousTab,
                     child: _isLoadingReclamo
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
                         : const Text('Anterior'),
                   ),
                 ),
