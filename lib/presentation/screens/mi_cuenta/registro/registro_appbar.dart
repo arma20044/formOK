@@ -10,6 +10,10 @@ class RegistroAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: const Text("Mi Cuenta - Registrate"),
       bottom: TabBar(
+         onTap: (index) {
+          print('Tocaste el tab $index');
+          // Aquí capturas cuando el usuario toca cualquier tab, incluso si ya está seleccionado
+        },
         controller: controller,
         tabs: const [
           Tab(text: "Paso 1"),

@@ -2,18 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:form/model/archivo_adjunto_model.dart';
 import 'package:form/presentation/components/common/adjuntos.dart';
 
-class Paso3Tab extends StatelessWidget {
-  const Paso3Tab({super.key});
+class Paso3Tab extends StatefulWidget {
+  final GlobalKey<FormState> formKey;
+  const Paso3Tab({super.key, required this.formKey});
 
   @override
+  State<Paso3Tab> createState() => _Paso3TabState();
+}
+
+class _Paso3TabState extends State<Paso3Tab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    super.build(context);
 
     ArchivoAdjunto? _archivoSeleccionado;
 
     return Scaffold(
       body: Form(
-        key: _formKey,
+        key: widget.formKey,
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -24,7 +33,7 @@ class Paso3Tab extends StatelessWidget {
                     value == null ? 'Debes adjuntar un archivo' : null,
                 onChanged: (archivo) =>
                     //print('Seleccionado: ${archivo?.file.path}'),
-                    _archivoSeleccionado = archivo
+                    _archivoSeleccionado = archivo,
               ),
               Adjuntos(
                 label: 'Adjuntar imagen o video',
@@ -35,8 +44,8 @@ class Paso3Tab extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
+                  if (widget.formKey.currentState!.validate()) {
+                    widget.formKey.currentState!.save();
                   }
                 },
                 child: const Text('Guardar'),

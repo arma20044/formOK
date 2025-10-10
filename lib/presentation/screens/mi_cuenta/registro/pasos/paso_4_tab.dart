@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
 class Paso4Tab extends StatefulWidget {
-  const Paso4Tab({super.key});
+  final GlobalKey<FormState> formKey;
+  const Paso4Tab({super.key, required this.formKey});
 
   @override
   State<Paso4Tab> createState() => _Paso4TabState();
 }
 
-class _Paso4TabState extends State<Paso4Tab> {
+class _Paso4TabState extends State<Paso4Tab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   final Map<String, bool> opciones = {
     'Acepto los términos y condiciones': false,
     'Deseo recibir notificaciones por correo': false,
@@ -16,38 +20,22 @@ class _Paso4TabState extends State<Paso4Tab> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        const Text(
-          'Confirmaciones y Consentimientos',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    super.build(context);
+    return Form(
+      key: widget.formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Contraseña'),
+              validator: (value) =>
+                  (value == null || value.isEmpty) ? 'Campo obligatorio' : null,
+            ),
+            // Otros campos...
+          ],
         ),
-        const SizedBox(height: 16),
-        ...opciones.keys.map((texto) {
-          return CheckboxListTile(
-            title: Text(texto),
-            value: opciones[texto],
-            onChanged: (bool? value) {
-              setState(() {
-                opciones[texto] = value ?? false;
-              });
-            },
-          );
-        }),
-        const SizedBox(height: 20),
-        Builder(
-          builder: (context) {
-            final bool algunSeleccionado = opciones.containsValue(true);
-            if (!algunSeleccionado) {
-              return const Text(
-                '⚠️ Debe seleccionar al menos una opción para continuar',
-                style: TextStyle(color: Colors.red),
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        ),
-      ],
+      ),
     );
   }
 }
