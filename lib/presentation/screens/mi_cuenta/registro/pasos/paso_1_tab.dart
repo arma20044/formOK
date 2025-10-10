@@ -15,6 +15,13 @@ final List<ModalModel> listaTipoTramite = dataTipoClienteArray;
 final List<ModalModel> listaTipoSolicitante = dataTipoSolicitanteArray;
 final List<ModalModel> listaTipoDocumento = dataTipoDocumentoArray;
 
+void consultarDocumento(String documento) {
+
+  print(documento);
+
+
+}
+
 class _Paso1TabState extends State<Paso1Tab>
     with AutomaticKeepAliveClientMixin {
   @override
@@ -25,6 +32,23 @@ class _Paso1TabState extends State<Paso1Tab>
   ModalModel? selectedTipoDocumento;
 
   final TextEditingController numeroDocumentoController = TextEditingController();
+    final FocusNode _focusNode = FocusNode();
+
+
+    @override
+  void initState() {
+    super.initState();
+
+    // Escuchamos cambios de foco
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        // Aquí el TextFormField perdió el foco
+        //print('TextFormField perdió el foco');
+        //print('Valor actual: ${numeroDocumentoController.text}');
+        consultarDocumento(numeroDocumentoController.text);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +101,7 @@ class _Paso1TabState extends State<Paso1Tab>
             ),
             const SizedBox(height: 20),
             TextFormField(
+              focusNode: _focusNode,
               controller: numeroDocumentoController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
@@ -91,6 +116,7 @@ class _Paso1TabState extends State<Paso1Tab>
                 //}
                 
               },
+             
             ),
             // Otros campos...
           ],
@@ -98,4 +124,6 @@ class _Paso1TabState extends State<Paso1Tab>
       ),
     );
   }
+  
+  
 }
