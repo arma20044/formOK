@@ -109,7 +109,7 @@ class _Paso1TabState extends State<Paso1Tab>
   @override
   void initState() {
     super.initState();
-    _fetchDepartamentos();
+    //_fetchDepartamentos();
 
     // Escuchamos cambios de foco
     _focusNode.addListener(() {
@@ -221,40 +221,81 @@ class _Paso1TabState extends State<Paso1Tab>
                 value: selectedPais,
                 displayBuilder: (b) => b.descripcion!,
                 validator: (val) => val == null ? "Seleccione un País" : null,
-                onChanged: (val) => setState(() => selectedPais = val),
-              ),
-              const SizedBox(height: 20),
-              DropdownCustom<Departamento>(
-                label: "Departamento",
-                items: listaDepartamentos,
-                value: selectedDept,
-                displayBuilder: (d) => d.nombre!,
-                validator: (val) =>
-                    val == null ? "Seleccione un Departamento" : null,
-                onChanged: (val) {
-                  setState(() {
-                    selectedDept = val;
-                    selectedCiudad = null;
-                    ciudades = [];
-                  });
-                  if (val != null) _fetchCiudades(val.idDepartamento);
+                onChanged: (val) => {
+                  setState(() => selectedPais = val),
+
+                  if (val?.descripcion?.compareTo("Paraguay") == 0)
+                    {
+                      selectedDept = null,
+                      listaDepartamentos = [],
+                      listaCiudades = [],
+                      ciudades = [],
+                      departamentos = [],
+                      selectedCiudad = null,
+
+                      _fetchDepartamentos(),
+                    },
+
+                  //if (val?.id != null && val?.descripcion?.compareTo("Paraguay") == 0) _fetchCiudades(val.id.toString())
                 },
               ),
               const SizedBox(height: 20),
-              DropdownCustom<Ciudad>(
-                label: "Ciudad",
-                items: listaCiudades,
-                value: selectedCiudad,
-                displayBuilder: (c) => c.nombre!,
-                validator: (val) =>
-                    val == null ? "Seleccione una ciudad" : null,
-                onChanged: (val) {
-                  setState(() {
-                    selectedCiudad = val;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
+              selectedPais?.id == 'Paraguay'
+                  ? Column(
+                      children: [
+                        IgnorePointer(
+                          ignoring:
+                              selectedPais?.descripcion?.compareTo(
+                                    "Paraguay",
+                                  ) ==
+                                  0
+                              ? false
+                              : true,
+                          child: DropdownCustom<Departamento>(
+                            label: "Departamento",
+                            items: listaDepartamentos,
+                            value: selectedDept,
+                            displayBuilder: (d) => d.nombre!,
+                            validator: (val) => val == null
+                                ? "Seleccione un Departamento"
+                                : null,
+                            onChanged: (val) {
+                              setState(() {
+                                selectedDept = val;
+                                selectedCiudad = null;
+                                ciudades = [];
+                              });
+                              if (val != null)
+                                _fetchCiudades(val.idDepartamento);
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    )
+                  : Text(""),
+
+              selectedPais?.id == 'Paraguay'
+                  ? Column(
+                      children: [
+                        DropdownCustom<Ciudad>(
+                          label: "Ciudad",
+                          items: listaCiudades,
+                          value: selectedCiudad,
+                          displayBuilder: (c) => c.nombre!,
+                          validator: (val) =>
+                              val == null ? "Seleccione una ciudad" : null,
+                          onChanged: (val) {
+                            setState(() {
+                              selectedCiudad = val;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    )
+                  : Text(""),
+              
               TextFormField(
                 //focusNode: _focusNode,
                 controller: correoController,

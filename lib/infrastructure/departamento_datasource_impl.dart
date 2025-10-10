@@ -20,15 +20,15 @@ class DepartamentoDatasourceImpl extends DepartamentoDatasource {
 
   
 
-    var data = FormData.fromMap({
-        //'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
-        //'categoriaWebAppJsonArray': '["FE"]',
-      });
+  
 
   @override
   Future<List<Departamento>> getDepartamento() async{
 
-  
+    var data = FormData.fromMap({
+        //'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
+        //'categoriaWebAppJsonArray': '["FE"]',
+      });
 
     
   
