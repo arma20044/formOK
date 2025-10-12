@@ -2,30 +2,29 @@ import '../model/archivo_adjunto_model.dart';
 import '../model/model.dart';
 
 abstract class MiCuentaRegistroDatasource {
-  Future<MiCuentaRegistroResponse> getMiCuentaRegistro(
-    String actualizarDatos,
-    num tipoRegistro,
-    num tipoSolicitante,
-    num tipoDocumento,
-    num tipoCliente,
-    String cedulaRepresentante,
-    String numeroDocumento,
-    String nombre,
-    String apellido,
-    String pais,
-    String departamento,
-    String ciudad,
-    String direccion,
-    String correo,
-    String telefonoFijo,
-    String numeroTelefonoCelular,
-    String password,
-    String confirmacionPassword,
-    String passwordAnterior,
-    num tipoVerificacion,
+  Future<MiCuentaRegistroResponse> getMiCuentaRegistro({
+    required String actualizarDatos,
+    required num tipoCliente,
+    required String tipoSolicitante,
+    required String tipoDocumento,
+    required String cedulaRepresentante,
+    required String numeroDocumento,
+    required String nombre,
+    required String apellido,
+    required String pais,
+    required String departamento,
+    required String ciudad,
+    required String direccion,
+    required String correo,
+    required String telefonoFijo,
+    required String numeroTelefonoCelular,
+    required String password,
+    required String confirmacionPassword,
+    required String passwordAnterior,
+    required String tipoVerificacion,
 
-    String solicitudOTP,
-    String codigoOTP,
+    required String solicitudOTP,
+    required String codigoOTP,
 
     ArchivoAdjunto? ci1,
     String? ci1Extra,
@@ -36,5 +35,5 @@ abstract class MiCuentaRegistroDatasource {
     String? fotoPersonal1Extra,
     ArchivoAdjunto? fotoPersonal2,
     String? fotoPersonal2Extra,
-  );
+  });
 }

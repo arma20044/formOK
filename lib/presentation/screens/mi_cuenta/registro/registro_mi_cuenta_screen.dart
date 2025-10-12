@@ -83,8 +83,8 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     }
   }
 
-  //Future<MiCuentaRegistroResponse> _fetchMiCuentaRegistro() async {
-  Future<bool> _fetchMiCuentaRegistro() async {
+  Future<MiCuentaRegistroResponse> _fetchMiCuentaRegistro() async {
+    //Future<bool> _fetchMiCuentaRegistro() async {
     final repoMicuentaRegistro = MiCuentaRegistroRepositoryImpl(
       MiCuentaRegistroDatasourceImpl(MiAndeApi()),
     );
@@ -98,10 +98,31 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     print("Datos a enviar: $datosPaso2");
     print("Datos a enviar: $datosPaso3");
 
-    // final miCuentaRegistroResponse = await repoMicuentaRegistro.getMiCuentaRegistro(
-
-    //);
-    return true;
+    final miCuentaRegistroResponse = await repoMicuentaRegistro
+        .getMiCuentaRegistro(
+          actualizarDatos: 'S',
+          tipoCliente: num.parse(datosPaso1!['tipoCliente']),
+          tipoSolicitante: datosPaso1['tipoSolicitante'],
+          tipoDocumento: datosPaso1['tipoDocumento'],
+          cedulaRepresentante: datosPaso1['cedulaRepresentante'] ?? '',
+          numeroDocumento: datosPaso1['numeroDocumento'] ?? '',
+          nombre: datosPaso1['nombre'] ?? '',
+          apellido: datosPaso1['apellido'] ?? '',
+          pais: datosPaso1['pais'] ?? '',
+          departamento: datosPaso1['departamento'] ?? '',
+          ciudad: datosPaso1['ciudad'] ?? '',
+          direccion: datosPaso1['direccion'] ?? '',
+          correo: datosPaso1['correo'] ?? '',
+          telefonoFijo: datosPaso1['telefonoFijo'] ?? '',
+          numeroTelefonoCelular: datosPaso1['telefonoCelular'] ?? '',
+          password: datosPaso2!['password'] ?? '',
+          confirmacionPassword: datosPaso2['confirmacionPassword'] ?? '',
+          passwordAnterior: datosPaso2['passwordAnterior'] ?? '',
+          tipoVerificacion: datosPaso2['tipoVerificacion'] ?? '',
+          solicitudOTP: datosPaso2['solicitudOTP'] ?? '',
+          codigoOTP: datosPaso2['codigoOTP'] ?? '',
+        );
+    return miCuentaRegistroResponse;
   }
 
   /// Enviar formulario completo
@@ -132,9 +153,9 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     setState(() => _isLoadingReclamo = true);
 
     try {
-      //      MiCuentaRegistroResponse result = await _fetchMiCuentaRegistro();
-      bool result = await _fetchMiCuentaRegistro();
-      /*  if (result.error) {
+      MiCuentaRegistroResponse result = await _fetchMiCuentaRegistro();
+      //bool result = await _fetchMiCuentaRegistro();
+      if (result.error) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(result.errorValList![0])));
@@ -143,7 +164,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Formulario enviado correctamente")),
         );
-      }*/
+      }
     } finally {
       setState(() => _isLoadingReclamo = false);
     }

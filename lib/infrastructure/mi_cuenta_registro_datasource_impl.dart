@@ -18,30 +18,29 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
   MiCuentaRegistroDatasourceImpl(MiAndeApi api) : dio = api.dio;
 
   @override
-  Future<MiCuentaRegistroResponse> getMiCuentaRegistro(
-    String actualizarDatos,
-    num tipoRegistro,
-    num tipoSolicitante,
-    num tipoDocumento,
-    num tipoCliente,
-    String cedulaRepresentante,
-    String numeroDocumento,
-    String nombre,
-    String apellido,
-    String pais,
-    String departamento,
-    String ciudad,
-    String direccion,
-    String correo,
-    String telefonoFijo,
-    String numeroTelefonoCelular,
-    String password,
-    String confirmacionPassword,
-    String passwordAnterior,
-    num tipoVerificacion,
+  Future<MiCuentaRegistroResponse> getMiCuentaRegistro({
+    required String actualizarDatos,
+    required num tipoCliente,
+    required String tipoSolicitante,
+    required String tipoDocumento,
+    required String cedulaRepresentante,
+    required String numeroDocumento,
+    required String nombre,
+    required String apellido,
+    required String pais,
+    required String departamento,
+    required String ciudad,
+    required String direccion,
+    required String correo,
+    required String telefonoFijo,
+    required String numeroTelefonoCelular,
+    required String password,
+    required String confirmacionPassword,
+    required String passwordAnterior,
+    required String tipoVerificacion,
 
-    String solicitudOTP,
-    String codigoOTP,
+    required String solicitudOTP,
+    required String codigoOTP,
 
     ArchivoAdjunto? ci1,
     String? ci1Extra,
@@ -52,13 +51,12 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
     String? fotoPersonal1Extra,
     ArchivoAdjunto? fotoPersonal2,
     String? fotoPersonal2Extra,
-  ) async {
+  }) async {
     late final formMap = {
       'actualizarDatos': actualizarDatos,
-      'tipoRegistro': tipoRegistro,
+      'tipoCliente': tipoCliente,
       'tipoSolicitante': tipoSolicitante,
       'tipoDocumento': tipoDocumento,
-      'tipoCliente': tipoCliente,
       'cedulaRepresentante': cedulaRepresentante,
       'numeroDocumento': numeroDocumento,
       'nombre': nombre,
@@ -138,7 +136,6 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
       token = jsonObject.token;
     }
 
-    
     String url = "";
     if (tipoCliente == 1 && (token != "")) {
       url = '${Environment.hostCtxRegistroUnico}/v1/actualizarDatos';

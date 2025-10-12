@@ -40,7 +40,7 @@ class Paso1TabState extends State<Paso1Tab>
 
   Map<String, dynamic> getFormData() {
   return {
-    "tipoTramite": selectedTipoTramite?.id,
+    "tipoCliente": selectedTipoTramite?.id,
     "tipoSolicitante": selectedTipoSolicitante?.id,
     "tipoDocumento": selectedTipoDocumento?.id,
     "numeroDocumento": numeroDocumentoController.text,
