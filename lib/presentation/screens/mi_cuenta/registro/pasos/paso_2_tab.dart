@@ -10,20 +10,30 @@ class Paso2Tab extends StatefulWidget {
   const Paso2Tab({super.key, required this.formKey});
 
   @override
-  State<Paso2Tab> createState() => _Paso2TabState();
+  State<Paso2Tab> createState() => Paso2TabState();
 }
 
 final List<ModalModel> listaTipoVerificacion = dataTipoVerificacion;
 
-class _Paso2TabState extends State<Paso2Tab>
-    with AutomaticKeepAliveClientMixin {
+class Paso2TabState extends State<Paso2Tab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
   bool passwordVisible = false;
   bool confirmarPasswordVisible = false;
 
-    ModalModel? selectedTipoVerificacion;
+  ModalModel? selectedTipoVerificacion;
+
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmarPassowordController = TextEditingController();
+
+  Map<String, dynamic> getFormData() {
+  return {
+    "password": passwordController.text, 
+    "confirmarPassword": confirmarPassowordController.text,
+    "tipoVerificacion": selectedTipoVerificacion?.id,
+  };
+}
 
 
   @override
@@ -38,6 +48,7 @@ class _Paso2TabState extends State<Paso2Tab>
             TituloSubtitulo(titulo: "Contraseña de Seguridad"),
             const SizedBox(height: 20),
             TextFormField(
+              controller: passwordController,
               obscureText: passwordVisible,
               keyboardType: TextInputType.visiblePassword,
               decoration: InputDecoration(
@@ -59,6 +70,7 @@ class _Paso2TabState extends State<Paso2Tab>
             ),
             const SizedBox(height: 20),
             TextFormField(
+              controller: confirmarPassowordController,
               obscureText: confirmarPasswordVisible,
               keyboardType: TextInputType.visiblePassword,
               decoration: InputDecoration(
@@ -81,17 +93,23 @@ class _Paso2TabState extends State<Paso2Tab>
                   (value == null || value.isEmpty) ? 'Campo obligatorio' : null,
             ),
             const SizedBox(height: 20),
-             DropdownCustom<ModalModel>(
-                label: "Tipo Trámite",
-                items: listaTipoVerificacion,
-                value: selectedTipoVerificacion,
-                displayBuilder: (b) => b.descripcion!,
-                validator: (val) =>
-                    val == null ? "Seleccione un Tipo Verificación" : null,
-                onChanged: (val) => setState(() => selectedTipoVerificacion = val),
-              ),
-               const SizedBox(height: 10),
-              InfoCardSimple(title: infoTipoVerificacion, subtitle: "",  color: Colors.blue , size: 13,)
+            DropdownCustom<ModalModel>(
+              label: "Tipo Trámite",
+              items: listaTipoVerificacion,
+              value: selectedTipoVerificacion,
+              displayBuilder: (b) => b.descripcion!,
+              validator: (val) =>
+                  val == null ? "Seleccione un Tipo Verificación" : null,
+              onChanged: (val) =>
+                  setState(() => selectedTipoVerificacion = val),
+            ),
+            const SizedBox(height: 10),
+            InfoCardSimple(
+              title: infoTipoVerificacion,
+              subtitle: "",
+              color: Colors.blue,
+              size: 13,
+            ),
           ],
         ),
       ),

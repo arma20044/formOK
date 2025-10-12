@@ -26,6 +26,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     (_) => GlobalKey<FormState>(),
   );
   final GlobalKey<Paso1TabState> paso1Key = GlobalKey<Paso1TabState>();
+  final GlobalKey<Paso2TabState> paso2Key = GlobalKey<Paso2TabState>();
 
   @override
   void initState() {
@@ -85,12 +86,14 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
       MiCuentaRegistroDatasourceImpl(MiAndeApi()),
     );
 
-    final formPaso1 = _formKeys[0].currentState;
+    
 
     // ✅ Obtener los valores del formulario del Paso 1
     final datosPaso1 = paso1Key.currentState?.getFormData();
+    final datosPaso2 = paso2Key.currentState?.getFormData();
 
     print("Datos a enviar: $datosPaso1");
+    print("Datos a enviar: $datosPaso2");
 
     // final miCuentaRegistroResponse = await repoMicuentaRegistro.getMiCuentaRegistro(
 
@@ -174,11 +177,10 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                 physics: const NeverScrollableScrollPhysics(),
                 controller: _tabController,
                 children: [
-                  
                   //Paso1Tab(formKey: _formKeys[0]),
                   Paso1Tab(key: paso1Key, formKey: _formKeys[0]),
+                  Paso2Tab(key: paso2Key, formKey: _formKeys[1]),
 
-                  Paso2Tab(formKey: _formKeys[1]),
                   Paso3Tab(formKey: _formKeys[2]),
                   Paso4Tab(formKey: _formKeys[3]),
                 ],
