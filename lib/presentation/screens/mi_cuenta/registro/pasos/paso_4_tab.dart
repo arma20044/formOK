@@ -89,29 +89,31 @@ class Paso4TabState extends State<Paso4Tab> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: widget.formKey,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            CheckboxGroup(
-              checkboxes: checkboxes,
-              onChanged: (updatedList) {
-                setState(() {
-                  checkboxes = updatedList;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            const InfoCardSimple(
-              title: "",
-              subtitle:
-                  "La cuenta General estará activa, una vez que se verifique y valide los datos y archivos adjuntos.",
-              color: Colors.blue,
-              icon: Icons.info,
-            ),
-          ],
+    return SingleChildScrollView(
+      child: Form(
+        key: widget.formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              CheckboxGroup(
+                checkboxes: checkboxes,
+                onChanged: (updatedList) {
+                  setState(() {
+                    checkboxes = updatedList;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              const InfoCardSimple(
+                title: "",
+                subtitle:
+                    "La cuenta General estará activa, una vez que se verifique y valide los datos y archivos adjuntos.",
+                color: Colors.blue,
+                icon: Icons.info,
+              ),
+            ],
+          ),
         ),
       ),
     );

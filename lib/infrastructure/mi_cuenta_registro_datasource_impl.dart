@@ -58,7 +58,7 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
       'tipoSolicitante': tipoSolicitante,
       'tipoDocumento': tipoDocumento,
       'cedulaRepresentante': cedulaRepresentante,
-      'numeroDocumento': numeroDocumento,
+      'documentoIdentificacion': numeroDocumento,
       'nombre': nombre,
       'apellido': apellido,
       'pais': pais,

@@ -29,37 +29,39 @@ class Paso3TabState extends State<Paso3Tab> with AutomaticKeepAliveClientMixin {
     super.build(context);
 
     return Scaffold(
-      body: Form(
-        key: widget.formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text("Documentos Adjuntos"),
-              Adjuntos(
-                label: 'Adjuntar imagen o video',
-                validator: (value) =>
-                    value == null ? 'Debes adjuntar un archivo' : null,
-                onChanged: (archivo) =>
-                    //print('Seleccionado: ${archivo?.file.path}'),
-                    _archivoSeleccionado1 = archivo,
-              ),
-              Adjuntos(
-                label: 'Adjuntar imagen o video',
-                validator: (value) =>
-                    value == null ? 'Debes adjuntar un archivo' : null,
-                onChanged: (archivo) =>
-                    //print('Seleccionado: ${archivo?.file.path}'),
-                    _archivoSeleccionado2 = archivo,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (widget.formKey.currentState!.validate()) {
-                    widget.formKey.currentState!.save();
-                  }
-                },
-                child: const Text('Guardar'),
-              ),
-            ],
+      body: SingleChildScrollView(
+        child: Form(
+          key: widget.formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text("Documentos Adjuntos"),
+                Adjuntos(
+                  label: 'Adjuntar imagen o video',
+                  validator: (value) =>
+                      value == null ? 'Debes adjuntar un archivo' : null,
+                  onChanged: (archivo) =>
+                      //print('Seleccionado: ${archivo?.file.path}'),
+                      _archivoSeleccionado1 = archivo,
+                ),
+                Adjuntos(
+                  label: 'Adjuntar imagen o video',
+                  validator: (value) =>
+                      value == null ? 'Debes adjuntar un archivo' : null,
+                  onChanged: (archivo) =>
+                      //print('Seleccionado: ${archivo?.file.path}'),
+                      _archivoSeleccionado2 = archivo,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (widget.formKey.currentState!.validate()) {
+                      widget.formKey.currentState!.save();
+                    }
+                  },
+                  child: const Text('Guardar'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

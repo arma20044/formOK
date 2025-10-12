@@ -39,78 +39,80 @@ class Paso2TabState extends State<Paso2Tab> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Form(
-      key: widget.formKey,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TituloSubtitulo(titulo: "Contraseña de Seguridad"),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: passwordController,
-              obscureText: passwordVisible,
-              keyboardType: TextInputType.visiblePassword,
-              decoration: InputDecoration(
-                labelText: 'Contraseña',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    passwordVisible ? Icons.visibility : Icons.visibility_off,
+    return SingleChildScrollView(
+      child: Form(
+        key: widget.formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TituloSubtitulo(titulo: "Contraseña de Seguridad"),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: passwordController,
+                obscureText: passwordVisible,
+                keyboardType: TextInputType.visiblePassword,
+                decoration: InputDecoration(
+                  labelText: 'Contraseña',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      passwordVisible ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        passwordVisible = !passwordVisible;
+                      });
+                    },
                   ),
-                  onPressed: () {
-                    setState(() {
-                      passwordVisible = !passwordVisible;
-                    });
-                  },
                 ),
+      
+                validator: (value) =>
+                    (value == null || value.isEmpty) ? 'Campo obligatorio' : null,
               ),
-
-              validator: (value) =>
-                  (value == null || value.isEmpty) ? 'Campo obligatorio' : null,
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: confirmarPassowordController,
-              obscureText: confirmarPasswordVisible,
-              keyboardType: TextInputType.visiblePassword,
-              decoration: InputDecoration(
-                labelText: 'Confirmar Contraseña',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    confirmarPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: confirmarPassowordController,
+                obscureText: confirmarPasswordVisible,
+                keyboardType: TextInputType.visiblePassword,
+                decoration: InputDecoration(
+                  labelText: 'Confirmar Contraseña',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      confirmarPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        confirmarPasswordVisible = !confirmarPasswordVisible;
+                      });
+                    },
                   ),
-                  onPressed: () {
-                    setState(() {
-                      confirmarPasswordVisible = !confirmarPasswordVisible;
-                    });
-                  },
                 ),
+      
+                validator: (value) =>
+                    (value == null || value.isEmpty) ? 'Campo obligatorio' : null,
               ),
-
-              validator: (value) =>
-                  (value == null || value.isEmpty) ? 'Campo obligatorio' : null,
-            ),
-            const SizedBox(height: 20),
-            DropdownCustom<ModalModel>(
-              label: "Tipo Trámite",
-              items: listaTipoVerificacion,
-              value: selectedTipoVerificacion,
-              displayBuilder: (b) => b.descripcion!,
-              validator: (val) =>
-                  val == null ? "Seleccione un Tipo Verificación" : null,
-              onChanged: (val) =>
-                  setState(() => selectedTipoVerificacion = val),
-            ),
-            const SizedBox(height: 10),
-            InfoCardSimple(
-              title: infoTipoVerificacion,
-              subtitle: "",
-              color: Colors.blue,
-              size: 13,
-            ),
-          ],
+              const SizedBox(height: 20),
+              DropdownCustom<ModalModel>(
+                label: "Tipo Trámite",
+                items: listaTipoVerificacion,
+                value: selectedTipoVerificacion,
+                displayBuilder: (b) => b.descripcion!,
+                validator: (val) =>
+                    val == null ? "Seleccione un Tipo Verificación" : null,
+                onChanged: (val) =>
+                    setState(() => selectedTipoVerificacion = val),
+              ),
+              const SizedBox(height: 10),
+              InfoCardSimple(
+                title: infoTipoVerificacion,
+                subtitle: "",
+                color: Colors.blue,
+                size: 13,
+              ),
+            ],
+          ),
         ),
       ),
     );

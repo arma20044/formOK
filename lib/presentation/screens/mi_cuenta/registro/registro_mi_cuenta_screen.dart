@@ -4,6 +4,7 @@ import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import '../../../../core/api/mi_ande_api.dart';
 import '../../../../infrastructure/infrastructure.dart';
 import '../../../../repositories/repositories.dart';
+import '../../../components/common/otp_verification_widget.dart';
 import 'registro.dart';
 
 class RegistroMiCuentaScreen extends StatefulWidget {
@@ -30,6 +31,9 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   final GlobalKey<Paso2TabState> paso2Key = GlobalKey<Paso2TabState>();
   final GlobalKey<Paso3TabState> paso3Key = GlobalKey<Paso3TabState>();
   final GlobalKey<Paso4TabState> paso4Key = GlobalKey<Paso4TabState>();
+
+  String? codigoOTPObtenido;
+  String? solicitarOTP;
 
   @override
   void initState() {
@@ -104,23 +108,23 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           tipoCliente: num.parse(datosPaso1!['tipoCliente']),
           tipoSolicitante: datosPaso1['tipoSolicitante'],
           tipoDocumento: datosPaso1['tipoDocumento'],
-          cedulaRepresentante: datosPaso1['cedulaRepresentante'] ?? '',
+          cedulaRepresentante: datosPaso1['cedulaRepresentante'] ?? 'lteor',
           numeroDocumento: datosPaso1['numeroDocumento'] ?? '',
           nombre: datosPaso1['nombre'] ?? '',
           apellido: datosPaso1['apellido'] ?? '',
           pais: datosPaso1['pais'] ?? '',
-          departamento: datosPaso1['departamento'] ?? '',
-          ciudad: datosPaso1['ciudad'] ?? '',
+          departamento: datosPaso1['departamento'] ?? 'NINGUNO',
+          ciudad: datosPaso1['ciudad'] ?? 'NINGUNO',
           direccion: datosPaso1['direccion'] ?? '',
           correo: datosPaso1['correo'] ?? '',
           telefonoFijo: datosPaso1['telefonoFijo'] ?? '',
           numeroTelefonoCelular: datosPaso1['telefonoCelular'] ?? '',
           password: datosPaso2!['password'] ?? '',
-          confirmacionPassword: datosPaso2['confirmacionPassword'] ?? '',
+          confirmacionPassword: datosPaso2['confirmarPassword'] ?? '',
           passwordAnterior: datosPaso2['passwordAnterior'] ?? '',
           tipoVerificacion: datosPaso2['tipoVerificacion'] ?? '',
-          solicitudOTP: datosPaso2['solicitudOTP'] ?? '',
-          codigoOTP: datosPaso2['codigoOTP'] ?? '',
+          solicitudOTP: solicitarOTP ?? 'S',
+          codigoOTP: codigoOTPObtenido.toString(),
         );
     return miCuentaRegistroResponse;
   }
@@ -230,6 +234,17 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                   ),
                 ],
               ),
+            ),
+            OtpInputWidget(
+              phoneNumber: "+595 981 123 456",
+              onSubmit: (otp) {
+                setState(() {
+                  codigoOTPObtenido = otp;
+                  solicitarOTP='N';
+                });
+                _enviarFormulario();
+                print("Código ingresado: $otp");
+              },
             ),
           ],
         ),
