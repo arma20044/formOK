@@ -17,6 +17,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isLoadingReclamo = false;
+  String? tipoClienteId;
 
   late final Paso1Tab paso1Widget;
 
@@ -28,7 +29,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   final GlobalKey<Paso1TabState> paso1Key = GlobalKey<Paso1TabState>();
   final GlobalKey<Paso2TabState> paso2Key = GlobalKey<Paso2TabState>();
   final GlobalKey<Paso3TabState> paso3Key = GlobalKey<Paso3TabState>();
-  
+  final GlobalKey<Paso4TabState> paso4Key = GlobalKey<Paso4TabState>();
 
   @override
   void initState() {
@@ -88,14 +89,10 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
       MiCuentaRegistroDatasourceImpl(MiAndeApi()),
     );
 
-    
-
     // ✅ Obtener los valores del formulario del Paso 1
     final datosPaso1 = paso1Key.currentState?.getFormData();
     final datosPaso2 = paso2Key.currentState?.getFormData();
     final datosPaso3 = paso3Key.currentState?.getFormData();
-
-      
 
     print("Datos a enviar: $datosPaso1");
     print("Datos a enviar: $datosPaso2");
@@ -122,6 +119,14 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
         );
         return;
       }
+    }
+    if (!paso4Key.currentState!.validateCheckboxes()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Debe aceptar todos los términos requeridos"),
+        ),
+      );
+      return;
     }
 
     setState(() => _isLoadingReclamo = true);
@@ -184,13 +189,24 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                 controller: _tabController,
                 children: [
                   //Paso1Tab(formKey: _formKeys[0]),
-                  Paso1Tab(key: paso1Key, formKey: _formKeys[0]),
+                  Paso1Tab(
+                    key: paso1Key,
+                    formKey: _formKeys[0],
+                    onTipoClienteChanged: (id) {
+                      setState(() {
+                        tipoClienteId = id;
+                      });
+                    },
+                  ),
                   Paso2Tab(key: paso2Key, formKey: _formKeys[1]),
                   Paso3Tab(key: paso3Key, formKey: _formKeys[2]),
 
-                  
-  
-                  Paso4Tab(formKey: _formKeys[3]),
+                  Paso4Tab(
+                    key: paso4Key,
+                    formKey: _formKeys[3],
+                    tipoClienteId:
+                        paso1Key.currentState?.selectedTipoTramite?.id ?? "",
+                  ),
                 ],
               ),
             ),

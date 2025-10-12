@@ -1,8 +1,8 @@
 import 'package:form/config/tipo_tramite_model.dart';
 
 final List<ModalModel> dataTipoClienteArray = [
-  ModalModel(id: "1", descripcion: "Gestión Documental (EXPEDIENTES)"),
-  ModalModel(id: "2", descripcion: "Gestión Comercial"),
+  ModalModel(id: "2", descripcion: "Gestión Documental (EXPEDIENTES)"),
+  ModalModel(id: "1", descripcion: "Gestión Comercial"),
   //{ "id": "2", "descripcion": "Gestión Documental (EXPEDIENTES)" },
   //{ "id": "1", "descripcion": "Gestión Comercial" }
 ];

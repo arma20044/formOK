@@ -11,7 +11,9 @@ import '../../../../../repositories/repositories.dart';
 
 class Paso1Tab extends StatefulWidget {
   final GlobalKey<FormState> formKey;
-  const Paso1Tab({super.key, required this.formKey});
+  final Function(String?)? onTipoClienteChanged;
+
+  const Paso1Tab({super.key, required this.formKey, this.onTipoClienteChanged});
 
   @override
   State<Paso1Tab> createState() => Paso1TabState();
@@ -175,7 +177,10 @@ class Paso1TabState extends State<Paso1Tab>
                 displayBuilder: (b) => b.descripcion!,
                 validator: (val) =>
                     val == null ? "Seleccione un Tipo Trámite" : null,
-                onChanged: (val) => setState(() => selectedTipoTramite = val),
+                onChanged: (val) => setState(() {selectedTipoTramite = val;
+                      widget.onTipoClienteChanged?.call(val?.id);
+                }
+                ),
               ),
               const SizedBox(height: 20),
               DropdownCustom<ModalModel>(
