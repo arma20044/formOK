@@ -26,7 +26,7 @@ class LocationInfo extends StatelessWidget {
     }
 
     return Container(
-      color: Colors.blue.shade50,
+      //color: Colors.blue.shade50,
       padding: const EdgeInsets.all(8),
       child: Text(text, style: const TextStyle(fontSize: 14)),
     );
