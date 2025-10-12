@@ -36,6 +36,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
 
   String? codigoOTPObtenido;
   String? solicitarOTP = 'S';
+  bool mostrarCargarCodigoOTP = false;
 
   @override
   void initState() {
@@ -180,6 +181,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
         setState(() {
           solicitarOTP = 'S';
         });
+        mostrarCargarCodigoOTP = true;
         DialogHelper.showAutoCloseMessage(
           context,
           MessageType.success,
@@ -254,17 +256,19 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                 ],
               ),
             ),
-            OtpInputWidget(
+           mostrarCargarCodigoOTP ? OtpInputWidget(
               phoneNumber: "+595 981 123 456",
               onSubmit: (otp) {
                 setState(() {
                   codigoOTPObtenido = otp;
                   solicitarOTP = 'N';
+                  
                 });
+
                 _enviarFormulario();
                 print("Código ingresado: $otp");
               },
-            ),
+            ): Text(""),
           ],
         ),
       ),
