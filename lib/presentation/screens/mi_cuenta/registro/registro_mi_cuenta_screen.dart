@@ -27,6 +27,8 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   );
   final GlobalKey<Paso1TabState> paso1Key = GlobalKey<Paso1TabState>();
   final GlobalKey<Paso2TabState> paso2Key = GlobalKey<Paso2TabState>();
+  final GlobalKey<Paso3TabState> paso3Key = GlobalKey<Paso3TabState>();
+  
 
   @override
   void initState() {
@@ -91,9 +93,13 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     // ✅ Obtener los valores del formulario del Paso 1
     final datosPaso1 = paso1Key.currentState?.getFormData();
     final datosPaso2 = paso2Key.currentState?.getFormData();
+    final datosPaso3 = paso3Key.currentState?.getFormData();
+
+      
 
     print("Datos a enviar: $datosPaso1");
     print("Datos a enviar: $datosPaso2");
+    print("Datos a enviar: $datosPaso3");
 
     // final miCuentaRegistroResponse = await repoMicuentaRegistro.getMiCuentaRegistro(
 
@@ -180,8 +186,10 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                   //Paso1Tab(formKey: _formKeys[0]),
                   Paso1Tab(key: paso1Key, formKey: _formKeys[0]),
                   Paso2Tab(key: paso2Key, formKey: _formKeys[1]),
+                  Paso3Tab(key: paso3Key, formKey: _formKeys[2]),
 
-                  Paso3Tab(formKey: _formKeys[2]),
+                  
+  
                   Paso4Tab(formKey: _formKeys[3]),
                 ],
               ),

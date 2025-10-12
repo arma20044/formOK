@@ -7,18 +7,26 @@ class Paso3Tab extends StatefulWidget {
   const Paso3Tab({super.key, required this.formKey});
 
   @override
-  State<Paso3Tab> createState() => _Paso3TabState();
+  State<Paso3Tab> createState() => Paso3TabState();
 }
 
-class _Paso3TabState extends State<Paso3Tab>
-    with AutomaticKeepAliveClientMixin {
+class Paso3TabState extends State<Paso3Tab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  ArchivoAdjunto? _archivoSeleccionado1;
+  ArchivoAdjunto? _archivoSeleccionado2;
+
+    Map<String, dynamic> getFormData() {
+    return {
+      "archivo1": _archivoSeleccionado1?.file.path,
+      "archivo2": _archivoSeleccionado2?.file.path,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
-    ArchivoAdjunto? _archivoSeleccionado;
 
     return Scaffold(
       body: Form(
@@ -33,14 +41,15 @@ class _Paso3TabState extends State<Paso3Tab>
                     value == null ? 'Debes adjuntar un archivo' : null,
                 onChanged: (archivo) =>
                     //print('Seleccionado: ${archivo?.file.path}'),
-                    _archivoSeleccionado = archivo,
+                    _archivoSeleccionado1 = archivo,
               ),
               Adjuntos(
                 label: 'Adjuntar imagen o video',
                 validator: (value) =>
                     value == null ? 'Debes adjuntar un archivo' : null,
                 onChanged: (archivo) =>
-                    print('Seleccionado: ${archivo?.file.path}'),
+                    //print('Seleccionado: ${archivo?.file.path}'),
+                    _archivoSeleccionado2 = archivo,
               ),
               ElevatedButton(
                 onPressed: () {
