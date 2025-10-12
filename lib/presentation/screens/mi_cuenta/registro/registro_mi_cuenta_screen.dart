@@ -243,7 +243,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                     },
                   ),
                   Paso2Tab(key: paso2Key, formKey: _formKeys[1]),
-                  Paso3Tab(key: paso3Key, formKey: _formKeys[2]),
+                  Paso3Tab(key: paso3Key, formKey: _formKeys[2], tipoTramite: tipoClienteId == null  ? 2 : int.parse(tipoClienteId!)),
 
                   Paso4Tab(
                     key: paso4Key,

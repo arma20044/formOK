@@ -4,7 +4,8 @@ import 'package:form/presentation/components/common/adjuntos.dart';
 
 class Paso3Tab extends StatefulWidget {
   final GlobalKey<FormState> formKey;
-  const Paso3Tab({super.key, required this.formKey});
+  final int tipoTramite;
+  const Paso3Tab({super.key, required this.formKey, required this.tipoTramite});
 
   @override
   State<Paso3Tab> createState() => Paso3TabState();
@@ -39,7 +40,7 @@ class Paso3TabState extends State<Paso3Tab> with AutomaticKeepAliveClientMixin {
                 Adjuntos(
                   label: 'Adjuntar imagen o video',
                   validator: (value) =>
-                      value == null ? 'Debes adjuntar un archivo' : null,
+                     widget.tipoTramite == 1 && value == null ? 'Debes adjuntar un archivo' : null,
                   onChanged: (archivo) =>
                       //print('Seleccionado: ${archivo?.file.path}'),
                       _archivoSeleccionado1 = archivo,
@@ -47,7 +48,7 @@ class Paso3TabState extends State<Paso3Tab> with AutomaticKeepAliveClientMixin {
                 Adjuntos(
                   label: 'Adjuntar imagen o video',
                   validator: (value) =>
-                      value == null ? 'Debes adjuntar un archivo' : null,
+                      widget.tipoTramite == 1 && value == null ? 'Debes adjuntar un archivo' : null,
                   onChanged: (archivo) =>
                       //print('Seleccionado: ${archivo?.file.path}'),
                       _archivoSeleccionado2 = archivo,
