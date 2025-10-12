@@ -14,7 +14,7 @@ class Paso1Tab extends StatefulWidget {
   const Paso1Tab({super.key, required this.formKey});
 
   @override
-  State<Paso1Tab> createState() => _Paso1TabState();
+  State<Paso1Tab> createState() => Paso1TabState();
 }
 
 final List<ModalModel> listaTipoTramite = dataTipoClienteArray;
@@ -31,10 +31,29 @@ bool isLoadingCiudades = false;
 List<Departamento> listaDepartamentos = [];
 List<Ciudad> listaCiudades = [];
 
-class _Paso1TabState extends State<Paso1Tab>
+class Paso1TabState extends State<Paso1Tab>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  Map<String, dynamic> getFormData() {
+  return {
+    "tipoTramite": selectedTipoTramite?.id,
+    "tipoSolicitante": selectedTipoSolicitante?.id,
+    "tipoDocumento": selectedTipoDocumento?.id,
+    "numeroDocumento": numeroDocumentoController.text,
+    "nombre": nombreObtenido,
+    "apellido": apellidoObtenido,
+    "pais": selectedPais?.descripcion,
+    "departamento": selectedDept?.nombre,
+    "ciudad": selectedCiudad?.nombre,
+    "direccion": direccionController.text,
+    "correo": correoController.text,
+    "telefonoFijo": numeroTelefonoFijoController.text,
+    "telefonoCelular": numeroTelefonoCelularController.text,
+  };
+}
+
 
   ModalModel? selectedTipoTramite;
   ModalModel? selectedTipoSolicitante;

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:form/model/model.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import '../../../../core/api/mi_ande_api.dart';
+import '../../../../infrastructure/infrastructure.dart';
+import '../../../../repositories/repositories.dart';
 import 'registro.dart';
 
 class RegistroMiCuentaScreen extends StatefulWidget {
@@ -14,16 +18,21 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   late TabController _tabController;
   bool _isLoadingReclamo = false;
 
+  late final Paso1Tab paso1Widget;
+
   /// Un formKey por cada paso
   final List<GlobalKey<FormState>> _formKeys = List.generate(
     4,
     (_) => GlobalKey<FormState>(),
   );
+  final GlobalKey<Paso1TabState> paso1Key = GlobalKey<Paso1TabState>();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: _formKeys.length, vsync: this);
+    paso1Widget = Paso1Tab(formKey: _formKeys[0]);
+
     // Listener para actualizar la UI cuando cambia el tab
     _tabController.addListener(() {
       // Solo cuando terminó la animación y no está en el medio de un swipe
@@ -70,6 +79,25 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     }
   }
 
+  //Future<MiCuentaRegistroResponse> _fetchMiCuentaRegistro() async {
+  Future<bool> _fetchMiCuentaRegistro() async {
+    final repoMicuentaRegistro = MiCuentaRegistroRepositoryImpl(
+      MiCuentaRegistroDatasourceImpl(MiAndeApi()),
+    );
+
+    final formPaso1 = _formKeys[0].currentState;
+
+    // ✅ Obtener los valores del formulario del Paso 1
+    final datosPaso1 = paso1Key.currentState?.getFormData();
+
+    print("Datos a enviar: $datosPaso1");
+
+    // final miCuentaRegistroResponse = await repoMicuentaRegistro.getMiCuentaRegistro(
+
+    //);
+    return true;
+  }
+
   /// Enviar formulario completo
   Future<void> _enviarFormulario() async {
     if (_isLoadingReclamo) return;
@@ -90,10 +118,18 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     setState(() => _isLoadingReclamo = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 2)); // Simulación
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Formulario enviado correctamente")),
-      );
+      //      MiCuentaRegistroResponse result = await _fetchMiCuentaRegistro();
+      bool result = await _fetchMiCuentaRegistro();
+      /*  if (result.error) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(result.errorValList![0])));
+        return;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Formulario enviado correctamente")),
+        );
+      }*/
     } finally {
       setState(() => _isLoadingReclamo = false);
     }
@@ -138,7 +174,10 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                 physics: const NeverScrollableScrollPhysics(),
                 controller: _tabController,
                 children: [
-                  Paso1Tab(formKey: _formKeys[0]),
+                  
+                  //Paso1Tab(formKey: _formKeys[0]),
+                  Paso1Tab(key: paso1Key, formKey: _formKeys[0]),
+
                   Paso2Tab(formKey: _formKeys[1]),
                   Paso3Tab(formKey: _formKeys[2]),
                   Paso4Tab(formKey: _formKeys[3]),

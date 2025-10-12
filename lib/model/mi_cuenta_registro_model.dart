@@ -1,11 +1,11 @@
-class MiCuentaRegistroModel {
+class MiCuentaRegistroResponse {
   final dynamic resultado;
   final List<String> mensajeList;
   final String mensaje;
   final bool error;
   final List<dynamic> errorValList;
 
-  MiCuentaRegistroModel({
+  MiCuentaRegistroResponse({
     required this.resultado,
     required this.mensajeList,
     required this.mensaje,
@@ -13,8 +13,8 @@ class MiCuentaRegistroModel {
     required this.errorValList,
   });
 
-  factory MiCuentaRegistroModel.fromJson(Map<String, dynamic> json) {
-    return MiCuentaRegistroModel(
+  factory MiCuentaRegistroResponse.fromJson(Map<String, dynamic> json) {
+    return MiCuentaRegistroResponse(
       resultado: json['resultado'],
        mensajeList: List<String>.from(json['mensajeList'].map((item) => item)),
       mensaje: json['mensaje'],
@@ -33,14 +33,14 @@ class MiCuentaRegistroModel {
     };
   }
 
-  MiCuentaRegistroModel copyWith({
+  MiCuentaRegistroResponse copyWith({
     required dynamic resultado,
     required List<String> mensajeList,
     required String mensaje,
     required bool error,
     required List<dynamic> errorValList,
   }) {
-    return MiCuentaRegistroModel(
+    return MiCuentaRegistroResponse(
       resultado: resultado,
       mensajeList: mensajeList,
       mensaje: mensaje,
