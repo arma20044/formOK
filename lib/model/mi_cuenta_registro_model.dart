@@ -1,14 +1,14 @@
 class MiCuentaRegistroResponse {
   final dynamic resultado;
   final List<String> mensajeList;
-  final String mensaje;
+  final String? mensaje;
   final bool error;
   final List<dynamic> errorValList;
 
   MiCuentaRegistroResponse({
     required this.resultado,
     required this.mensajeList,
-    required this.mensaje,
+     this.mensaje,
     required this.error,
     required this.errorValList,
   });

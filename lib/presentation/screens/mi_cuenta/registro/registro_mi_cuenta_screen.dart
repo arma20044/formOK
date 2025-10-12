@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:form/model/model.dart';
+import 'package:form/presentation/components/common/custom_message_dialog.dart';
+import 'package:form/presentation/components/common/custom_show_dialog.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import '../../../../core/api/mi_ande_api.dart';
 import '../../../../infrastructure/infrastructure.dart';
@@ -33,7 +35,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   final GlobalKey<Paso4TabState> paso4Key = GlobalKey<Paso4TabState>();
 
   String? codigoOTPObtenido;
-  String? solicitarOTP;
+  String? solicitarOTP = 'S';
 
   @override
   void initState() {
@@ -160,13 +162,30 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
       MiCuentaRegistroResponse result = await _fetchMiCuentaRegistro();
       //bool result = await _fetchMiCuentaRegistro();
       if (result.error) {
-        ScaffoldMessenger.of(
+        /* ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(result.errorValList![0])));
+        ).showSnackBar(SnackBar(content: Text(result.errorValList![0]))); */
+        DialogHelper.showMessage(
+          context,
+          MessageType.error,
+          'Error',
+          result.errorValList[0],
+        );
+
         return;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        /* ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Formulario enviado correctamente")),
+        ); */
+        setState(() {
+          solicitarOTP = 'S';
+        });
+        DialogHelper.showAutoCloseMessage(
+          context,
+          MessageType.success,
+          'Éxito',
+          result.mensaje!,
+          duration: const Duration(seconds: 3),
         );
       }
     } finally {
@@ -240,7 +259,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
               onSubmit: (otp) {
                 setState(() {
                   codigoOTPObtenido = otp;
-                  solicitarOTP='N';
+                  solicitarOTP = 'N';
                 });
                 _enviarFormulario();
                 print("Código ingresado: $otp");
