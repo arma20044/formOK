@@ -250,7 +250,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                   Paso4Tab(
                     key: paso4Key,
                     formKey: _formKeys[3],
-                    tipoClienteId:
+                    tipoTramite:
                         paso1Key.currentState?.selectedTipoTramite?.id ?? "",
                   ),
                 ],

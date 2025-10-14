@@ -4,12 +4,12 @@ import 'package:form/presentation/components/common/info_card_simple.dart';
 
 class Paso4Tab extends StatefulWidget {
   final GlobalKey<FormState> formKey;
-  final String tipoClienteId; // '1' = Comercial, otros = no Comercial
+  final String tipoTramite; // '1' = Comercial, otros = no Comercial
 
   const Paso4Tab({
     super.key,
     required this.formKey,
-    required this.tipoClienteId,
+    required this.tipoTramite,
   });
 
   @override
@@ -23,7 +23,7 @@ class Paso4TabState extends State<Paso4Tab> {
   void initState() {
     super.initState();
 
-    final esComercial = widget.tipoClienteId == "1";
+    final esComercial = widget.tipoTramite == "1";
 
     checkboxes = [
       CustomCheckbox(
@@ -96,6 +96,7 @@ class Paso4TabState extends State<Paso4Tab> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              Text('${widget.tipoTramite} asd'),
               CheckboxGroup(
                 checkboxes: checkboxes,
                 onChanged: (updatedList) {
@@ -121,7 +122,7 @@ class Paso4TabState extends State<Paso4Tab> {
 
   /// Validar checkboxes según el tipo de cliente
   bool validateCheckboxes() {
-    final esComercial = widget.tipoClienteId == "1";
+    final esComercial = widget.tipoTramite == "1";
 
     for (int i = 0; i < checkboxes.length; i++) {
       // Ignorar el 2do checkbox si no es comercial
