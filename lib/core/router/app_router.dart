@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/presentation/screens/expedientes/expedientes_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/mis_datos.dart';
 import 'package:form/presentation/screens/mi_cuenta/registro/registro_mi_cuenta_screen.dart';
+import 'package:form/presentation/screens/splash_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:form/core/auth/auth_notifier.dart';
@@ -32,11 +33,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     refreshListenable: refreshListenable,
     routes: [
+      GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/misDatos', builder: (context, state) => const MisDatos()),
-      GoRoute(path: '/expediente', builder: (context, state) => const ExpedienteScreen()),
-      GoRoute(path: '/registroMiCuenta', builder: (context, state) => const RegistroMiCuentaScreen()),
+      GoRoute(
+        path: '/expediente',
+        builder: (context, state) => const ExpedienteScreen(),
+      ),
+      GoRoute(
+        path: '/registroMiCuenta',
+        builder: (context, state) => const RegistroMiCuentaScreen(),
+      ),
       GoRoute(
         path: '/miCuenta',
         builder: (context, state) => const MiCuentaScreen(),
@@ -63,6 +72,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // 🔹 Logueado e intenta entrar al login → redirigir a home
       if (isLoggedIn && loggingIn) return '/';
+
+      final location = state.uri.path;
+      final current = state.fullPath; // ruta actual
+
+      if (current == location) return null;
 
       return null;
     },

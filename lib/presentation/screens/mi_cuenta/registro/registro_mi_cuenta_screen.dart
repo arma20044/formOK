@@ -19,7 +19,7 @@ class RegistroMiCuentaScreen extends StatefulWidget {
 class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool _isLoadingReclamo = false;
+  bool _isLoadingRegistroMiCuenta = false;
   String? tipoClienteId;
 
   late final Paso1Tab paso1Widget;
@@ -134,7 +134,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
 
   /// Enviar formulario completo
   Future<void> _enviarFormulario() async {
-    if (_isLoadingReclamo) return;
+    if (_isLoadingRegistroMiCuenta) return;
 
     // Validar todos los pasos
     for (final key in _formKeys) {
@@ -157,7 +157,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
       return;
     }
 
-    setState(() => _isLoadingReclamo = true);
+    setState(() => _isLoadingRegistroMiCuenta = true);
 
     try {
       MiCuentaRegistroResponse result = await _fetchMiCuentaRegistro();
@@ -182,16 +182,16 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           solicitarOTP = 'S';
         });
         mostrarCargarCodigoOTP = true;
-        DialogHelper.showAutoCloseMessage(
+        DialogHelper.showMessage(
           context,
           MessageType.success,
           'Éxito',
           result.mensaje!,
-          duration: const Duration(seconds: 3),
+          //duration: const Duration(seconds: 3),
         );
       }
     } finally {
-      setState(() => _isLoadingReclamo = false);
+      setState(() => _isLoadingRegistroMiCuenta = false);
     }
   }
 
@@ -282,8 +282,8 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
               if (_tabController.index > 0)
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: _isLoadingReclamo ? null : _previousTab,
-                    child: _isLoadingReclamo
+                    onPressed: _isLoadingRegistroMiCuenta ? null : _previousTab,
+                    child: _isLoadingRegistroMiCuenta
                         ? const SizedBox(
                             height: 20,
                             width: 20,
@@ -295,12 +295,12 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
               if (_tabController.index > 0) const SizedBox(width: 8),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: _isLoadingReclamo
+                  onPressed: _isLoadingRegistroMiCuenta
                       ? null
                       : isLastTab
                       ? _enviarFormulario
                       : _nextTab,
-                  child: _isLoadingReclamo
+                  child: _isLoadingRegistroMiCuenta
                       ? const SizedBox(
                           height: 20,
                           width: 20,
