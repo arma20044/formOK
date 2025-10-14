@@ -106,7 +106,7 @@ class AuthDrawerSection extends ConsumerWidget {
           ? () => Navigator.pop(context)
           : () {
               Navigator.pop(context);
-              context.go(path); // ✅ usa go, no push
+              context.push(path); // ✅ usa go, no push
             },
     );
   }
