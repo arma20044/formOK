@@ -4,20 +4,20 @@ import 'package:flutter_riverpod/legacy.dart';
 
 
 // Estado del formulario
-class FormState {
+class FormStateTerminosCondiciones {
   final String selectedDropdown;
   final List<CustomCheckbox> tab4Checkboxes;
 
-  FormState({
+  FormStateTerminosCondiciones({
     this.selectedDropdown = '',
     this.tab4Checkboxes = const [],
   });
 
-  FormState copyWith({
+  FormStateTerminosCondiciones copyWith({
     String? selectedDropdown,
     List<CustomCheckbox>? tab4Checkboxes,
   }) {
-    return FormState(
+    return FormStateTerminosCondiciones(
       selectedDropdown: selectedDropdown ?? this.selectedDropdown,
       tab4Checkboxes: tab4Checkboxes ?? this.tab4Checkboxes,
     );
@@ -25,8 +25,8 @@ class FormState {
 }
 
 // Notifier del formulario
-class FormNotifier extends StateNotifier<FormState> {
-  FormNotifier() : super(FormState());
+class FormNotifier extends StateNotifier<FormStateTerminosCondiciones> {
+  FormNotifier() : super(FormStateTerminosCondiciones());
 
   /// Actualiza el dropdown y reemplaza la lista de checkboxes
   void updateDropdown(String value, List<CustomCheckbox> options) {
@@ -57,6 +57,6 @@ class FormNotifier extends StateNotifier<FormState> {
 }
 
 // Provider global
-final formProvider = StateNotifierProvider<FormNotifier, FormState>(
+final formProvider = StateNotifierProvider<FormNotifier, FormStateTerminosCondiciones>(
   (ref) => FormNotifier(),
 );

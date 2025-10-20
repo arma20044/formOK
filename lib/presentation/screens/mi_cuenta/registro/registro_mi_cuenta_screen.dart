@@ -32,7 +32,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   final GlobalKey<Paso1TabState> paso1Key = GlobalKey<Paso1TabState>();
   final GlobalKey<Paso2TabState> paso2Key = GlobalKey<Paso2TabState>();
   final GlobalKey<Paso3TabState> paso3Key = GlobalKey<Paso3TabState>();
-  
+  final GlobalKey<FormState> paso4Key = GlobalKey<FormState>();
 
   String? codigoOTPObtenido;
   String? solicitarOTP = 'S';
@@ -137,17 +137,31 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     if (_isLoadingRegistroMiCuenta) return;
 
     // Validar todos los pasos
-    for (final key in _formKeys) {
-      final isValid = key.currentState?.validate() ?? false;
+    for (int i = 0; i < _formKeys.length; i++) {
+      final isValid = _formKeys[i].currentState?.validate() ?? false;
       if (!isValid) {
+        if (i == _formKeys.length - 1) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Debe aceptar todos los Terminos y Condiciones"),
+            ),
+          );
+          return;
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Complete todos los campos obligatorios"),
+          SnackBar(
+            content: Text(
+              "Complete todos los campos obligatorios del paso ${i + 1}",
+            ),
           ),
         );
         return;
       }
+
+      // 🔹 Último tab
     }
+
     /*if (!paso4Key.currentState!.validateCheckboxes()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -245,31 +259,37 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                     },
                   ),
                   Paso2Tab(key: paso2Key, formKey: _formKeys[1]),
-                  Paso3Tab(key: paso3Key, formKey: _formKeys[2], tipoTramite: tipoClienteId == null  ? 2 : int.parse(tipoClienteId!)),
+                  Paso3Tab(
+                    key: paso3Key,
+                    formKey: _formKeys[2],
+                    tipoTramite: tipoClienteId == null
+                        ? 2
+                        : int.parse(tipoClienteId!),
+                  ),
 
                   Tab4(
-
-                    //key: paso4Key,
-                  //  formKey: _formKeys[3],
+                    key: paso4Key,
+                    formKey: _formKeys[3],
                     //tipoTramite:
-                     //   paso1Key.currentState?.selectedTipoTramite?.id ?? "",
+                    //   paso1Key.currentState?.selectedTipoTramite?.id ?? "",
                   ),
                 ],
               ),
             ),
-           mostrarCargarCodigoOTP ? OtpInputWidget(
-              phoneNumber: "+595 981 123 456",
-              onSubmit: (otp) {
-                setState(() {
-                  codigoOTPObtenido = otp;
-                  solicitarOTP = 'N';
-                  
-                });
+            mostrarCargarCodigoOTP
+                ? OtpInputWidget(
+                    phoneNumber: "+595 981 123 456",
+                    onSubmit: (otp) {
+                      setState(() {
+                        codigoOTPObtenido = otp;
+                        solicitarOTP = 'N';
+                      });
 
-                _enviarFormulario();
-                print("Código ingresado: $otp");
-              },
-            ): Text(""),
+                      _enviarFormulario();
+                      print("Código ingresado: $otp");
+                    },
+                  )
+                : Text(""),
           ],
         ),
       ),

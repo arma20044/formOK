@@ -9,6 +9,7 @@ import 'package:form/presentation/components/common/info_card_simple.dart';
 import 'package:form/presentation/components/widgets/dropdown_custom.dart';
 import 'package:form/provider/check.dart';
 import 'package:form/provider/terminos.dart' hide FormState;
+import 'package:form/utils/utils.dart';
 
 import '../../../../../core/api/mi_ande_api.dart';
 import '../../../../../infrastructure/infrastructure.dart';
@@ -42,13 +43,8 @@ List<Ciudad> listaCiudades = [];
 // Este archivo debe estar accesible donde lo uses (ej: checkboxes_data.dart)
 
 final Map<String, List<CustomCheckbox>> checkboxesBySelection = {
-  '1': 
-    checkboxesInicial(true)
-  ,
-  '2': 
-  checkboxesInicial(false)
-  ,
-  
+  '1': checkboxesInicial(true),
+  '2': checkboxesInicial(false),
 };
 
 class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
@@ -205,8 +201,9 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
 
                       if (val != null) {
                         final options = checkboxesBySelection[val.id] ?? [];
-                         ref.read(formProvider.notifier).updateDropdown(val.id!, options);
-                            
+                        ref
+                            .read(formProvider.notifier)
+                            .updateDropdown(val.id!, options);
                       }
                     },
                   );
@@ -389,7 +386,7 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                   if (val == null || val.isEmpty) {
                     return "Ingrese Correo";
                   }
-                  //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+                  if (!emailRegex.hasMatch(val)) return "Ingrese formato de correo válido.";
                   return null;
                   //}
                 },
