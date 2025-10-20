@@ -44,7 +44,12 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
   // Login automático sin tocar state
   Future<UserModel?> _attemptLoginAuto(DatosUser datos) async {
     try {
-      final user = await login(datos.numeroDocumento, datos.password, datos.tipoDocumento);
+      final user = await login(
+        datos.numeroDocumento,
+        datos.password,
+        datos.tipoDocumento,
+        true,
+      );
       return user.numeroDocumento.isNotEmpty ? user : null;
     } catch (_) {
       return null;
@@ -52,15 +57,26 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
   }
 
   // Login manual
-  Future<UserModel> login(String numeroDocumento, String password, String tipoDocumento) async {
+  Future<UserModel> login(
+    String numeroDocumento,
+    String password,
+    String tipoDocumento,
+    bool loginSilencioso,
+  ) async {
     state = const AsyncLoading();
 
     try {
-      final response = await _authRepository.login(numeroDocumento, password, tipoDocumento);
+      final response = await _authRepository.login(
+        numeroDocumento,
+        password,
+        tipoDocumento,
+      );
 
       if (response.error) {
         state = const AsyncValue.data(AuthStateData(state: AuthState.error));
-        _showToast("Error en el inicio de sesión", false);
+        if (!loginSilencioso) {
+          _showToast("Error en el inicio de sesión", false);
+        }
         return UserModel.empty();
       }
 
@@ -84,13 +100,19 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
 
       await _storage.write(key: _userKey, value: jsonEncode(user.toMap()));
 
-      state = AsyncData(AuthStateData(state: AuthState.authenticated, user: user));
-      _showToast("Inicio de Sesión Exitosa", true);
+      state = AsyncData(
+        AuthStateData(state: AuthState.authenticated, user: user),
+      );
+      if (!loginSilencioso) {
+        _showToast("Inicio de Sesión Exitosa", true);
+      }
 
       return user;
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
-      _showToast("Error en el inicio de sesión: $e", false);
+      if (!loginSilencioso) {
+        _showToast("Error en el inicio de sesión: $e", false);
+      }
       return UserModel.empty();
     }
   }
@@ -102,7 +124,9 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
       await _authRepository.logout();
       await _storage.delete(key: _userKey);
 
-      state = const AsyncValue.data(AuthStateData(state: AuthState.unauthenticated));
+      state = const AsyncValue.data(
+        AuthStateData(state: AuthState.unauthenticated),
+      );
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
     }
@@ -120,4 +144,6 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
   }
 }
 
-final authProvider = AsyncNotifierProvider<AuthNotifier, AuthStateData>(AuthNotifier.new);
+final authProvider = AsyncNotifierProvider<AuthNotifier, AuthStateData>(
+  AuthNotifier.new,
+);
