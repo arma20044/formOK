@@ -1,178 +1,123 @@
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter/material.dart';
 import 'package:form/core/auth/auth_repository.dart';
 import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/core/auth/model/user_model.dart';
 import 'package:form/model/storage/userDatos.dart';
-
 import 'model/auth_state.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthStateData> {
   late final AuthRepository _authRepository;
+  static const _userKey = 'user_data';
   final _storage = const FlutterSecureStorage();
 
   @override
   Future<AuthStateData> build() async {
-    // Check initial authentication status (e.g., from stored tokens)
     _authRepository = ref.read(authRepositoryProvider);
 
-      // 👇 Marca el estado inicial como "loading" antes de cualquier lógica
-  state = const AsyncLoading();
-
-    // Intentar login automático al inicializar
-    String? datosSesion = await _storage.read(key: 'user_data');
-
-    if (datosSesion != null) {
-      var datosJson = json.decode(datosSesion);
-      final jsonObject = DatosUser.fromJson(datosJson);
-      print(jsonObject);
-      // Intentar login automático
-      UserModel loginExitoso = await login(
-        jsonObject.numeroDocumento,
-        jsonObject.password,
-        jsonObject.tipoDocumento,
-      );
-
-      if (loginExitoso.numeroDocumento.isNotEmpty) {
-        return AuthStateData(
-          state: AuthState.authenticated,
-          user: UserModel(
-            nombre: loginExitoso.nombre,
-            apellido: loginExitoso.apellido,
-            numeroDocumento: loginExitoso.numeroDocumento,
-            tipoDocumento: loginExitoso.tipoDocumento,
-            password: loginExitoso.password,
-            cedulaRepresentante: loginExitoso.cedulaRepresentante,
-            tipoSolicitante: loginExitoso.tipoSolicitante,
-            token: loginExitoso.token,
-            correo: loginExitoso.correo,
-            direccion: loginExitoso.direccion,
-            pais: loginExitoso.pais,
-            departamento: loginExitoso.departamento,
-            ciudad: loginExitoso.ciudad,
-            telefonoCelular: loginExitoso.telefonoCelular,
-            tipoCliente: loginExitoso.tipoCliente,
-            
-          ),
-        );
-      } else {
-        return AuthStateData(state: AuthState.unauthenticated);
-      }
-    }
-    /* if (token == null) return AuthStateData(state: AuthState.unauthenticated);
-
-    try {
-      final user = await _authRepository.getUserFromToken(token);
-      return AuthStateData(state: AuthState.authenticated, user: user);
-    } catch (_) {
-      return AuthStateData(state: AuthState.unauthenticated);
-    }
-*/
-    // Check initial authentication status (e.g., from stored tokens)
-    return AuthStateData(state: AuthState.unauthenticated);
-  }
-
-  static const _userKey = 'user_data';
-
-  Future<UserModel> login(
-    String numeroDocumento,
-    String password,
-    String tipoDocumento,
-  ) async {
-    final _storage = const FlutterSecureStorage();
-
+    // Estado inicial: cargando
     state = const AsyncLoading();
 
-    //state = const AsyncValue.data(AuthStateData(state: AuthState.loading));
     try {
-      final authRepository = ref.read(authRepositoryProvider);
-      final responseLogin = await authRepository.login(
-        numeroDocumento,
-        password,
-        tipoDocumento,
-      );
-      if (!responseLogin.error) {
-        //state = const AsyncValue.data(AuthStateData(state: AuthState.authenticated));
+      String? datosSesion = await _storage.read(key: _userKey);
 
-        final user = UserModel(
-          nombre: responseLogin.resultado!.nombre!,
-          apellido: responseLogin.resultado!.apellido!,
-          numeroDocumento: numeroDocumento,
-          tipoDocumento: tipoDocumento,
-          password: password,
-          cedulaRepresentante: '', //LLEGARA DESDE EL FORM
-          tipoSolicitante: '', //LLEGARA DESDE EL FORM
-          token: responseLogin.token!,
-          correo: responseLogin.resultado!.correo!,
-          direccion: responseLogin.resultado!.direccion!,
-          pais: responseLogin.resultado!.pais!,
-          departamento: responseLogin.resultado!.departamento!,
-          ciudad: responseLogin.resultado!.ciudad!,
-          telefonoCelular: responseLogin.resultado!.telefonoCelular!,
-          tipoCliente: responseLogin.resultado!.tipoCliente!,
-        );
+      if (datosSesion != null) {
+        final datosJson = json.decode(datosSesion);
+        final datosUser = DatosUser.fromJson(datosJson);
 
-        await _storage.write(key: _userKey, value: jsonEncode(user.toMap()));
+        final user = await _attemptLoginAuto(datosUser);
+        if (user != null) {
+          return AuthStateData(state: AuthState.authenticated, user: user);
+        }
+      }
 
-        state = AsyncData(
-          AuthStateData(state: AuthState.authenticated, user: user),
-        );
+      // Si no hay datos o login automático falla
+      return const AuthStateData(state: AuthState.unauthenticated);
+    } catch (_) {
+      return const AuthStateData(state: AuthState.unauthenticated);
+    }
+  }
 
-        Fluttertoast.showToast(
-          msg: "Inicio de Sesión Exitosa", // Mensaje de error
-          toastLength: Toast.LENGTH_SHORT, // Duración corta del toast
-          gravity: ToastGravity.BOTTOM, // Posición del toast (abajo)
-          backgroundColor: Colors.green, // Color de fondo rojo para error
-          textColor: Colors.white, // Color del texto
-          fontSize: 16.0, // Tamaño de la fuente
-        );
-        return user;
-      } else {
-        state = const AsyncValue.data(
-          AuthStateData(state: AuthState.error),
-        ); // Or a more specific error state
-        Fluttertoast.showToast(
-          msg: "Error en el inicio de sesión", // Mensaje de error
-          toastLength: Toast.LENGTH_SHORT, // Duración corta del toast
-          gravity: ToastGravity.BOTTOM, // Posición del toast (abajo)
-          backgroundColor: Colors.redAccent, // Color de fondo rojo para error
-          textColor: Colors.white, // Color del texto
-          fontSize: 16.0, // Tamaño de la fuente
-        );
+  // Login automático sin tocar state
+  Future<UserModel?> _attemptLoginAuto(DatosUser datos) async {
+    try {
+      final user = await login(datos.numeroDocumento, datos.password, datos.tipoDocumento);
+      return user.numeroDocumento.isNotEmpty ? user : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Login manual
+  Future<UserModel> login(String numeroDocumento, String password, String tipoDocumento) async {
+    state = const AsyncLoading();
+
+    try {
+      final response = await _authRepository.login(numeroDocumento, password, tipoDocumento);
+
+      if (response.error) {
+        state = const AsyncValue.data(AuthStateData(state: AuthState.error));
+        _showToast("Error en el inicio de sesión", false);
         return UserModel.empty();
       }
+
+      final user = UserModel(
+        nombre: response.resultado!.nombre!,
+        apellido: response.resultado!.apellido!,
+        numeroDocumento: numeroDocumento,
+        tipoDocumento: tipoDocumento,
+        password: password,
+        cedulaRepresentante: '',
+        tipoSolicitante: '',
+        token: response.token!,
+        correo: response.resultado!.correo!,
+        direccion: response.resultado!.direccion!,
+        pais: response.resultado!.pais!,
+        departamento: response.resultado!.departamento!,
+        ciudad: response.resultado!.ciudad!,
+        telefonoCelular: response.resultado!.telefonoCelular!,
+        tipoCliente: response.resultado!.tipoCliente!,
+      );
+
+      await _storage.write(key: _userKey, value: jsonEncode(user.toMap()));
+
+      state = AsyncData(AuthStateData(state: AuthState.authenticated, user: user));
+      _showToast("Inicio de Sesión Exitosa", true);
+
+      return user;
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
-      Fluttertoast.showToast(
-        msg: "Error en el inicio de sesión: $e", // Mensaje de error
-        toastLength: Toast.LENGTH_SHORT, // Duración corta del toast
-        gravity: ToastGravity.BOTTOM, // Posición del toast (abajo)
-        backgroundColor: Colors.redAccent, // Color de fondo rojo para error
-        textColor: Colors.white, // Color del texto
-        fontSize: 16.0, // Tamaño de la fuente
-      );
+      _showToast("Error en el inicio de sesión: $e", false);
       return UserModel.empty();
     }
   }
 
   Future<void> logout() async {
     state = const AsyncValue.data(AuthStateData(state: AuthState.loading));
+
     try {
-      final authRepository = ref.read(authRepositoryProvider);
-      await authRepository.logout();
-      state = const AsyncValue.data(
-        AuthStateData(state: AuthState.unauthenticated),
-      );
+      await _authRepository.logout();
+      await _storage.delete(key: _userKey);
+
+      state = const AsyncValue.data(AuthStateData(state: AuthState.unauthenticated));
     } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
+      state = AsyncError(e, StackTrace.current);
     }
+  }
+
+  void _showToast(String msg, bool success) {
+    Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: success ? Colors.green : Colors.redAccent,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 }
 
-final authProvider = AsyncNotifierProvider<AuthNotifier, AuthStateData>(
-  AuthNotifier.new,
-);
+final authProvider = AsyncNotifierProvider<AuthNotifier, AuthStateData>(AuthNotifier.new);
