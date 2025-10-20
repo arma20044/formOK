@@ -3,19 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Modelo para cada fragmento de texto dentro de un checkbox
-class TextFragment {
-  final String text;
-  final String? url; // si tiene url es un link
-  TextFragment({required this.text, this.url});
-}
+
 
 /// Modelo para cada checkbox
+
+
+
 class CustomCheckbox {
   final List<TextFragment> fragments;
   bool value;
 
-  CustomCheckbox({required this.fragments, this.value = false});
+  CustomCheckbox({
+    required this.fragments,
+    this.value = false,
+  });
+
+  String fragmentsToText() => fragments.map((f) => f.text).join();
 }
+
+class TextFragment {
+  final String text;
+  final String? url;
+
+  TextFragment({required this.text, this.url});
+}
+
 
 /// Widget reutilizable de grupo de checkboxes
 class CheckboxGroup extends StatefulWidget {

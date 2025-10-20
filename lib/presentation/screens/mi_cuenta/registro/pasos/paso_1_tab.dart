@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/config/tipo_tramite_model.dart';
+import 'package:form/model/constans/listado_checks_registro_mi_cuenta.dart';
 import 'package:form/model/model.dart';
+import 'package:form/presentation/components/common/checkbox_group.dart';
 import 'package:form/presentation/components/common/info_card_simple.dart';
 import 'package:form/presentation/components/widgets/dropdown_custom.dart';
+import 'package:form/provider/check.dart';
+import 'package:form/provider/terminos.dart' hide FormState;
 
 import '../../../../../core/api/mi_ande_api.dart';
 import '../../../../../infrastructure/infrastructure.dart';
 import '../../../../../repositories/repositories.dart';
+import '../../../../components/common.dart';
 
 class Paso1Tab extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -33,29 +39,39 @@ bool isLoadingCiudades = false;
 List<Departamento> listaDepartamentos = [];
 List<Ciudad> listaCiudades = [];
 
-class Paso1TabState extends State<Paso1Tab>
-    with AutomaticKeepAliveClientMixin {
+// Este archivo debe estar accesible donde lo uses (ej: checkboxes_data.dart)
+
+final Map<String, List<CustomCheckbox>> checkboxesBySelection = {
+  '1': 
+    checkboxesInicial(true)
+  ,
+  '2': 
+  checkboxesInicial(false)
+  ,
+  
+};
+
+class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
   Map<String, dynamic> getFormData() {
-  return {
-    "tipoCliente": selectedTipoTramite?.id,
-    "tipoSolicitante": selectedTipoSolicitante?.id,
-    "tipoDocumento": selectedTipoDocumento?.id,
-    "numeroDocumento": numeroDocumentoController.text,
-    "nombre": nombreObtenido,
-    "apellido": apellidoObtenido,
-    "pais": selectedPais?.descripcion,
-    "departamento": selectedDept?.nombre,
-    "ciudad": selectedCiudad?.nombre,
-    "direccion": direccionController.text,
-    "correo": correoController.text,
-    "telefonoFijo": numeroTelefonoFijoController.text,
-    "telefonoCelular": numeroTelefonoCelularController.text,
-  };
-}
-
+    return {
+      "tipoCliente": selectedTipoTramite?.id,
+      "tipoSolicitante": selectedTipoSolicitante?.id,
+      "tipoDocumento": selectedTipoDocumento?.id,
+      "numeroDocumento": numeroDocumentoController.text,
+      "nombre": nombreObtenido,
+      "apellido": apellidoObtenido,
+      "pais": selectedPais?.descripcion,
+      "departamento": selectedDept?.nombre,
+      "ciudad": selectedCiudad?.nombre,
+      "direccion": direccionController.text,
+      "correo": correoController.text,
+      "telefonoFijo": numeroTelefonoFijoController.text,
+      "telefonoCelular": numeroTelefonoCelularController.text,
+    };
+  }
 
   ModalModel? selectedTipoTramite;
   ModalModel? selectedTipoSolicitante;
@@ -170,18 +186,33 @@ class Paso1TabState extends State<Paso1Tab>
                 ),
               ),
               const SizedBox(height: 20),
-              DropdownCustom<ModalModel>(
-                label: "Tipo Trámite",
-                items: listaTipoTramite,
-                value: selectedTipoTramite,
-                displayBuilder: (b) => b.descripcion!,
-                validator: (val) =>
-                    val == null ? "Seleccione un Tipo Trámite" : null,
-                onChanged: (val) => setState(() {selectedTipoTramite = val;
+
+              Consumer(
+                builder: (context, ref, _) {
+                  return DropdownCustom<ModalModel>(
+                    label: "Tipo Trámite",
+                    items: listaTipoTramite,
+                    value: selectedTipoTramite,
+                    displayBuilder: (b) => b.descripcion!,
+                    validator: (val) =>
+                        val == null ? "Seleccione un Tipo Trámite" : null,
+                    onChanged: (val) {
+                      setState(() {
+                        selectedTipoTramite = val;
+                      });
+
                       widget.onTipoClienteChanged?.call(val?.id);
-                }
-                ),
+
+                      if (val != null) {
+                        final options = checkboxesBySelection[val.id] ?? [];
+                         ref.read(formProvider.notifier).updateDropdown(val.id!, options);
+                            
+                      }
+                    },
+                  );
+                },
               ),
+
               const SizedBox(height: 20),
               DropdownCustom<ModalModel>(
                 label: "Tipo Solicitante",
