@@ -26,7 +26,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   ref.onDispose(refreshListenable.dispose);
 
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/splash',
     refreshListenable: refreshListenable,
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),

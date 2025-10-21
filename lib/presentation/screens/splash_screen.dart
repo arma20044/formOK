@@ -8,27 +8,47 @@ import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/core/enviromens/Enrivoment.dart';
 import 'package:go_router/go_router.dart';
 
-class SplashScreen extends ConsumerWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
 
-    // Escucha cambios en AuthStateData de forma segura
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Llamar login silencioso en segundo plano
+    _attemptSilentLogin();
+  }
+
+  Future<void> _attemptSilentLogin() async {
+    final authNotifier = ref.read(authProvider.notifier);
+
+    // Este login es silencioso si hay credenciales guardadas
+    await authNotifier.build();
+
+    // ref.listen se encargará de redirigir
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Escuchamos cambios del authProvider
     ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
-      next.whenData((authData) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final router = GoRouter.maybeOf(context);
-          if (router == null) return; // evita crash si no hay GoRouter
+      next.whenOrNull(
+        data: (authData) {
+          if (!mounted) return;
 
           if (authData.state == AuthState.authenticated) {
-            GoRouter.of(context).go('/');
-          } else if (authData.state == AuthState.unauthenticated) {
-            GoRouter.of(context).go('/login');
+            GoRouter.of(context).go('/'); // Login correcto → Home
+          } else if (authData.state == AuthState.unauthenticated ||
+              authData.state == AuthState.error) {
+            GoRouter.of(context).go('/login'); // Login fallido → LoginScreen
           }
-        });
-      });
+        },
+      );
     });
 
     return Directionality(
@@ -37,14 +57,10 @@ class SplashScreen extends ConsumerWidget {
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset('assets/images/logoande.png', height: 50),
-              const SizedBox(height: 20),
-              Platform.isAndroid
-                  ? Text(Environment.appVersion.android.version)
-                  : Text(Environment.appVersion.ios.version),
-              const SizedBox(height: 20),
-              const CircularProgressIndicator(),
+            children: const [
+              Image(image: AssetImage('assets/images/logoande.png'), height: 50),
+              SizedBox(height: 20),
+              CircularProgressIndicator(),
             ],
           ),
         ),

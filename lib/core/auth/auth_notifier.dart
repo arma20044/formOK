@@ -10,16 +10,16 @@ import 'package:form/model/storage/userDatos.dart';
 import 'model/auth_state.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthStateData> {
-  late final AuthRepository _authRepository;
+  late final AuthRepository _authRepository = ref.read(authRepositoryProvider);
   static const _userKey = 'user_data';
   final _storage = const FlutterSecureStorage();
 
   @override
   Future<AuthStateData> build() async {
-    _authRepository = ref.read(authRepositoryProvider);
+    
 
     // Estado inicial: cargando
-    state = const AsyncLoading();
+    //state = const AsyncLoading();
 
     try {
       String? datosSesion = await _storage.read(key: _userKey);
