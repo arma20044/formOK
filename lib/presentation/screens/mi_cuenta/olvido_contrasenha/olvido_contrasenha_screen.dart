@@ -38,7 +38,7 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
     if (_formKey.currentState!.validate()) {
       if (_selectedRadio == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Seleccione medio de notificación',)),
+          const SnackBar(content: Text('Seleccione medio de notificación')),
         );
         return;
       }
@@ -67,11 +67,7 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
         // Si todo está correcto:
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              olvidoContrasenhaResponse.mensaje,
-            ),
-          ),
+          SnackBar(content: Text(olvidoContrasenhaResponse.mensaje)),
         );
         GoRouter.of(context).pop();
       }
@@ -120,7 +116,10 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
               ),
               const SizedBox(height: 24),
               // Radio Buttons
-              const Text('Seleccione medio de notificación:', style: TextStyle(fontSize: 16)),
+              const Text(
+                'Seleccione medio de notificación:',
+                style: TextStyle(fontSize: 16),
+              ),
               RadioListTile<String>(
                 title: const Text('Mensaje de Texto (SMS)'),
                 value: 'S',
@@ -139,8 +138,12 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _enviarFormulario,
-                  child: const Text('Recuperar'),
+                  onPressed: _isLoadingOlvidoContrasenha
+                      ? null
+                      : _enviarFormulario,
+                  child: _isLoadingOlvidoContrasenha
+                      ? const SizedBox(child: CircularProgressIndicator())
+                      : Text('Recuperar'),
                 ),
               ),
             ],
