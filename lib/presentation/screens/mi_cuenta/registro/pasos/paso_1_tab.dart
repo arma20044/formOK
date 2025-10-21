@@ -7,14 +7,13 @@ import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common/checkbox_group.dart';
 import 'package:form/presentation/components/common/info_card_simple.dart';
 import 'package:form/presentation/components/widgets/dropdown_custom.dart';
-import 'package:form/provider/check.dart';
+
 import 'package:form/provider/terminos.dart' hide FormState;
 import 'package:form/utils/utils.dart';
 
 import '../../../../../core/api/mi_ande_api.dart';
 import '../../../../../infrastructure/infrastructure.dart';
 import '../../../../../repositories/repositories.dart';
-import '../../../../components/common.dart';
 
 class Paso1Tab extends StatefulWidget {
   final GlobalKey<FormState> formKey;
