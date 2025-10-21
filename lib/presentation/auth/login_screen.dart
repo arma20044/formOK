@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
@@ -65,6 +66,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     return Scaffold(
+      endDrawer: CustomDrawer(),
       appBar: AppBar(title: const Text("Mi Cuenta - Acceder")),
       body: Stack(
         children: [

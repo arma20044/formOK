@@ -57,10 +57,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Image(image: AssetImage('assets/images/logoande.png'), height: 50),
+            children: [
+              Image(
+                image: AssetImage('assets/images/logoande.png'),
+                height: 50,
+              ),
               SizedBox(height: 20),
               CircularProgressIndicator(),
+              Platform.isAndroid
+                  ? Text(Environment.appVersion.android.version)
+                  : Text(Environment.appVersion.ios.version),
             ],
           ),
         ),

@@ -138,6 +138,7 @@ class _ConsultaFacturasScreenState
                     Expanded(
                       flex: 8, // 80% del espacio
                       child: TextFormField(
+                        maxLength: 7,
                         controller: _nisController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
@@ -150,6 +151,9 @@ class _ConsultaFacturasScreenState
                           }
                           if (!RegExp(r'^\d+$').hasMatch(value)) {
                             return 'Solo números permitidos';
+                          }
+                          if(value.length != 7){
+                            return 'NIS debe ser de 7 dígitos.';
                           }
                           return null;
                         },
