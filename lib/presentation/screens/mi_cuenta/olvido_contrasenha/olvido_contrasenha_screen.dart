@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:form/core/api/mi_ande_api.dart';
+import 'package:form/model/olvido_contrasenha.dart';
 import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../infrastructure/infrastructure.dart';
+import '../../../../repositories/repositories.dart';
 
 enum SingingCharacter { lafayette, jefferson }
 
@@ -18,36 +24,65 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
   String? _selectedOpcion; // Dropdown
   String? _selectedRadio; // RadioButton
 
+  bool _isLoadingOlvidoContrasenha = false;
+
   DropdownItem? selectedTipoDocumento;
-  final isLoading = false;
-  final numeroController = TextEditingController();
 
-  final List<String> _opcionesDropdown = ['Opción A', 'Opción B', 'Opción C'];
+  final documentoIdentificacionController = TextEditingController();
 
-  void _enviarFormulario() {
+  final repoOlvidoContrasenha = OlvidoContrasenhaRepositoryImpl(
+    OlvidoContrasenhaDatasourceImpl(MiAndeApi()),
+  );
+
+  void _enviarFormulario() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedRadio == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Seleccione una opción de tipo')),
+          const SnackBar(content: Text('Seleccione medio de notificación',)),
         );
         return;
       }
 
-      // Si todo está correcto:
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Enviado ✅\nDropdown: $_selectedOpcion\nTipo: $_selectedRadio',
+      setState(() {
+        _isLoadingOlvidoContrasenha = true;
+      });
+      final olvidoContrasenhaResponse = await repoOlvidoContrasenha
+          .getOlvidoContrasenha(
+            selectedTipoDocumento!.id,
+            documentoIdentificacionController.text,
+            _selectedRadio!,
+            //cedulaRepresenante ?? 'lteor',
+            'lteor',
+            //tipoSolicitante
+            'Sin registros',
+          );
+
+      if (!mounted) return;
+      if (olvidoContrasenhaResponse.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(olvidoContrasenhaResponse.errorValList[0])),
+        );
+        return;
+      } else {
+        // Si todo está correcto:
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              olvidoContrasenhaResponse.mensaje,
+            ),
           ),
-        ),
-      );
+        );
+        GoRouter.of(context).pop();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Formulario con Dropdown y Radios')),
+      endDrawer: CustomDrawer(),
+      appBar: AppBar(title: const Text('Recuperar Contraseña')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -65,15 +100,14 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
                           DropdownMenuItem(value: item, child: Text(item.name)),
                     )
                     .toList(),
-                onChanged: isLoading
-                    ? null
-                    : (value) => setState(() => selectedTipoDocumento = value),
+                onChanged: (value) =>
+                    setState(() => selectedTipoDocumento = value),
                 validator: (value) =>
                     value == null ? 'Seleccione un tipo de documento' : null,
               ),
               const SizedBox(height: 24),
               TextFormField(
-                controller: numeroController,
+                controller: documentoIdentificacionController,
                 decoration: const InputDecoration(
                   labelText: 'Número de CI, RUC o Pasaporte',
                 ),
@@ -83,11 +117,10 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
                   }
                   return null;
                 },
-                enabled: !isLoading,
               ),
               const SizedBox(height: 24),
               // Radio Buttons
-              const Text('Seleccione tipo:', style: TextStyle(fontSize: 16)),
+              const Text('Seleccione medio de notificación:', style: TextStyle(fontSize: 16)),
               RadioListTile<String>(
                 title: const Text('Mensaje de Texto (SMS)'),
                 value: 'S',
@@ -107,7 +140,7 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _enviarFormulario,
-                  child: const Text('Enviar formulario'),
+                  child: const Text('Recuperar'),
                 ),
               ),
             ],

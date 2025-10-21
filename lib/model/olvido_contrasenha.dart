@@ -1,0 +1,51 @@
+class OlvidoContrasenhaResponse {
+  final dynamic resultado;
+  final List<dynamic> mensajeList;
+  final String mensaje;
+  final bool error;
+  final List<dynamic> errorValList;
+
+  OlvidoContrasenhaResponse({
+    required this.resultado,
+    required this.mensajeList,
+    required this.mensaje,
+    required this.error,
+    required this.errorValList,
+  });
+
+  factory OlvidoContrasenhaResponse.fromJson(Map<String, dynamic> json) {
+    return OlvidoContrasenhaResponse(
+      resultado: json['resultado'],
+       mensajeList: List<dynamic>.from(json['mensajeList'].map((item) => item)),
+      mensaje: json['mensaje'],
+      error: json['error'],
+       errorValList: List<dynamic>.from(json['errorValList'].map((item) => item)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'resultado': resultado,
+      'mensajeList': mensajeList.map((item) => item).toList(),
+      'mensaje': mensaje,
+      'error': error,
+      'errorValList': errorValList.map((item) => item).toList(),
+    };
+  }
+
+  OlvidoContrasenhaResponse copyWith({
+    required dynamic resultado,
+    required List<dynamic> mensajeList,
+    required String mensaje,
+    required bool error,
+    required List<dynamic> errorValList,
+  }) {
+    return OlvidoContrasenhaResponse(
+      resultado: resultado,
+      mensajeList: mensajeList,
+      mensaje: mensaje,
+      error: error,
+      errorValList: errorValList,
+    );
+  }
+}
