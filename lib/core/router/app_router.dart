@@ -15,6 +15,11 @@ import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/mi_cuenta_screen.dart';
 import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen.dart';
 
+import '../../presentation/screens/comercial/consulta_facturas_screen.dart' show ConsultaFacturasScreen;
+
+final publicRoutes = ['/login', '/register', '/splash','/'];
+final privateRoutes = ['/miCuenta', '/misDatos', '/settings','consultaFacturas'];
+
 final goRouterProvider = Provider<GoRouter>((ref) {
   // Notificador para forzar rebuild cuando cambie authProvider
   final refreshListenable = ValueNotifier<int>(0);
@@ -37,6 +42,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/miCuenta', builder: (context, state) => const MiCuentaScreen()),
       GoRoute(path: '/reclamosFaltaEnergia', builder: (context, state) => const ReclamosScreen(tipoReclamo: 'FE')),
       GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+      GoRoute(path: '/consultaFacturas', builder: (context, state) => const ConsultaFacturasScreen()),
     ],
     redirect: (context, state) {
       final authState = ref.read(authProvider);
@@ -46,9 +52,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       final isLoggedIn = authState.value?.state == AuthState.authenticated;
       final loggingIn = state.uri.path == '/login';
+      final currentPath = state.matchedLocation;
 
       // 🔹 Usuario no logueado y no está en login → ir a login
-      if (!isLoggedIn && !loggingIn) return '/login';
+      if (!isLoggedIn && !loggingIn && privateRoutes.contains(currentPath)) return '/login';
+      
+      if (!isLoggedIn && !loggingIn && publicRoutes.contains(currentPath)) return '/';
 
       // 🔹 Usuario logueado e intenta ir a login → redirigir a home
       if (isLoggedIn && loggingIn) return '/';
