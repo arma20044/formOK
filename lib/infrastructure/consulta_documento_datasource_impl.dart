@@ -18,10 +18,14 @@ class ConsultaDocumentoDatasourceImpl extends ConsultaDocumentoDatasource {
   @override
   Future<ConsultaDocumentoResultado> getConsultaDocumento(String numerodocumento, String tipoDocumento) async {
 
+    List<String> rucString = numerodocumento.split('-');
+
       var data = FormData.fromMap({
     //'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
     //'categoriaWebAppJsonArray': '["FE"]',
-    'cedula': numerodocumento
+    'cedula': rucString[0],
+    'dv' : rucString[1],
+    'ruc' : rucString[0]
   });
 
     String urlConsulta = tipoDocumento.compareTo('TD001') == 0 ?  '/v4/mitic/consultaPorCedulaMobile' : '/v4/mitic/consultaSetMobile';

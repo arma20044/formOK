@@ -53,6 +53,7 @@ class ConsultaDocumentoResultado {
   final String estadoCivil;
   final String sexo;
   final String nombres;
+  final String razonSocial;
 
   ConsultaDocumentoResultado({
     required this.nacionalidadBean,
@@ -63,6 +64,7 @@ class ConsultaDocumentoResultado {
     required this.estadoCivil,
     required this.sexo,
     required this.nombres,
+    required this.razonSocial,
   });
 
   factory ConsultaDocumentoResultado.fromJson(Map<String, dynamic> json) {
@@ -75,6 +77,7 @@ class ConsultaDocumentoResultado {
       estadoCivil: json['estadoCivil'],
       sexo: json['sexo'],
       nombres: json['nombres'],
+      razonSocial: json['razonSocial'],
     );
   }
 
@@ -110,6 +113,7 @@ class ConsultaDocumentoResultado {
       estadoCivil: estadoCivil,
       sexo: sexo,
       nombres: nombres,
+      razonSocial:razonSocial
     );
   }
 }

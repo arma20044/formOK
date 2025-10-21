@@ -35,6 +35,7 @@ late ConsultaDocumentoResultado consultaDocumentoResponse;
 bool isLoadingConsultaDocumento = false;
 bool isLoadingDepartamentos = false;
 bool isLoadingCiudades = false;
+bool isLoadingConsultaDocumentoRepresentante = false;
 
 List<Departamento> listaDepartamentos = [];
 List<Ciudad> listaCiudades = [];
@@ -78,6 +79,9 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
   String nombreObtenido = "";
   String apellidoObtenido = "";
 
+  String nombreRepresentanteObtenido = "";
+  String apellidoRepresentanteObtenido = "";
+
   List<Departamento> departamentos = [];
   List<Ciudad> ciudades = [];
 
@@ -90,7 +94,11 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
   final TextEditingController numeroTelefonoCelularController =
       TextEditingController();
 
+  final TextEditingController documentoRepresentanteController =
+      TextEditingController();
+
   final FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNodeNumeroDocumentoRepresentante = FocusNode();
 
   final repoConsultaDocumento = ConsultaDocumentoRepositoryImpl(
     ConsultaDocumentoDatasourceImpl(MiAndeApi()),
@@ -107,12 +115,12 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
     try {
       consultaDocumentoResponse = await repoConsultaDocumento
           .getConsultaDocumento(
-            numeroDocumentoController.value.text,
+            numeroDocumentoController.text,
             selectedTipoDocumento!.id ?? "",
           );
 
       setState(() {
-        nombreObtenido = consultaDocumentoResponse.nombres;
+        nombreObtenido = consultaDocumentoResponse.razonSocial;
         apellidoObtenido = consultaDocumentoResponse.apellido;
       });
     } catch (e) {
@@ -144,6 +152,26 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
     }
   }
 
+  void consultarRepresentante(String cedulaRepresenante) async {
+    setState(() => isLoadingConsultaDocumentoRepresentante = true);
+    try {
+      consultaDocumentoResponse = await repoConsultaDocumento
+          .getConsultaDocumento(
+            documentoRepresentanteController.value.text,
+            'TD001',
+          );
+
+      setState(() {
+          nombreRepresentanteObtenido = consultaDocumentoResponse.nombres;
+         apellidoRepresentanteObtenido = consultaDocumentoResponse.apellido;
+      });
+    } catch (e) {
+      print("Error al consultar Documento Representante: $e");
+    } finally {
+      setState(() => isLoadingConsultaDocumentoRepresentante = false);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -156,6 +184,12 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
         //print('TextFormField perdió el foco');
         //print('Valor actual: ${numeroDocumentoController.text}');
         consultarDocumento(numeroDocumentoController.text);
+      }
+    });
+
+    _focusNodeNumeroDocumentoRepresentante.addListener(() {
+      if (!_focusNodeNumeroDocumentoRepresentante.hasFocus) {
+        consultarRepresentante(documentoRepresentanteController.text);
       }
     });
   }
@@ -272,6 +306,32 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                 ),
               ),
               const SizedBox(height: 20),
+
+              selectedTipoDocumento?.id != 'TD004' &&
+                      selectedTipoSolicitante?.id?.contains('Entidad') == true
+                  ? TextFormField(
+                      focusNode: _focusNodeNumeroDocumentoRepresentante,
+                      controller: documentoRepresentanteController,
+                      keyboardType: TextInputType.text,
+                      decoration: const InputDecoration(
+                        labelText: "Número de CI del Representante",
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (val) {
+                        //if (selectedTipoReclamo?.nisObligatorio == 'S') {
+                        if (val == null || val.isEmpty) {
+                          return "Ingrese Número de CI del Representante.";
+                        }
+
+                        return null;
+                        //}
+                      },
+                    )
+                  : Text(""),
+              const SizedBox(height: 20),
+
+              Text(nombreRepresentanteObtenido),
+
               DropdownCustom<ModalModel>(
                 label: "País",
                 items: listaPais,
@@ -385,7 +445,8 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                   if (val == null || val.isEmpty) {
                     return "Ingrese Correo";
                   }
-                  if (!emailRegex.hasMatch(val)) return "Ingrese formato de correo válido.";
+                  if (!emailRegex.hasMatch(val))
+                    return "Ingrese formato de correo válido.";
                   return null;
                   //}
                 },
