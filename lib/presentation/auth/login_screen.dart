@@ -80,7 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     DropdownButtonFormField<DropdownItem>(
-                      value: selectedTipoDocumento,
+                      initialValue: selectedTipoDocumento,
                       hint: const Text("Seleccionar Tipo de Documento"),
                       items: dropDownItems
                           .map(
@@ -163,13 +163,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: <Widget>[
                         TextButton(
                           onPressed: () {
-                            // Handle left button press
+                             GoRouter.of(context).push('/olvidoContrasenha');
                           },
                           child: const Text('Olvido de Contraseña'),
                         ),
                         TextButton(
                           onPressed: () {
-                            // Handle right button press
+                            GoRouter.of(context).push('/registroMiCuenta');
                           },
                           child: const Text('Regístrate'),
                         ),

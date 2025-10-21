@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/presentation/screens/expedientes/expedientes_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/mis_datos.dart';
+import 'package:form/presentation/screens/mi_cuenta/olvido_contrasenha/olvido_contrasenha_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/registro/registro_mi_cuenta_screen.dart';
 import 'package:form/presentation/screens/splash_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -43,6 +44,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/reclamosFaltaEnergia', builder: (context, state) => const ReclamosScreen(tipoReclamo: 'FE')),
       GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/consultaFacturas', builder: (context, state) => const ConsultaFacturasScreen()),
+      GoRoute(path: '/olvidoContrasenha', builder: (context, state) => const OlvidoContrasenhaScreen()),
     ],
     redirect: (context, state) {
       final authState = ref.read(authProvider);
