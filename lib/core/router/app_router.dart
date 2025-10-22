@@ -57,6 +57,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final isLoggedIn = authState.value?.state == AuthState.authenticated;
       final loggingIn = state.uri.path == '/login';
       final currentPath = state.matchedLocation;
+      final forzarCambioContrasenha = authState.value?.user?.modificarPassword;
+
+      if(forzarCambioContrasenha != null && forzarCambioContrasenha.contains('S')) return '/cambioContrasenha';
 
       // 🔹 Usuario no logueado y no está en login → ir a login
       if (!isLoggedIn && !loggingIn && privateRoutes.contains(currentPath)) return '/login';

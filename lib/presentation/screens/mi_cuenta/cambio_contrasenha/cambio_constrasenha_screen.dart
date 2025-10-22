@@ -65,16 +65,22 @@ class _CambioContrasenhaScreenState
             .read(authProvider.notifier)
             .actualizarPassword(passwordController.text);
 
-        ScaffoldMessenger.of(context).showSnackBar(
+       
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) GoRouter.of(context).go('/');
+        });
+
+         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(cambioContrasenhaResponse.mensaje!)),
         );
-        GoRouter.of(context).pop();
       }
     } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
