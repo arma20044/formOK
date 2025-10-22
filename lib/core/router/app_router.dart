@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/presentation/screens/expedientes/expedientes_screen.dart';
-import 'package:form/presentation/screens/mi_cuenta/mis_datos.dart';
+import 'package:form/presentation/screens/mi_cuenta/cambio_contrasenha/cambio_constrasenha_screen.dart';
+import 'package:form/presentation/screens/mi_cuenta/mis_datos_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/olvido_contrasenha/olvido_contrasenha_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/registro/registro_mi_cuenta_screen.dart';
 import 'package:form/presentation/screens/splash_screen.dart';
@@ -19,7 +20,7 @@ import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen
 import '../../presentation/screens/comercial/consulta_facturas_screen.dart' show ConsultaFacturasScreen;
 
 final publicRoutes = ['/login', '/register', '/splash','/'];
-final privateRoutes = ['/miCuenta', '/misDatos', '/settings','/consultaFacturas'];
+final privateRoutes = ['/miCuenta', '/misDatos', '/settings','/consultaFacturas','cambioContrasenha'];
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   // Notificador para forzar rebuild cuando cambie authProvider
@@ -45,6 +46,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/consultaFacturas', builder: (context, state) => const ConsultaFacturasScreen()),
       GoRoute(path: '/olvidoContrasenha', builder: (context, state) => const OlvidoContrasenhaScreen()),
+      GoRoute(path: '/cambioContrasenha', builder: (context, state) => const CambioContrasenhaScreen()),
     ],
     redirect: (context, state) {
       final authState = ref.read(authProvider);

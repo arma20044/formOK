@@ -33,7 +33,7 @@ class InfoCardSimple extends StatelessWidget {
           title,
           style:  TextStyle( fontSize: size  ),
         ),
-        subtitle: Text(subtitle),
+        //subtitle: Text(subtitle),
         //trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       ),
     );
