@@ -7,3 +7,4 @@ export 'consulta_facturas_datasource_impl.dart';
 export 'consulta_documento_datasource_impl.dart';
 export 'mi_cuenta_registro_datasource_impl.dart';
 export 'olvido_contrasenha_datasource_impl.dart';
+export 'cambio_contrasenha_datasource_impl.dart';

@@ -1,33 +1,93 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/core/api/mi_ande_api.dart';
+import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/core/auth/model/auth_state.dart';
+import 'package:form/core/auth/model/user_model.dart';
+import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/presentation/components/common/info_card_simple.dart';
+import 'package:form/repositories/cambio_contrasenha_repository_impl.dart';
+import 'package:go_router/go_router.dart';
 
-class CambioContrasenhaScreen extends StatefulWidget {
+class CambioContrasenhaScreen extends ConsumerStatefulWidget {
   const CambioContrasenhaScreen({super.key});
 
   @override
-  State<CambioContrasenhaScreen> createState() =>
+  ConsumerState<CambioContrasenhaScreen> createState() =>
       _CambioContrasenhaScreenState();
 }
 
-class _CambioContrasenhaScreenState extends State<CambioContrasenhaScreen> {
+class _CambioContrasenhaScreenState
+    extends ConsumerState<CambioContrasenhaScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool isLoading = false;
 
-  void _enviarFormulario() async {
-    if (_formKey.currentState!.validate()) {
+  final passwordAnteriorController = TextEditingController();
+  final passwordController = TextEditingController();
+  final passwordConfirmacionController = TextEditingController();
+
+  final repoCambioContrasenha = CambioContrasenhaRepositoryImpl(
+    CambioContrasenhaDatasourceImpl(MiAndeApi()),
+  );
+
+  void _enviarFormulario(UserModel user) async {
+    if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Seleccione medio de notificación')),
+        const SnackBar(content: Text('Ingrese todos los cambios')),
       );
       return;
     }
+   
+   try{
+      setState(() {
+        isLoading = true;
+      });
+
+      final cambioContrasenhaResponse = await repoCambioContrasenha
+          .getCambioContrasenha(
+            passwordAnteriorController.text,
+            passwordController.text,
+            passwordConfirmacionController.text,
+            user.tipoCliente,
+            user.token
+          );
+
+      if (!mounted) return;
+      if (cambioContrasenhaResponse.error!) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(cambioContrasenhaResponse.errorValList![0])),
+        );
+        return;
+      } else {
+        // Si todo está correcto:
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(cambioContrasenhaResponse.mensaje!)),
+        );
+        GoRouter.of(context).pop();
+      }
+   }
+   catch(e){
+
+   }
+   finally{
+      setState(() {
+        isLoading = false;
+      });
+   }
+    
   }
 
   @override
   Widget build(BuildContext context) {
-    final passwordAnteriorController = TextEditingController();
-    final passwordController = TextEditingController();
-    final passwordConfirmacionController = TextEditingController();
+    final authState = ref.watch(authProvider);
 
-    bool isLoading = false;
+    UserModel? datosJson;
+
+    if (authState.value?.state == AuthState.authenticated) {
+      //datosJson = authState.value?.user;
+      //print(datosJson!.apellido);
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text("Cambiar Contraseña")),
@@ -92,7 +152,9 @@ class _CambioContrasenhaScreenState extends State<CambioContrasenhaScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : _enviarFormulario,
+                  onPressed: isLoading
+                      ? null
+                      : () => _enviarFormulario(authState.value!.user!),
                   child: Text("Cambiar Contraseña"),
                 ),
               ),
