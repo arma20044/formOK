@@ -27,7 +27,11 @@ class _ParentScreenState extends State<ReclamosScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final List<GlobalKey<FormState>> _formKeys = List.generate(
+    3,
+    (_) => GlobalKey<FormState>(),
+  );
+
   final GlobalKey<Tab1State> tab1Key = GlobalKey();
   final GlobalKey<MediaPickerState> tab2Key = GlobalKey();
 
@@ -49,8 +53,6 @@ class _ParentScreenState extends State<ReclamosScreen>
   }
 
   void enviarFormulario() async {
-    print(formKey);
-
     //validar adjuntos si es el caso
     if (tab1Key.currentState?.selectedTipoReclamo?.adjuntoObligatorio == 'S') {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,60 +61,78 @@ class _ParentScreenState extends State<ReclamosScreen>
       return;
     }
 
-    final isValid = formKey.currentState?.validate() ?? false;
-    // Envía los datos
-    if (isValid) {
-      ReclamoResponse result = await _fetchReclamo();
-      if (!mounted) return;
-      if (result.error) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(result.errorValList![0])));
+    for (int i = 0; i < _formKeys.length; i++) {
+      final isValid = _formKeys[i].currentState?.validate() ?? false;
+      if (!isValid) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Complete todos los campos obligatorios del paso ${i + 1}",
+            ),
+          ),
+        );
         return;
       }
+      if (isValid) {
+        ReclamoResponse result = await _fetchReclamo();
+        if (!mounted) return;
+        if (result.error) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(result.errorValList![0])));
+          return;
+        }
 
-      limpiarTodo();
-      //ScaffoldMessenger.of(context).showSnackBar(
-      // const SnackBar(content: Text("Formulario enviado correctamente!")),
-      //);
+        limpiarTodo();
+        //ScaffoldMessenger.of(context).showSnackBar(
+        // const SnackBar(content: Text("Formulario enviado correctamente!")),
+        //);
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-            String mensajeExitoso = 'Reclamo creado correctamente. ${result.reclamo?.numeroReclamo}';
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            String mensajeExitoso =
+                'Reclamo creado correctamente. Reclamo Nro.: ${result.reclamo?.numeroReclamo}';
 
-          return AlertDialog(
-            title: Text(mensajeExitoso),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-                child: const Text('Aceptar'),
-              ),
-              TextButton(
-                onPressed: () {
-                  _copyTextToClipboard(mensajeExitoso);
-                },
-                child: const Text('Copiar'),
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Complete todos los campos obligatorios")),
-      );
+            return AlertDialog(
+              backgroundColor: Colors.green,
+              title: Text(mensajeExitoso),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text('Aceptar'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _copyTextToClipboard(mensajeExitoso);
+                  },
+                  child: const Text('Copiar'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Complete todos los campos obligatorios"),
+          ),
+        );
+      }
+
+      // 🔹 Último tab
     }
+    // Envía los datos
   }
 
   void _copyTextToClipboard(String textToCopy) async {
     await Clipboard.setData(ClipboardData(text: textToCopy));
     // Optionally, show a confirmation message to the user, like a SnackBar
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Text copied to clipboard!')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Texto copiado exitosamente!')),
+    );
   }
 
   Future<ReclamoResponse> _fetchReclamo() async {
@@ -181,15 +201,23 @@ class _ParentScreenState extends State<ReclamosScreen>
             IconButton(icon: const Icon(Icons.refresh), onPressed: limpiarTodo),
           ], */
         ),
-        body: FormWrapper(
-          formKey: formKey,
+        body: SafeArea(
           child: TabBarView(
             physics: NeverScrollableScrollPhysics(),
             controller: _tabController,
             children: [
-              Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo),
+              Tab1(
+                key: tab1Key,
+                tipoReclamo: widget.tipoReclamo,
+                formKey: _formKeys[0],
+              ),
               Tab2(key: tab2Key, onSaved: (newValue) => {_archivo = newValue}),
-              Tab3(lat: _lat, lng: _lng, onLocationSelected: _setLocation),
+              Tab3(
+                lat: _lat,
+                lng: _lng,
+                onLocationSelected: _setLocation,
+                formKey: _formKeys[2],
+              ),
             ],
           ),
         ),
