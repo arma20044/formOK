@@ -19,7 +19,7 @@ import 'package:form/presentation/screens/reclamos/reclamos_falta_energia_screen
 import '../../presentation/screens/comercial/consulta_facturas_screen.dart' show ConsultaFacturasScreen;
 
 final publicRoutes = ['/login', '/register', '/splash','/'];
-final privateRoutes = ['/miCuenta', '/misDatos', '/settings','consultaFacturas'];
+final privateRoutes = ['/miCuenta', '/misDatos', '/settings','/consultaFacturas'];
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   // Notificador para forzar rebuild cuando cambie authProvider

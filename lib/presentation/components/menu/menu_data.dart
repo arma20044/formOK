@@ -67,10 +67,8 @@ final List<MenuGroup> menuGroups = [
         id: 'consulta_factura',
         icon: Icons.document_scanner,
         label: 'Consulta de Facturas',
-        onTap: (context) => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ConsultaFacturasScreen()),
-        ),
+        onTap: (context) =>
+            context.push('/consultaFacturas'),
       ),
       MenuItemModel(
         id: 'history',
