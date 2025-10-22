@@ -76,8 +76,8 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
   Departamento? selectedDept;
   Ciudad? selectedCiudad;
 
-  String nombreObtenido = "";
-  String apellidoObtenido = "";
+  final TextEditingController nombreObtenido = TextEditingController();
+  final TextEditingController apellidoObtenido = TextEditingController();
 
   String nombreRepresentanteObtenido = "";
   String apellidoRepresentanteObtenido = "";
@@ -120,8 +120,13 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
           );
 
       setState(() {
-        nombreObtenido = consultaDocumentoResponse.nombres!;
-        apellidoObtenido = consultaDocumentoResponse.apellido!;
+        if (consultaDocumentoResponse.razonSocial != null) {
+          nombreObtenido.text = consultaDocumentoResponse.razonSocial!;
+          apellidoObtenido.text = consultaDocumentoResponse.razonSocial!;
+        } else {
+          nombreObtenido.text = consultaDocumentoResponse.nombres!;
+          apellidoObtenido.text = consultaDocumentoResponse.apellido!;
+        }
       });
     } catch (e) {
       print("Error al consultar Documento: $e");
@@ -156,14 +161,11 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
     setState(() => isLoadingConsultaDocumentoRepresentante = true);
     try {
       consultaDocumentoResponse = await repoConsultaDocumento
-          .getConsultaDocumento(
-            documentoRepresentanteController.text,
-            'TD001',
-          );
+          .getConsultaDocumento(documentoRepresentanteController.text, 'TD001');
 
       setState(() {
-          nombreRepresentanteObtenido = consultaDocumentoResponse.razonSocial!;
-         apellidoRepresentanteObtenido = consultaDocumentoResponse.razonSocial!;
+        nombreRepresentanteObtenido = consultaDocumentoResponse.nombres!;
+        apellidoRepresentanteObtenido = consultaDocumentoResponse.apellido!;
       });
     } catch (e) {
       print("Error al consultar Documento Representante: $e");
@@ -179,7 +181,9 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
 
     // Escuchamos cambios de foco
     _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
+      if (!_focusNode.hasFocus &&
+          numeroDocumentoController.text.isNotEmpty &&
+          selectedTipoDocumento?.id != 'TD004') {
         // Aquí el TextFormField perdió el foco
         //print('TextFormField perdió el foco');
         //print('Valor actual: ${numeroDocumentoController.text}');
@@ -284,27 +288,48 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                 },
               ),
               const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  children: [
-                    Text("Nombre(s) o Razón Social"),
-                    Text(nombreObtenido),
-                  ],
-                ),
-              ),
+              selectedTipoDocumento?.id == 'TD004'
+                  ? (TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Ingrese Nombre(s) o Razón Social.";
+                        }
+                        return null;
+                      },
+                      controller: nombreObtenido,
+                      decoration: const InputDecoration(
+                        labelText: "Nombre(s) o Razón Social",
+                        border: OutlineInputBorder(),
+                      ),
+                    ))
+                  : Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        children: [
+                          Text("Nombre(s) o Razón Social"),
+                          Text(nombreObtenido.text),
+                        ],
+                      ),
+                    ),
               const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  children: [
-                    isLoadingConsultaDocumento
-                        ? CircularProgressIndicator()
-                        : Text("Apellido(s)"),
-                    Text(apellidoObtenido),
-                  ],
-                ),
-              ),
+              selectedTipoDocumento?.id == 'TD004'
+                  ? (TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Apellido(s)",
+                        border: OutlineInputBorder(),
+                      ),
+                    ))
+                  : Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        children: [
+                          isLoadingConsultaDocumento
+                              ? CircularProgressIndicator()
+                              : Text("Apellido(s)"),
+                          Text(apellidoObtenido.text),
+                        ],
+                      ),
+                    ),
               const SizedBox(height: 20),
 
               selectedTipoDocumento?.id != 'TD004' &&
@@ -331,6 +356,7 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
               const SizedBox(height: 20),
 
               Text(nombreRepresentanteObtenido),
+              Text(apellidoRepresentanteObtenido),
 
               DropdownCustom<ModalModel>(
                 label: "País",
