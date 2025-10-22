@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/tab3.dart';
 
@@ -78,22 +79,22 @@ class _ParentScreenState extends State<ReclamosScreen>
       showDialog(
         context: context,
         builder: (BuildContext context) {
+            String mensajeExitoso = 'Reclamo creado correctamente. ${result.reclamo?.numeroReclamo}';
+
           return AlertDialog(
-            title: Text(result.mensaje!.split('<h1>')[0]),
+            title: Text(mensajeExitoso),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  // Cerrar el diálogo y devolver 'false' (cancelar)
-                  Navigator.of(context).pop(false);
-                },
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () {
-                  // Cerrar el diálogo y devolver 'true' (confirmar)
                   Navigator.of(context).pop(true);
                 },
                 child: const Text('Aceptar'),
+              ),
+              TextButton(
+                onPressed: () {
+                  _copyTextToClipboard(mensajeExitoso);
+                },
+                child: const Text('Copiar'),
               ),
             ],
           );
@@ -104,6 +105,14 @@ class _ParentScreenState extends State<ReclamosScreen>
         const SnackBar(content: Text("Complete todos los campos obligatorios")),
       );
     }
+  }
+
+  void _copyTextToClipboard(String textToCopy) async {
+    await Clipboard.setData(ClipboardData(text: textToCopy));
+    // Optionally, show a confirmation message to the user, like a SnackBar
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Text copied to clipboard!')));
   }
 
   Future<ReclamoResponse> _fetchReclamo() async {

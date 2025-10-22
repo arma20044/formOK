@@ -228,6 +228,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             validator: (val) {
               if (selectedTipoReclamo?.nisObligatorio == 'S') {
                 if (val == null || val.isEmpty) return "Ingrese NIS";
+                if (val.length != 7) return "NIS debe ser de 7 dígitos";
                 if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
                 return null;
               }
