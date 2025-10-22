@@ -49,7 +49,7 @@ class _ParentScreenState extends State<ReclamosScreen>
   void limpiarTodo() {
     //formKey.currentState?.reset();
     tab1Key.currentState?.limpiar();
-    tab2Key.currentState?.limpiar();
+    //tab2Key.currentState?.limpiar();
   }
 
   void enviarFormulario() async {
@@ -73,7 +73,9 @@ class _ParentScreenState extends State<ReclamosScreen>
         );
         return;
       }
-      if (isValid) {
+    }
+
+      
         ReclamoResponse result = await _fetchReclamo();
         if (!mounted) return;
         if (result.error) {
@@ -114,18 +116,11 @@ class _ParentScreenState extends State<ReclamosScreen>
             );
           },
         );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Complete todos los campos obligatorios"),
-          ),
-        );
       }
 
-      // 🔹 Último tab
-    }
+      
     // Envía los datos
-  }
+  
 
   void _copyTextToClipboard(String textToCopy) async {
     await Clipboard.setData(ClipboardData(text: textToCopy));
@@ -211,7 +206,7 @@ class _ParentScreenState extends State<ReclamosScreen>
                 tipoReclamo: widget.tipoReclamo,
                 formKey: _formKeys[0],
               ),
-              Tab2(key: tab2Key, onSaved: (newValue) => {_archivo = newValue}),
+              Tab2(key: tab2Key, onSaved: (newValue) => {_archivo = newValue}, formKey: _formKeys[1],),
               Tab3(
                 lat: _lat,
                 lng: _lng,
