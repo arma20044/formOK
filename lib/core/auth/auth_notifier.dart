@@ -16,8 +16,6 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
 
   @override
   Future<AuthStateData> build() async {
-    
-
     // Estado inicial: cargando
     //state = const AsyncLoading();
 
@@ -140,6 +138,24 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
       backgroundColor: success ? Colors.green : Colors.redAccent,
       textColor: Colors.white,
       fontSize: 16.0,
+    );
+  }
+
+  Future<void> actualizarPassword(String nuevoPassword) async {
+    final currentState = state.value;
+    if (currentState == null || currentState.user == null) return;
+
+    final user = currentState.user!;
+
+    // Crear un nuevo objeto usuario con el password actualizado
+    final updatedUser = user.copyWith(password: nuevoPassword);
+
+    // Guardar en el almacenamiento seguro
+    await _storage.write(key: _userKey, value: jsonEncode(updatedUser.toMap()));
+
+    // Actualizar el estado global
+    state = AsyncData(
+      AuthStateData(state: AuthState.authenticated, user: updatedUser),
     );
   }
 }

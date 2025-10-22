@@ -37,8 +37,8 @@ class _CambioContrasenhaScreenState
       );
       return;
     }
-   
-   try{
+
+    try {
       setState(() {
         isLoading = true;
       });
@@ -49,7 +49,7 @@ class _CambioContrasenhaScreenState
             passwordController.text,
             passwordConfirmacionController.text,
             user.tipoCliente,
-            user.token
+            user.token,
           );
 
       if (!mounted) return;
@@ -60,22 +60,22 @@ class _CambioContrasenhaScreenState
         return;
       } else {
         // Si todo está correcto:
+        // Actualiza contraseña en AuthNotifier
+        await ref
+            .read(authProvider.notifier)
+            .actualizarPassword(passwordController.text);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(cambioContrasenhaResponse.mensaje!)),
         );
         GoRouter.of(context).pop();
       }
-   }
-   catch(e){
-
-   }
-   finally{
+    } catch (e) {
+    } finally {
       setState(() {
         isLoading = false;
       });
-   }
-    
+    }
   }
 
   @override

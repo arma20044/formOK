@@ -85,4 +85,31 @@ class UserModel {
     telefonoCelular: map['telefonoCelular'],
     tipoCliente: map['tipoCliente'],
   );
+
+
+ 
+  UserModel copyWith({
+    String? password,
+    String? token,
+  }) {
+    return UserModel(
+      nombre: nombre,
+      apellido: apellido,
+      numeroDocumento: numeroDocumento,
+      tipoDocumento: tipoDocumento,
+      password: password ?? this.password,
+      cedulaRepresentante: cedulaRepresentante,
+      tipoSolicitante: tipoSolicitante,
+      token: token ?? this.token,
+      correo: correo,
+      direccion: direccion,
+      pais: pais,
+      departamento: departamento,
+      ciudad: ciudad,
+      telefonoCelular: telefonoCelular,
+      tipoCliente: tipoCliente,
+    );
+  
+}
+
 }
