@@ -7,48 +7,52 @@ import '../../model/archivo_adjunto_model.dart';
 import 'widgets/media/MediaPickerButton.dart';
 import 'widgets/media/MediaPreview.dart';
 
-/// FormField para manejo de media
 class Tab2 extends FormField<ArchivoAdjunto?> {
-
-  final GlobalKey<FormState> formKey;
-
-
-  Tab2({super.key, super.onSaved, super.validator, super.initialValue, required this.formKey})
-    : super(
-        builder: (state) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _MediaPicker(file: state.value, onChanged: state.didChange, formKey: formKey,),
-              if (state.hasError)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    state.errorText ?? "",
-                    style: const TextStyle(color: Colors.red, fontSize: 12),
-                  ),
+  Tab2({
+    super.key,
+    super.onSaved,
+    super.initialValue,
+    super.validator,
+  }) : super(
+          
+          builder: (state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _MediaPicker(
+                  file: state.value,
+                  onChanged: state.didChange,
                 ),
-            ],
-          );
-        },
-      );
+                if (state.hasError)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      state.errorText ?? '',
+                      style: const TextStyle(
+                          color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+              ],
+            );
+          },
+        );
 }
 
-/// Media Picker principal
 class _MediaPicker extends StatefulWidget {
   final ArchivoAdjunto? file;
   final ValueChanged<ArchivoAdjunto?> onChanged;
-    final GlobalKey<FormState> formKey;
 
-
-  const _MediaPicker({Key? key, this.file, required this.onChanged, required this.formKey})
-    : super(key: key);
+  const _MediaPicker({
+    Key? key,
+    this.file,
+    required this.onChanged,
+  }) : super(key: key);
 
   @override
-  State<_MediaPicker> createState() => MediaPickerState();
+  State<_MediaPicker> createState() => _MediaPickerState();
 }
 
-class MediaPickerState extends State<_MediaPicker>
+class _MediaPickerState extends State<_MediaPicker>
     with AutomaticKeepAliveClientMixin {
   final ImagePicker _picker = ImagePicker();
   Uint8List? _videoThumbnail;
@@ -90,30 +94,30 @@ class MediaPickerState extends State<_MediaPicker>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Form(
-      key: widget.formKey,
-      child: Column(
-        children: [
-          const SizedBox(height: 16),
-          MediaPreview(file: widget.file?.file, videoThumbnail: _videoThumbnail),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              MediaPickerButton(
-                onPickImage: () => _pickMedia(ImageSource.camera),
-                onPickVideo: () => _pickMedia(ImageSource.camera, isVideo: true),
-                onPickGallery: () => _pickMedia(ImageSource.gallery),
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        MediaPreview(
+          file: widget.file?.file,
+          videoThumbnail: _videoThumbnail,
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            MediaPickerButton(
+              onPickImage: () => _pickMedia(ImageSource.camera),
+              onPickVideo: () => _pickMedia(ImageSource.camera, isVideo: true),
+              onPickGallery: () => _pickMedia(ImageSource.gallery),
+            ),
+            if (widget.file != null)
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: _clearMedia,
               ),
-              if (widget.file != null)
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: _clearMedia,
-                ),
-            ],
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

@@ -33,7 +33,6 @@ class _ParentScreenState extends State<ReclamosScreen>
   );
 
   final GlobalKey<Tab1State> tab1Key = GlobalKey();
-  final GlobalKey<MediaPickerState> tab2Key = GlobalKey();
 
   ArchivoAdjunto? _archivo;
 
@@ -61,66 +60,64 @@ class _ParentScreenState extends State<ReclamosScreen>
       return;
     }
 
-    for (int i = 0; i < _formKeys.length; i++) {
-      final isValid = _formKeys[i].currentState?.validate() ?? false;
+    
+      final isValid = _formKeys[0].currentState?.validate() ?? false;
       if (!isValid) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Complete todos los campos obligatorios del paso ${i + 1}",
+              //"Complete todos los campos obligatorios del paso ${i + 1}",
+              "Complete todos los campos obligatorios del paso 1",
             ),
           ),
         );
         return;
       }
+    
+
+    ReclamoResponse result = await _fetchReclamo();
+    if (!mounted) return;
+    if (result.error) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.errorValList![0])));
+      return;
     }
 
-      
-        ReclamoResponse result = await _fetchReclamo();
-        if (!mounted) return;
-        if (result.error) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(result.errorValList![0])));
-          return;
-        }
+    limpiarTodo();
+    //ScaffoldMessenger.of(context).showSnackBar(
+    // const SnackBar(content: Text("Formulario enviado correctamente!")),
+    //);
 
-        limpiarTodo();
-        //ScaffoldMessenger.of(context).showSnackBar(
-        // const SnackBar(content: Text("Formulario enviado correctamente!")),
-        //);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String mensajeExitoso =
+            'Reclamo creado correctamente. Reclamo Nro.: ${result.reclamo?.numeroReclamo}';
 
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            String mensajeExitoso =
-                'Reclamo creado correctamente. Reclamo Nro.: ${result.reclamo?.numeroReclamo}';
-
-            return AlertDialog(
-              backgroundColor: Colors.green,
-              title: Text(mensajeExitoso),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: const Text('Aceptar'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    _copyTextToClipboard(mensajeExitoso);
-                  },
-                  child: const Text('Copiar'),
-                ),
-              ],
-            );
-          },
+        return AlertDialog(
+          backgroundColor: Colors.green,
+          title: Text(mensajeExitoso),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Aceptar'),
+            ),
+            TextButton(
+              onPressed: () {
+                _copyTextToClipboard(mensajeExitoso);
+              },
+              child: const Text('Copiar'),
+            ),
+          ],
         );
-      }
+      },
+    );
+  }
 
-      
-    // Envía los datos
-  
+  // Envía los datos
 
   void _copyTextToClipboard(String textToCopy) async {
     await Clipboard.setData(ClipboardData(text: textToCopy));
@@ -206,7 +203,17 @@ class _ParentScreenState extends State<ReclamosScreen>
                 tipoReclamo: widget.tipoReclamo,
                 formKey: _formKeys[0],
               ),
-              Tab2(key: tab2Key, onSaved: (newValue) => {_archivo = newValue}, formKey: _formKeys[1],),
+              Tab2(
+                onSaved: (newValue) => {_archivo = newValue},
+
+                validator: (archivo) {
+                  if (archivo == null) return 'Debe adjuntar un archivo';
+                  if (archivo.file.lengthSync() > 5 * 1024 * 1024) {
+                    return 'El archivo no debe superar los 5 MB';
+                  }
+                  return null;
+                },
+              ),
               Tab3(
                 lat: _lat,
                 lng: _lng,
