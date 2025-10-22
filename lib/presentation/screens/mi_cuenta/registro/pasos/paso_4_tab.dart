@@ -15,7 +15,8 @@ class Tab4 extends ConsumerWidget {
     final checkboxes = ref.watch(formProvider.select((s) => s.tab4Checkboxes));
 
     if (checkboxes.isEmpty) {
-      return const Center(child: Text('Seleccione una opción en Tab1'));
+      //return const Center(child: Text('Seleccione una opción en Tab1'));
+      return const Center(child: Text(''));
     }
 
     return SingleChildScrollView(

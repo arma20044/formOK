@@ -79,8 +79,10 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
   final TextEditingController nombreObtenido = TextEditingController();
   final TextEditingController apellidoObtenido = TextEditingController();
 
-  String nombreRepresentanteObtenido = "";
-  String apellidoRepresentanteObtenido = "";
+  final TextEditingController nombreRepresentanteObtenido =
+      TextEditingController();
+  final TextEditingController apellidoRepresentanteObtenido =
+      TextEditingController();
 
   List<Departamento> departamentos = [];
   List<Ciudad> ciudades = [];
@@ -164,8 +166,9 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
           .getConsultaDocumento(documentoRepresentanteController.text, 'TD001');
 
       setState(() {
-        nombreRepresentanteObtenido = consultaDocumentoResponse.nombres!;
-        apellidoRepresentanteObtenido = consultaDocumentoResponse.apellido!;
+        nombreRepresentanteObtenido.text = consultaDocumentoResponse.nombres!;
+        apellidoRepresentanteObtenido.text =
+            consultaDocumentoResponse.apellido!;
       });
     } catch (e) {
       print("Error al consultar Documento Representante: $e");
@@ -307,7 +310,9 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                       child: Column(
                         children: [
                           Text("Nombre(s) o Razón Social"),
-                          Text(nombreObtenido.text),
+                          isLoadingConsultaDocumento
+                              ? Text("")
+                              : Text(nombreObtenido.text),
                         ],
                       ),
                     ),
@@ -326,7 +331,9 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                           isLoadingConsultaDocumento
                               ? CircularProgressIndicator()
                               : Text("Apellido(s)"),
-                          Text(apellidoObtenido.text),
+                          isLoadingConsultaDocumento
+                              ? Text("")
+                              : Text(apellidoObtenido.text),
                         ],
                       ),
                     ),
@@ -334,29 +341,58 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
 
               selectedTipoDocumento?.id != 'TD004' &&
                       selectedTipoSolicitante?.id?.contains('Entidad') == true
-                  ? TextFormField(
-                      focusNode: _focusNodeNumeroDocumentoRepresentante,
-                      controller: documentoRepresentanteController,
-                      keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
-                        labelText: "Número de CI del Representante",
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (val) {
-                        //if (selectedTipoReclamo?.nisObligatorio == 'S') {
-                        if (val == null || val.isEmpty) {
-                          return "Ingrese Número de CI del Representante.";
-                        }
+                  ? Column(
+                      children: [
+                        TextFormField(
+                          focusNode: _focusNodeNumeroDocumentoRepresentante,
+                          controller: documentoRepresentanteController,
+                          keyboardType: TextInputType.text,
+                          decoration: const InputDecoration(
+                            labelText: "Número de CI del Representante",
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (val) {
+                            //if (selectedTipoReclamo?.nisObligatorio == 'S') {
+                            if (val == null || val.isEmpty) {
+                              return "Ingrese Número de CI del Representante.";
+                            }
 
-                        return null;
-                        //}
-                      },
+                            return null;
+                            //}
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            children: [
+                              isLoadingConsultaDocumentoRepresentante
+                                  ? CircularProgressIndicator()
+                                  : Text("Nombre(s) del Representante"),
+                              isLoadingConsultaDocumentoRepresentante
+                                  ? Text("")
+                                  : Text(nombreRepresentanteObtenido.text),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            children: [
+                              isLoadingConsultaDocumentoRepresentante
+                                  ? CircularProgressIndicator()
+                                  : Text("Apellido(s) del Representante"),
+                              isLoadingConsultaDocumentoRepresentante
+                                  ? Text("")
+                                  : Text(apellidoRepresentanteObtenido.text),
+                            ],
+                          ),
+                        ),
+                      ],
                     )
                   : Text(""),
               const SizedBox(height: 20),
-
-              Text(nombreRepresentanteObtenido),
-              Text(apellidoRepresentanteObtenido),
 
               DropdownCustom<ModalModel>(
                 label: "País",
