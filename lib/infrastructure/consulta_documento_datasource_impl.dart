@@ -13,24 +13,27 @@ class ConsultaDocumentoDatasourceImpl extends ConsultaDocumentoDatasource {
 
   ConsultaDocumentoDatasourceImpl(MiAndeApi api) : dio = api.dio;
 
-
-
   @override
-  Future<ConsultaDocumentoResultado> getConsultaDocumento(String numerodocumento, String tipoDocumento) async {
+  Future<ConsultaDocumentoResultado> getConsultaDocumento(
+    String numerodocumento,
+    String tipoDocumento,
+  ) async {
+    late List<String> rucString;
+    if (tipoDocumento.contains('TD002')) {
+      rucString = numerodocumento.split('-');
+    }
 
-    List<String> rucString = numerodocumento.split('-');
+    var data = FormData.fromMap({
+      'cedula': tipoDocumento.contains('TD002') ? rucString[0] : numerodocumento,
+      'dv': tipoDocumento.contains('TD002') ? rucString[1] : '',
+      'ruc':  tipoDocumento.contains('TD002') ? rucString[0] : '',
+    });
 
-      var data = FormData.fromMap({
-    //'clientKey': 'iBLQWFskMfSF5oGhD2a1UYNZyuYo0tdh',
-    //'categoriaWebAppJsonArray': '["FE"]',
-    'cedula': rucString[0],
-    'dv' : rucString[1],
-    'ruc' : rucString[0]
-  });
+    String urlConsulta = tipoDocumento.compareTo('TD001') == 0
+        ? '/v4/mitic/consultaPorCedulaMobile'
+        : '/v4/mitic/consultaSetMobile';
 
-    String urlConsulta = tipoDocumento.compareTo('TD001') == 0 ?  '/v4/mitic/consultaPorCedulaMobile' : '/v4/mitic/consultaSetMobile';
-
-    final response = await dio.post( 
+    final response = await dio.post(
       "${Environment.hostCtxOpen}$urlConsulta",
       data: data,
       options: Options(
@@ -42,7 +45,7 @@ class ConsultaDocumentoDatasourceImpl extends ConsultaDocumentoDatasource {
 
     if (response.statusCode == 200) {
       final rawMap = response.data['resultado'] as Map<String, dynamic>;
-    return ConsultaDocumentoResultado.fromJson(rawMap);
+      return ConsultaDocumentoResultado.fromJson(rawMap);
       /*return ConsultaDocumentoResponse(
         error: true,
         errorValList: [],

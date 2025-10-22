@@ -45,26 +45,26 @@ class ConsultaDocumentoResponse {
 }
 
 class ConsultaDocumentoResultado {
-  final String nacionalidadBean;
-  final String fechNacim;
-  final num cedula;
-  final String profesionBean;
-  final String apellido;
-  final String estadoCivil;
-  final String sexo;
-  final String nombres;
-  final String razonSocial;
+  final String? nacionalidadBean;
+  final String? fechNacim;
+  final num? cedula;
+  final String? profesionBean;
+  final String? apellido;
+  final String? estadoCivil;
+  final String? sexo;
+  final String? nombres;
+  final String? razonSocial;
 
   ConsultaDocumentoResultado({
-    required this.nacionalidadBean,
-    required this.fechNacim,
-    required this.cedula,
-    required this.profesionBean,
-    required this.apellido,
-    required this.estadoCivil,
-    required this.sexo,
-    required this.nombres,
-    required this.razonSocial,
+     this.nacionalidadBean,
+     this.fechNacim,
+     this.cedula,
+     this.profesionBean,
+     this.apellido,
+     this.estadoCivil,
+     this.sexo,
+     this.nombres,
+    this.razonSocial,
   });
 
   factory ConsultaDocumentoResultado.fromJson(Map<String, dynamic> json) {

@@ -116,12 +116,12 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
       consultaDocumentoResponse = await repoConsultaDocumento
           .getConsultaDocumento(
             numeroDocumentoController.text,
-            selectedTipoDocumento!.id ?? "",
+            selectedTipoDocumento?.id ?? "",
           );
 
       setState(() {
-        nombreObtenido = consultaDocumentoResponse.razonSocial;
-        apellidoObtenido = consultaDocumentoResponse.apellido;
+        nombreObtenido = consultaDocumentoResponse.nombres!;
+        apellidoObtenido = consultaDocumentoResponse.apellido!;
       });
     } catch (e) {
       print("Error al consultar Documento: $e");
@@ -157,13 +157,13 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
     try {
       consultaDocumentoResponse = await repoConsultaDocumento
           .getConsultaDocumento(
-            documentoRepresentanteController.value.text,
+            documentoRepresentanteController.text,
             'TD001',
           );
 
       setState(() {
-          nombreRepresentanteObtenido = consultaDocumentoResponse.nombres;
-         apellidoRepresentanteObtenido = consultaDocumentoResponse.apellido;
+          nombreRepresentanteObtenido = consultaDocumentoResponse.razonSocial!;
+         apellidoRepresentanteObtenido = consultaDocumentoResponse.razonSocial!;
       });
     } catch (e) {
       print("Error al consultar Documento Representante: $e");
