@@ -220,6 +220,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
           TextFormField(
             controller: nisController,
             keyboardType: TextInputType.number,
+            maxLength: 7,
             decoration: const InputDecoration(
               labelText: "NIS",
               border: OutlineInputBorder(),
