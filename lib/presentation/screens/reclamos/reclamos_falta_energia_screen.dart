@@ -27,10 +27,7 @@ class _ParentScreenState extends State<ReclamosScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<GlobalKey<FormState>> _formKeys = List.generate(
-    3,
-    (_) => GlobalKey<FormState>(),
-  );
+  final _formKey = GlobalKey<FormState>();
 
   final GlobalKey<Tab1State> tab1Key = GlobalKey();
 
@@ -52,35 +49,44 @@ class _ParentScreenState extends State<ReclamosScreen>
   }
 
   void enviarFormulario() async {
-    //validar adjuntos si es el caso
-    if (tab1Key.currentState?.selectedTipoReclamo?.adjuntoObligatorio == 'S') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Es necesario anexar foto o video.")),
-      );
-      return;
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      debugPrint('✅ Archivo guardado: ${_archivo?.file.path}');
+      // Aquí podrías enviar todo al backend
+    } else {
+      debugPrint('❌ Validación fallida');
     }
 
-    
-      final isValid = _formKeys[0].currentState?.validate() ?? false;
-      if (!isValid) {
+    //validar adjuntos si es el caso
+    if (tab1Key.currentState?.selectedTipoReclamo?.adjuntoObligatorio == 'S') {
+      if (_archivo == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              //"Complete todos los campos obligatorios del paso ${i + 1}",
-              "Complete todos los campos obligatorios del paso 1",
-            ),
-          ),
+          const SnackBar(content: Text("Es necesario anexar foto o video.")),
         );
         return;
       }
-    
+    }
+
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            //"Complete todos los campos obligatorios del paso ${i + 1}",
+            "Complete todos los campos obligatorios del paso 1",
+          ),
+        ),
+      );
+      return;
+    }
 
     ReclamoResponse result = await _fetchReclamo();
     if (!mounted) return;
     if (result.error) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(result.errorValList![0])));
+      ).showSnackBar(SnackBar(content: Text(result.errorValList == null ? result.errorValList![0] : result.mensaje)));
       return;
     }
 
@@ -194,33 +200,32 @@ class _ParentScreenState extends State<ReclamosScreen>
           ], */
         ),
         body: SafeArea(
-          child: TabBarView(
-            physics: NeverScrollableScrollPhysics(),
-            controller: _tabController,
-            children: [
-              Tab1(
-                key: tab1Key,
-                tipoReclamo: widget.tipoReclamo,
-                formKey: _formKeys[0],
-              ),
-              Tab2(
-                onSaved: (newValue) => {_archivo = newValue},
+          child: Form(
+            key: _formKey,
+            child: TabBarView(
+              physics: NeverScrollableScrollPhysics(),
+              controller: _tabController,
+              children: [
+                Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo),
+                Tab2(
+                  onSaved: (newValue) => {_archivo = newValue},
 
-                validator: (archivo) {
-                  if (archivo == null) return 'Debe adjuntar un archivo';
-                  if (archivo.file.lengthSync() > 5 * 1024 * 1024) {
-                    return 'El archivo no debe superar los 5 MB';
-                  }
-                  return null;
-                },
-              ),
-              Tab3(
-                lat: _lat,
-                lng: _lng,
-                onLocationSelected: _setLocation,
-                formKey: _formKeys[2],
-              ),
-            ],
+                  validator: (archivo) {
+                    //if (archivo == null) return 'Debe adjuntar un archivo';
+                    if (archivo != null && archivo.file.lengthSync() > 5 * 1024 * 1024) {
+                      return 'El archivo no debe superar los 5 MB';
+                    }
+                    return null;
+                  },
+                ),
+                Tab3(
+                  lat: _lat,
+                  lng: _lng,
+                  onLocationSelected: _setLocation,
+                  formKey: _formKey,
+                ),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: Padding(

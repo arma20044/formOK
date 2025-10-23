@@ -9,12 +9,12 @@ import '../../repositories/tipo_reclamo_repository_impl.dart';
 import 'widgets/dropdown_custom.dart';
 
 class Tab1 extends StatefulWidget {
-  final GlobalKey<FormState> formKey;
+  //final GlobalKey<FormState> formKey;
   
 
   final String tipoReclamo; // FE, CO, AP
 
-  const Tab1({super.key, required this.tipoReclamo, required this.formKey});
+  const Tab1({super.key, required this.tipoReclamo});
 
   @override
   Tab1State createState() => Tab1State();
@@ -189,9 +189,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     super.build(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Form(
-        key: widget.formKey,
-        child: Column(
+      child:Column(
           children: [
             //TELEFONO
             TextFormField(
@@ -353,7 +351,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             const SizedBox(height: 20),
           ],
         ),
-      ),
+      
     );
   }
 }
