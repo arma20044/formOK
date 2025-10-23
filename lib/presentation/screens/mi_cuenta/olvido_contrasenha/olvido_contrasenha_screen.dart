@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:form/config/constantes.dart';
+import 'package:form/config/tipo_tramite_model.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/model/olvido_contrasenha.dart';
 import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:form/presentation/components/widgets/dropdown_custom.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../infrastructure/infrastructure.dart';
@@ -27,8 +30,11 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
   bool _isLoadingOlvidoContrasenha = false;
 
   DropdownItem? selectedTipoDocumento;
+  final List<ModalModel> listaTipoSolicitante = dataTipoSolicitanteArray;
+  ModalModel? selectedTipoSolicitante;
 
   final documentoIdentificacionController = TextEditingController();
+  final documentoIdentificacionRepresentanteController = TextEditingController();
 
   final repoOlvidoContrasenha = OlvidoContrasenhaRepositoryImpl(
     OlvidoContrasenhaDatasourceImpl(MiAndeApi()),
@@ -101,9 +107,48 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
                 validator: (value) =>
                     value == null ? 'Seleccione un tipo de documento' : null,
               ),
+
+              Visibility(
+                visible: selectedTipoDocumento?.id.compareTo('TD002') == 0,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 24),
+                    DropdownCustom<ModalModel>(
+                      label: "Tipo Solicitante",
+                      items: listaTipoSolicitante,
+                      value: selectedTipoSolicitante,
+                      displayBuilder: (b) => b.descripcion!,
+                      validator: (val) =>
+                          val == null ? "Seleccione un Tipo Solicitante" : null,
+                      onChanged: (val) =>
+                          setState(() => selectedTipoSolicitante = val),
+                    ),
+                  ],
+                ),
+              ),
+
+              Visibility(
+                visible: selectedTipoSolicitante != null && selectedTipoSolicitante?.id?.compareTo("Particular") != 0,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: documentoIdentificacionController,
+                      decoration: const InputDecoration(labelText: 'RUC'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Ingrese RUC';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
               const SizedBox(height: 24),
               TextFormField(
-                controller: documentoIdentificacionController,
+                controller: documentoIdentificacionRepresentanteController,
                 decoration: const InputDecoration(
                   labelText: 'Número de CI, RUC o Pasaporte',
                 ),

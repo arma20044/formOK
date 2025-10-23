@@ -34,6 +34,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   final GlobalKey<Paso3TabState> paso3Key = GlobalKey<Paso3TabState>();
   final GlobalKey<FormState> paso4Key = GlobalKey<FormState>();
 
+String? celular;
   String? codigoOTPObtenido;
   String? solicitarOTP = 'S';
   bool mostrarCargarCodigoOTP = false;
@@ -90,7 +91,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     }
   }
 
-  Future<MiCuentaRegistroResponse> _fetchMiCuentaRegistro() async {
+  Future<MiCuentaRegistroResponse> _fetchMiCuentaRegistro(bool solicitarOTP) async {
     //Future<bool> _fetchMiCuentaRegistro() async {
     final repoMicuentaRegistro = MiCuentaRegistroRepositoryImpl(
       MiCuentaRegistroDatasourceImpl(MiAndeApi()),
@@ -104,6 +105,10 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     print("Datos a enviar: $datosPaso1");
     print("Datos a enviar: $datosPaso2");
     print("Datos a enviar: $datosPaso3");
+
+    setState(() {
+      celular = datosPaso1?['telefonoCelular'];
+    });
 
     final miCuentaRegistroResponse = await repoMicuentaRegistro
         .getMiCuentaRegistro(
@@ -126,14 +131,14 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           confirmacionPassword: datosPaso2['confirmarPassword'] ?? '',
           passwordAnterior: datosPaso2['passwordAnterior'] ?? '',
           tipoVerificacion: datosPaso2['tipoVerificacion'] ?? '',
-          solicitudOTP: solicitarOTP ?? 'S',
+          solicitudOTP: solicitarOTP ? 'S' : 'N',
           codigoOTP: codigoOTPObtenido.toString(),
         );
     return miCuentaRegistroResponse;
   }
 
   /// Enviar formulario completo
-  Future<void> _enviarFormulario() async {
+  Future<void> _enviarFormulario(bool solicitarOTP) async {
     if (_isLoadingRegistroMiCuenta) return;
 
     // Validar todos los pasos
@@ -174,7 +179,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
     setState(() => _isLoadingRegistroMiCuenta = true);
 
     try {
-      MiCuentaRegistroResponse result = await _fetchMiCuentaRegistro();
+      MiCuentaRegistroResponse result = await _fetchMiCuentaRegistro(solicitarOTP);
       //bool result = await _fetchMiCuentaRegistro();
       if (result.error) {
         /* ScaffoldMessenger.of(
@@ -187,13 +192,18 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           result.errorValList[0],
         );
 
+         setState(() {
+                        codigoOTPObtenido = "";
+                        this.solicitarOTP = "N";
+                      });
+
         return;
       } else {
         /* ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Formulario enviado correctamente")),
         ); */
         setState(() {
-          solicitarOTP = 'S';
+          this.solicitarOTP = 'S';
         });
         mostrarCargarCodigoOTP = true;
         DialogHelper.showMessage(
@@ -278,14 +288,15 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
             ),
             mostrarCargarCodigoOTP
                 ? OtpInputWidget(
-                    phoneNumber: "+595 981 123 456",
+                  isLoading: _isLoadingRegistroMiCuenta,
+                    phoneNumber: celular ?? '',
                     onSubmit: (otp) {
                       setState(() {
                         codigoOTPObtenido = otp;
                         solicitarOTP = 'N';
                       });
 
-                      _enviarFormulario();
+                      _enviarFormulario(false);
                       print("Código ingresado: $otp");
                     },
                   )
@@ -319,7 +330,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                   onPressed: _isLoadingRegistroMiCuenta
                       ? null
                       : isLastTab
-                      ? _enviarFormulario
+                      ? () => _enviarFormulario(true)
                       : _nextTab,
                   child: _isLoadingRegistroMiCuenta
                       ? const SizedBox(

@@ -35,14 +35,14 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
 
   void _onChanged(String value, int index) {
     if (value.isNotEmpty && index < 3) {
-      _focusNodes[index + 1].requestFocus();
+    //  _focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
+      //_focusNodes[index - 1].requestFocus();
     }
 
     final otp = _controllers.map((c) => c.text).join();
     if (otp.length == 4 && widget.onSubmit != null) {
-      widget.onSubmit!(otp);
+      //widget.onSubmit!(otp);
     }
   }
 
@@ -100,7 +100,7 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onChanged: (value) => _onChanged(value, index),
+                  //onChanged: (value) => _onChanged(value, index),
                 ),
               );
             }),
