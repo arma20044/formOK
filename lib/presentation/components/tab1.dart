@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form/utils/utils.dart';
 
 import '../../core/api/mi_ande_api.dart';
 import '../../core/validators/validators.dart';
@@ -327,10 +328,8 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
                 if (selectedTipoReclamo?.correoObligatorio == 'S') {
                   if (val == null || val.isEmpty)
                     return "Ingrese Correo Electrónico";
-                  if (!RegExp(
-                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                  ).hasMatch(val))
-                    return "Verifique el formato del correo.";
+                   if (!emailRegex.hasMatch(val))
+                    return "Ingrese formato de correo válido.";
         
                   return null;
                 }
