@@ -34,7 +34,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   final GlobalKey<Paso3TabState> paso3Key = GlobalKey<Paso3TabState>();
   final GlobalKey<FormState> paso4Key = GlobalKey<FormState>();
 
-String? celular;
+  String? celular;
   String? codigoOTPObtenido;
   String? solicitarOTP = 'S';
   bool mostrarCargarCodigoOTP = false;
@@ -91,7 +91,9 @@ String? celular;
     }
   }
 
-  Future<MiCuentaRegistroResponse> _fetchMiCuentaRegistro(bool solicitarOTP) async {
+  Future<MiCuentaRegistroResponse> _fetchMiCuentaRegistro(
+    bool solicitarOTP,
+  ) async {
     //Future<bool> _fetchMiCuentaRegistro() async {
     final repoMicuentaRegistro = MiCuentaRegistroRepositoryImpl(
       MiCuentaRegistroDatasourceImpl(MiAndeApi()),
@@ -179,7 +181,9 @@ String? celular;
     setState(() => _isLoadingRegistroMiCuenta = true);
 
     try {
-      MiCuentaRegistroResponse result = await _fetchMiCuentaRegistro(solicitarOTP);
+      MiCuentaRegistroResponse result = await _fetchMiCuentaRegistro(
+        solicitarOTP,
+      );
       //bool result = await _fetchMiCuentaRegistro();
       if (result.error) {
         /* ScaffoldMessenger.of(
@@ -192,13 +196,42 @@ String? celular;
           result.errorValList[0],
         );
 
-         setState(() {
-                        codigoOTPObtenido = "";
-                        this.solicitarOTP = "N";
-                      });
+        setState(() {
+          codigoOTPObtenido = "";
+          this.solicitarOTP = "N";
+        });
 
         return;
       } else {
+        showModalBottomSheet<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              // Este es el widget que se convertirá en el modal
+              height: 500,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    OtpInputWidget(
+                    isLoading: _isLoadingRegistroMiCuenta,
+                    phoneNumber: celular ?? '',
+                    onSubmit: (otp) {
+                      setState(() {
+                        codigoOTPObtenido = otp;
+                        this.solicitarOTP = 'N';
+                      });
+
+                      _enviarFormulario(false);
+                      print("Código ingresado: $otp");
+                    },
+                  )
+                  ],
+                ),
+              ),
+            );
+          },
+        );
         /* ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Formulario enviado correctamente")),
         ); */
@@ -286,21 +319,7 @@ String? celular;
                 ],
               ),
             ),
-            mostrarCargarCodigoOTP
-                ? OtpInputWidget(
-                  isLoading: _isLoadingRegistroMiCuenta,
-                    phoneNumber: celular ?? '',
-                    onSubmit: (otp) {
-                      setState(() {
-                        codigoOTPObtenido = otp;
-                        solicitarOTP = 'N';
-                      });
-
-                      _enviarFormulario(false);
-                      print("Código ingresado: $otp");
-                    },
-                  )
-                : Text(""),
+            
           ],
         ),
       ),
@@ -341,6 +360,8 @@ String? celular;
                       : Text(isLastTab ? 'Enviar' : 'Siguiente'),
                 ),
               ),
+
+              // En el widget que tiene el botón
             ],
           ),
         ),
