@@ -91,11 +91,8 @@ final List<MenuGroup> menuGroups = [
         id: 'cuenta',
         icon: Icons.person,
         label: 'Mi Cuenta',
-            onTap: (context) => 
-            Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const MiCuentaScreen()),
-        ),
+            onTap: (context) =>
+            context.push('/miCuenta'),
       ),
     ],
   ),

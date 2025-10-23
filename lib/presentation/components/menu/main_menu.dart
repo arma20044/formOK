@@ -8,11 +8,11 @@ class MenuButton extends StatelessWidget {
   final TextStyle? labelStyle;
 
   const MenuButton({
-    Key? key,
+    super.key,
     required this.item,
     this.iconSize = 36,
     this.labelStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,11 +84,11 @@ class MainMenu extends StatelessWidget {
   final TextStyle? itemLabelStyle;
 
   const MainMenu({
-    Key? key,
+    super.key,
     required this.groups,
     this.iconSize = 36,
     this.itemLabelStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
