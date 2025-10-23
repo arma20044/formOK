@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form/presentation/components/common/info_card_simple.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LocationInfo extends StatelessWidget {
@@ -17,18 +18,14 @@ class LocationInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     String text;
     if (lat != null && lng != null) {
-      text = "Ubicación seleccionada: lat $lat, lon $lng";
+      text = "Ubicación seleccionada:\n latitud $lat, \n longitud $lng";
     } else if (current != null) {
       text =
-          "Ubicación actual: lat ${current!.latitude}, lon ${current!.longitude}";
+          "Ubicación actual: \n lat ${current!.latitude}, \n lon ${current!.longitude}";
     } else {
       text = "Esperando ubicación...";
     }
 
-    return Container(
-      //color: Colors.blue.shade50,
-      padding: const EdgeInsets.all(8),
-      child: Text(text, style: const TextStyle(fontSize: 14)),
-    );
+    return InfoCardSimple(title: text, subtitle: "", color: Colors.red);
   }
 }

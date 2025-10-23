@@ -72,9 +72,10 @@ class _ParentScreenState extends State<ReclamosScreen>
     if (!isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          duration: Duration(seconds: 1),
           content: Text(
             //"Complete todos los campos obligatorios del paso ${i + 1}",
-            "Complete todos los campos obligatorios del paso 1",
+            "Complete todos los campos obligatorios",
           ),
         ),
       );
@@ -222,7 +223,7 @@ class _ParentScreenState extends State<ReclamosScreen>
                   lat: _lat,
                   lng: _lng,
                   onLocationSelected: _setLocation,
-                  formKey: _formKey,
+                  //formKey: _formKey,
                 ),
               ],
             ),
