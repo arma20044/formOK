@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/config/tipo_tramite_model.dart';
 import 'package:form/core/api/mi_ande_api.dart';
-import 'package:form/model/olvido_contrasenha.dart';
 import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/widgets/dropdown_custom.dart';
@@ -34,7 +33,8 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
   ModalModel? selectedTipoSolicitante;
 
   final documentoIdentificacionController = TextEditingController();
-  final documentoIdentificacionRepresentanteController = TextEditingController();
+  final documentoIdentificacionRepresentanteController =
+      TextEditingController();
 
   final repoOlvidoContrasenha = OlvidoContrasenhaRepositoryImpl(
     OlvidoContrasenhaDatasourceImpl(MiAndeApi()),
@@ -108,6 +108,34 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
                     value == null ? 'Seleccione un tipo de documento' : null,
               ),
 
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: documentoIdentificacionController,
+                decoration: const InputDecoration(
+                  labelText: 'Número de CI, RUC o Pasaporte',
+                ),
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return "Ingrese Número de CI, RUC o Pasaporte";
+                  }
+
+                  final tipo = selectedTipoDocumento!.id;
+
+                  // C.I. Civil → solo números, entre 6 y 10 dígitos
+                  if (tipo == 'TD001' &&
+                      !RegExp(r'^[0-9]{6,10}$').hasMatch(val)) {
+                    return "Éste campo debe contener solo números.";
+                  }
+
+                  // RUC → números, guion y dígito verificador
+                  if (tipo == 'TD002' &&
+                      !RegExp(r'^\d{6,12}-\d$').hasMatch(val)) {
+                    return "Este campo debe tener formato de RUC";
+                  }
+                  return null;
+                },
+              ),
+
               Visibility(
                 visible: selectedTipoDocumento?.id.compareTo('TD002') == 0,
                 child: Column(
@@ -120,24 +148,32 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
                       displayBuilder: (b) => b.descripcion!,
                       validator: (val) =>
                           val == null ? "Seleccione un Tipo Solicitante" : null,
-                      onChanged: (val) =>
-                          setState(() => selectedTipoSolicitante = val),
+                      onChanged: (val) => setState(() {
+                        selectedTipoSolicitante = val;
+                        documentoIdentificacionRepresentanteController.text= "";
+                      }),
                     ),
                   ],
                 ),
               ),
 
               Visibility(
-                visible: selectedTipoSolicitante != null && selectedTipoSolicitante?.id?.compareTo("Particular") != 0,
+                visible:
+                    selectedTipoSolicitante != null &&
+                    selectedTipoSolicitante?.id?.compareTo("Particular") != 0,
                 child: Column(
                   children: [
                     const SizedBox(height: 24),
                     TextFormField(
-                      controller: documentoIdentificacionController,
-                      decoration: const InputDecoration(labelText: 'RUC'),
+                      controller:
+                          documentoIdentificacionRepresentanteController,
+                      decoration: const InputDecoration(
+                        labelText:
+                            'Número de CI, RUC o Pasaporte del Representante',
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Ingrese RUC';
+                          return 'Ingrese Número de CI, RUC o Pasaporte del Representante';
                         }
                         return null;
                       },
@@ -146,19 +182,6 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: documentoIdentificacionRepresentanteController,
-                decoration: const InputDecoration(
-                  labelText: 'Número de CI, RUC o Pasaporte',
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese Número de CI, RUC o Pasaporte';
-                  }
-                  return null;
-                },
-              ),
               const SizedBox(height: 24),
               // Radio Buttons
               const Text(
