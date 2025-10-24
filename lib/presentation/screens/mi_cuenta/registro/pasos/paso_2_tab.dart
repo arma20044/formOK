@@ -19,8 +19,8 @@ class Paso2TabState extends State<Paso2Tab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
-  bool passwordVisible = false;
-  bool confirmarPasswordVisible = false;
+  bool passwordInvisible = true;
+  bool confirmarPasswordInvisible = true;
 
   ModalModel? selectedTipoVerificacion;
 
@@ -50,17 +50,17 @@ class Paso2TabState extends State<Paso2Tab> with AutomaticKeepAliveClientMixin {
               const SizedBox(height: 20),
               TextFormField(
                 controller: passwordController,
-                obscureText: passwordVisible,
+                obscureText: passwordInvisible,
                 keyboardType: TextInputType.visiblePassword,
                 decoration: InputDecoration(
                   labelText: 'Contraseña',
                   suffixIcon: IconButton(
                     icon: Icon(
-                      passwordVisible ? Icons.visibility : Icons.visibility_off,
+                      passwordInvisible ? Icons.visibility : Icons.visibility_off,
                     ),
                     onPressed: () {
                       setState(() {
-                        passwordVisible = !passwordVisible;
+                        passwordInvisible = !passwordInvisible;
                       });
                     },
                   ),
@@ -73,19 +73,19 @@ class Paso2TabState extends State<Paso2Tab> with AutomaticKeepAliveClientMixin {
               const SizedBox(height: 20),
               TextFormField(
                 controller: confirmarPassowordController,
-                obscureText: confirmarPasswordVisible,
+                obscureText: confirmarPasswordInvisible,
                 keyboardType: TextInputType.visiblePassword,
                 decoration: InputDecoration(
                   labelText: 'Confirmar Contraseña',
                   suffixIcon: IconButton(
                     icon: Icon(
-                      confirmarPasswordVisible
+                      confirmarPasswordInvisible
                           ? Icons.visibility
                           : Icons.visibility_off,
                     ),
                     onPressed: () {
                       setState(() {
-                        confirmarPasswordVisible = !confirmarPasswordVisible;
+                        confirmarPasswordInvisible = !confirmarPasswordInvisible;
                       });
                     },
                   ),

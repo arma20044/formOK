@@ -39,10 +39,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+ bool passwordInvisible = true;
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final isLoading = authState.isLoading;
+
+   
 
     ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
       next.when(
@@ -115,10 +119,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: passwordController,
-                      decoration: const InputDecoration(
+                      decoration:  InputDecoration(
                         labelText: 'Contraseña',
+                          suffixIcon: IconButton(
+                    icon: Icon(
+                      passwordInvisible ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        passwordInvisible = !passwordInvisible;
+                      });
+                    },
+                  ),
                       ),
-                      obscureText: true,
+                      obscureText: passwordInvisible,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Ingrese Contraseña';

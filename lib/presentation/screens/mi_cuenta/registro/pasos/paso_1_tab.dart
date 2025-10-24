@@ -175,7 +175,11 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
   }
 
   void consultarRepresentante(String cedulaRepresenante) async {
-    setState(() => isLoadingConsultaDocumentoRepresentante = true);
+    setState(() {
+      isLoadingConsultaDocumentoRepresentante = true;
+      nombreRepresentanteObtenido.text = "";
+      apellidoRepresentanteObtenido.text = "";
+    });
     try {
       consultaDocumentoResponse = await repoConsultaDocumento
           .getConsultaDocumento(documentoRepresentanteController.text, 'TD001');
@@ -187,6 +191,12 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
       });
     } catch (e) {
       print("Error al consultar Documento Representante: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("$e", style: TextStyle(color: Colors.white)),
+        ),
+      );
     } finally {
       setState(() => isLoadingConsultaDocumentoRepresentante = false);
     }
@@ -198,7 +208,7 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
     //_fetchDepartamentos();
 
     _focusNode.addListener(() {
-      if(selectedTipoDocumento?.id == null) return;
+      if (selectedTipoDocumento?.id == null) return;
       if (!_focusNode.hasFocus) {
         // 🔹 Esperar a que se estabilice el árbol de widgets
         WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -340,8 +350,6 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                     return "Este campo debe tener formato de RUC";
                   }
 
-               
-
                   return null;
                 },
               ),
@@ -366,7 +374,7 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                         children: [
                           Text("Nombre(s) o Razón Social"),
                           isLoadingConsultaDocumento
-                              ? Text("")
+                              ? loadingRow()
                               //: Text(nombreObtenido.text),
                               : TextFormField(
                                   enabled: false,
@@ -395,7 +403,7 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                       child: Column(
                         children: [
                           isLoadingConsultaDocumento
-                              ? CircularProgressIndicator()
+                              ? loadingRow()
                               : Text("Apellido(s)"),
 
                           isLoadingConsultaDocumento
@@ -445,11 +453,24 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                           child: Column(
                             children: [
                               isLoadingConsultaDocumentoRepresentante
-                                  ? CircularProgressIndicator()
-                                  : Text("Nombre(s) del Representante"),
-                              isLoadingConsultaDocumentoRepresentante
-                                  ? Text("")
-                                  : Text(nombreRepresentanteObtenido.text),
+                                  ? loadingRow()
+                                  : TextFormField(
+                                      decoration: const InputDecoration(
+                                        labelText:
+                                            "Nombre(s) del Representante",
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      enabled: false,
+                                      initialValue:
+                                          nombreRepresentanteObtenido.text,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Ingrese Nombre(s) del Representante";
+                                        }
+
+                                        return null;
+                                      },
+                                    ),
                             ],
                           ),
                         ),
@@ -459,11 +480,24 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                           child: Column(
                             children: [
                               isLoadingConsultaDocumentoRepresentante
-                                  ? CircularProgressIndicator()
-                                  : Text("Apellido(s) del Representante"),
-                              isLoadingConsultaDocumentoRepresentante
-                                  ? Text("")
-                                  : Text(apellidoRepresentanteObtenido.text),
+                                  ? loadingRow()
+                                  : TextFormField(
+                                      decoration: const InputDecoration(
+                                        labelText:
+                                            "Apellido(s) del Representante",
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      enabled: false,
+                                      initialValue:
+                                          apellidoRepresentanteObtenido.text,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Ingrese Apellido(s) del Representante";
+                                        }
+
+                                        return null;
+                                      },
+                                    ),
                               const SizedBox(height: 20),
                             ],
                           ),

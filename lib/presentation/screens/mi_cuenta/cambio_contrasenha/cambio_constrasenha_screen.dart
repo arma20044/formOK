@@ -65,13 +65,11 @@ class _CambioContrasenhaScreenState
             .read(authProvider.notifier)
             .actualizarPassword(passwordController.text);
 
-       
-
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) GoRouter.of(context).go('/');
         });
 
-         ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(cambioContrasenhaResponse.mensaje!)),
         );
       }
@@ -83,6 +81,10 @@ class _CambioContrasenhaScreenState
       if (mounted) setState(() => isLoading = false);
     }
   }
+
+  bool passwordAnteriorInvisible = true;
+  bool passwordNuevoInvisible = true;
+  bool passwordNuevoConfirmarInvisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -104,19 +106,34 @@ class _CambioContrasenhaScreenState
           child: Column(
             children: [
               // Text("data"),
-              InfoCardSimple(
-                title: "Debe cambiar la contraseña para continuar",
-                subtitle: "",
-                color: Colors.red,
-                size: 14,
-              ),
+               Visibility(
+                visible: authState.value?.user?.modificarPassword == 'S',
+                 child: InfoCardSimple(
+                  title: "Debe cambiar la contraseña para continuar",
+                  subtitle: "",
+                  color: Colors.red,
+                  size: 14,
+                               ),
+               ),
               const SizedBox(height: 24),
               TextFormField(
                 controller: passwordAnteriorController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Contraseña Anterior',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      passwordAnteriorInvisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        passwordAnteriorInvisible = !passwordAnteriorInvisible;
+                      });
+                    },
+                  ),
                 ),
-                obscureText: true,
+                obscureText: passwordAnteriorInvisible,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Ingrese Contraseña Anterior';
@@ -128,11 +145,25 @@ class _CambioContrasenhaScreenState
               const SizedBox(height: 24),
               TextFormField(
                 controller: passwordController,
-                decoration: const InputDecoration(labelText: 'Contraseña'),
-                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Contraseña nueva',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      passwordNuevoInvisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        passwordNuevoInvisible = !passwordNuevoInvisible;
+                      });
+                    },
+                  ),
+                ),
+                obscureText: passwordNuevoInvisible,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Ingrese Contraseña';
+                    return 'Ingrese Contraseña nueva';
                   }
                   return null;
                 },
@@ -141,13 +172,26 @@ class _CambioContrasenhaScreenState
               const SizedBox(height: 24),
               TextFormField(
                 controller: passwordConfirmacionController,
-                decoration: const InputDecoration(
-                  labelText: 'Confirmar Contraseña',
+                decoration: InputDecoration(
+                  labelText: 'Confirmar Contraseña nueva',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      passwordNuevoConfirmarInvisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        passwordNuevoConfirmarInvisible =
+                            !passwordNuevoConfirmarInvisible;
+                      });
+                    },
+                  ),
                 ),
-                obscureText: true,
+                obscureText: passwordNuevoConfirmarInvisible,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Ingrese Contraseña nuevamente';
+                    return 'Confirme la contraseña nueva';
                   }
                   return null;
                 },
