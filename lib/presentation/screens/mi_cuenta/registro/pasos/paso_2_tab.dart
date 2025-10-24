@@ -25,16 +25,16 @@ class Paso2TabState extends State<Paso2Tab> with AutomaticKeepAliveClientMixin {
   ModalModel? selectedTipoVerificacion;
 
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmarPassowordController = TextEditingController();
+  final TextEditingController confirmarPassowordController =
+      TextEditingController();
 
   Map<String, dynamic> getFormData() {
-  return {
-    "password": passwordController.text, 
-    "confirmarPassword": confirmarPassowordController.text,
-    "tipoVerificacion": selectedTipoVerificacion?.id,
-  };
-}
-
+    return {
+      "password": passwordController.text,
+      "confirmarPassword": confirmarPassowordController.text,
+      "tipoVerificacion": selectedTipoVerificacion?.id,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +65,10 @@ class Paso2TabState extends State<Paso2Tab> with AutomaticKeepAliveClientMixin {
                     },
                   ),
                 ),
-      
-                validator: (value) =>
-                    (value == null || value.isEmpty) ? 'Campo obligatorio' : null,
+
+                validator: (value) => (value == null || value.isEmpty)
+                    ? 'Campo obligatorio'
+                    : null,
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -89,9 +90,10 @@ class Paso2TabState extends State<Paso2Tab> with AutomaticKeepAliveClientMixin {
                     },
                   ),
                 ),
-      
-                validator: (value) =>
-                    (value == null || value.isEmpty) ? 'Campo obligatorio' : null,
+
+                validator: (value) => (value == null || value.isEmpty)
+                    ? 'Campo obligatorio'
+                    : null,
               ),
               const SizedBox(height: 20),
               DropdownCustom<ModalModel>(
@@ -104,7 +106,27 @@ class Paso2TabState extends State<Paso2Tab> with AutomaticKeepAliveClientMixin {
                 onChanged: (val) =>
                     setState(() => selectedTipoVerificacion = val),
               ),
-              const SizedBox(height: 10),
+              Visibility(
+                visible: selectedTipoVerificacion != null,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    InfoCardSimple(
+                      title:
+                          selectedTipoVerificacion != null &&
+                              selectedTipoVerificacion!.id != null &&
+                              selectedTipoVerificacion!.id!.contains("CEL")
+                          ? "Se utilizará para validar la cuenta vía SMS"
+                          : "Se utilizará para validar la cuenta vía Correo",
+                      subtitle: "",
+                      icon: Icons.info,
+                      color: Colors.blue,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
               InfoCardSimple(
                 title: infoTipoVerificacion,
                 subtitle: "",

@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class OtpInputWidget extends StatefulWidget {
-  final String phoneNumber;
+  final String? phoneNumber;
+  final String? correo;
   final void Function(String)? onSubmit;
   final bool isLoading;
+  final String tipoVerificacion;
 
   const OtpInputWidget({
     super.key,
-    required this.phoneNumber,
+    this.phoneNumber,
     this.onSubmit,
     this.isLoading = false,
+    required this.tipoVerificacion,
+    this.correo,
   });
 
   @override
@@ -18,8 +22,10 @@ class OtpInputWidget extends StatefulWidget {
 }
 
 class _OtpInputWidgetState extends State<OtpInputWidget> {
-  final List<TextEditingController> _controllers =
-      List.generate(4, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(
+    4,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
   @override
@@ -35,7 +41,7 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
 
   void _onChanged(String value, int index) {
     if (value.isNotEmpty && index < 3) {
-    //  _focusNodes[index + 1].requestFocus();
+      //  _focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
       //_focusNodes[index - 1].requestFocus();
     }
@@ -59,7 +65,9 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
           const SizedBox(height: 20),
 
           Text(
-            "Te enviamos un código a tu celular",
+            widget.tipoVerificacion.contains("CEL")
+                ? "Te enviamos un código a tu celular"
+                : "Te enviamos un código a tu correo",
             textAlign: TextAlign.center,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
@@ -69,7 +77,10 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
           const SizedBox(height: 8),
 
           Text(
-            widget.phoneNumber,
+             widget.tipoVerificacion.contains("CEL")
+                ? widget.phoneNumber!
+                : widget.correo!
+                ,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.grey[700],
             ),

@@ -547,13 +547,7 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
               ),
               const SizedBox(height: 10),
 
-              InfoCardSimple(
-                title: "Se utilizará para validar la cuenta vía SMS",
-                subtitle: "",
-                icon: Icons.info,
-                color: Colors.blue,
-              ),
-              const SizedBox(height: 20),
+          
             ],
           ),
         ),

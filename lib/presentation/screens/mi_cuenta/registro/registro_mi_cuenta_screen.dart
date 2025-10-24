@@ -35,6 +35,8 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
   final GlobalKey<FormState> paso4Key = GlobalKey<FormState>();
 
   String? celular;
+  String? correo;
+  String? tipoVerificacion;
   String? codigoOTPObtenido;
   String? solicitarOTP = 'S';
   bool mostrarCargarCodigoOTP = false;
@@ -110,6 +112,8 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
 
     setState(() {
       celular = datosPaso1?['telefonoCelular'];
+      correo = datosPaso1?['correo'];
+      tipoVerificacion = datosPaso2?['tipoVerificacion'];
     });
 
     final miCuentaRegistroResponse = await repoMicuentaRegistro
@@ -215,7 +219,9 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                   children: <Widget>[
                     OtpInputWidget(
                     isLoading: _isLoadingRegistroMiCuenta,
-                    phoneNumber: celular ?? '',
+                    tipoVerificacion: tipoVerificacion!,
+                    phoneNumber: celular!,
+                    correo: correo!,
                     onSubmit: (otp) {
                       setState(() {
                         codigoOTPObtenido = otp;
@@ -243,7 +249,11 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           context,
           MessageType.success,
           'Éxito',
-          result.mensaje!,
+          tipoVerificacion!.contains("CEL") 
+          ?"Te enviamos un código a tu celular, favor ingresa para confirmar el registro."
+          : "Te enviamos un código a tu correo, favor ingresa para confirmar el registro."
+
+          ,
           //duration: const Duration(seconds: 3),
         );
       }
