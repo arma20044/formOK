@@ -9,6 +9,7 @@ class DropdownCustom<T> extends StatelessWidget {
   final ValueChanged<T?> onChanged;
   final DisplayBuilder<T>? displayBuilder;
   final String? Function(T?)? validator;
+  final FocusNode? focusNode;
 
   const DropdownCustom({
     super.key,
@@ -17,12 +18,13 @@ class DropdownCustom<T> extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.displayBuilder,
-    this.validator,
+    this.validator, this.focusNode,
   });
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
+      focusNode: focusNode,
       initialValue: value,
       decoration: InputDecoration(labelText: label),
       items: items

@@ -100,7 +100,11 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
       TextEditingController();
 
   final FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNodeTipoDocumento = FocusNode();
   final FocusNode _focusNodeNumeroDocumentoRepresentante = FocusNode();
+
+  final _tipoDocumentoFieldKey = GlobalKey<FormFieldState<String>>();
+  final _numeroDocumentoFieldKey = GlobalKey<FormFieldState<String>>();
 
   final repoConsultaDocumento = ConsultaDocumentoRepositoryImpl(
     ConsultaDocumentoDatasourceImpl(MiAndeApi()),
@@ -113,7 +117,11 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
   final repoCiudad = CiudadRepositoryImpl(CiudadDatasourceImpl(MiAndeApi()));
 
   void consultarDocumento(String documento) async {
-    setState(() => isLoadingConsultaDocumento = true);
+    setState(() {
+      isLoadingConsultaDocumento = true;
+      nombreObtenido.text = "";
+      apellidoObtenido.text = "";
+    });
     try {
       consultaDocumentoResponse = await repoConsultaDocumento
           .getConsultaDocumento(
@@ -132,6 +140,13 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
       });
     } catch (e) {
       print("Error al consultar Documento: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("$e", style: TextStyle(color: Colors.white)),
+        ),
+      );
+      return;
     } finally {
       setState(() => isLoadingConsultaDocumento = false);
     }
@@ -182,15 +197,29 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
     super.initState();
     //_fetchDepartamentos();
 
-    // Escuchamos cambios de foco
     _focusNode.addListener(() {
-      if (!_focusNode.hasFocus &&
-          numeroDocumentoController.text.isNotEmpty &&
-          selectedTipoDocumento?.id != 'TD004') {
-        // Aquí el TextFormField perdió el foco
-        //print('TextFormField perdió el foco');
-        //print('Valor actual: ${numeroDocumentoController.text}');
-        consultarDocumento(numeroDocumentoController.text);
+      if(selectedTipoDocumento?.id == null) return;
+      if (!_focusNode.hasFocus) {
+        // 🔹 Esperar a que se estabilice el árbol de widgets
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          final state = _numeroDocumentoFieldKey.currentState;
+          if (state != null && state.mounted) {
+            final isValid = state.validate();
+            if (isValid) {
+              // 🔹 Si pasa la validación, ejecutamos la lógica adicional
+              //   await consultarDocumento();
+              consultarDocumento(numeroDocumentoController.text);
+            }
+          }
+        });
+      }
+    });
+
+    _focusNodeTipoDocumento.addListener(() {
+      if (!_focusNodeTipoDocumento.hasFocus) {
+        Future.microtask(() {
+          _numeroDocumentoFieldKey.currentState?.validate();
+        });
       }
     });
 
@@ -263,31 +292,57 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
               ),
               const SizedBox(height: 20),
               DropdownCustom<ModalModel>(
+                key: _tipoDocumentoFieldKey,
+                focusNode: _focusNodeTipoDocumento,
                 label: "Tipo Documento",
                 items: listaTipoDocumento,
                 value: selectedTipoDocumento,
                 displayBuilder: (b) => b.descripcion!,
                 validator: (val) =>
                     val == null ? "Seleccione un Tipo Documento" : null,
-                onChanged: (val) => setState(() => selectedTipoDocumento = val),
+                onChanged: (val) => {
+                  setState(() {
+                    selectedTipoDocumento = val;
+
+                    // ✅ validar el campo número de documento justo después del cambio
+                    Future.microtask(() {
+                      _numeroDocumentoFieldKey.currentState?.validate();
+                    });
+                  }),
+                },
               ),
               const SizedBox(height: 20),
               TextFormField(
+                key: _numeroDocumentoFieldKey,
                 focusNode: _focusNode,
                 controller: numeroDocumentoController,
-                keyboardType: TextInputType.number,
+                //keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   labelText: "Número de CI, RUC o Pasaporte",
                   border: OutlineInputBorder(),
                 ),
                 validator: (val) {
-                  //if (selectedTipoReclamo?.nisObligatorio == 'S') {
-                  if (val == null || val.isEmpty) {
+                  if (val == null || val.trim().isEmpty) {
                     return "Ingrese Número de CI, RUC o Pasaporte";
                   }
-                  //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+
+                  final tipo = selectedTipoDocumento!.id ?? '';
+
+                  // C.I. Civil → solo números, entre 6 y 10 dígitos
+                  if (tipo == 'TD001' &&
+                      !RegExp(r'^[0-9]{6,10}$').hasMatch(val)) {
+                    return "Éste campo debe contener solo números.";
+                  }
+
+                  // RUC → números, guion y dígito verificador
+                  if (tipo == 'TD002' &&
+                      !RegExp(r'^\d{6,12}-\d$').hasMatch(val)) {
+                    return "Este campo debe tener formato de RUC";
+                  }
+
+               
+
                   return null;
-                  //}
                 },
               ),
               const SizedBox(height: 20),
@@ -312,7 +367,18 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                           Text("Nombre(s) o Razón Social"),
                           isLoadingConsultaDocumento
                               ? Text("")
-                              : Text(nombreObtenido.text),
+                              //: Text(nombreObtenido.text),
+                              : TextFormField(
+                                  enabled: false,
+                                  initialValue: nombreObtenido.text,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Ingrese Nombre(s) o Razón Social.";
+                                    }
+
+                                    return null;
+                                  },
+                                ),
                         ],
                       ),
                     ),
@@ -331,9 +397,21 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                           isLoadingConsultaDocumento
                               ? CircularProgressIndicator()
                               : Text("Apellido(s)"),
+
                           isLoadingConsultaDocumento
                               ? Text("")
-                              : Text(apellidoObtenido.text),
+                              //: Text(apellidoObtenido.text),
+                              : TextFormField(
+                                  enabled: false,
+                                  initialValue: apellidoObtenido.text,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Ingrese Apellido(s)";
+                                    }
+
+                                    return null;
+                                  },
+                                ),
                         ],
                       ),
                     ),
@@ -386,13 +464,13 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                               isLoadingConsultaDocumentoRepresentante
                                   ? Text("")
                                   : Text(apellidoRepresentanteObtenido.text),
+                              const SizedBox(height: 20),
                             ],
                           ),
                         ),
                       ],
                     )
                   : Text(""),
-              const SizedBox(height: 20),
 
               DropdownCustom<ModalModel>(
                 label: "País",
@@ -418,41 +496,38 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                   //if (val?.id != null && val?.descripcion?.compareTo("Paraguay") == 0) _fetchCiudades(val.id.toString())
                 },
               ),
-              const SizedBox(height: 20),
-              selectedPais?.id == 'Paraguay'
-                  ? Column(
-                      children: [
-                        IgnorePointer(
-                          ignoring:
-                              selectedPais?.descripcion?.compareTo(
-                                    "Paraguay",
-                                  ) ==
-                                  0
-                              ? false
-                              : true,
-                          child: DropdownCustom<Departamento>(
-                            label: "Departamento",
-                            items: listaDepartamentos,
-                            value: selectedDept,
-                            displayBuilder: (d) => d.nombre!,
-                            validator: (val) => val == null
-                                ? "Seleccione un Departamento"
-                                : null,
-                            onChanged: (val) {
-                              setState(() {
-                                selectedDept = val;
-                                selectedCiudad = null;
-                                ciudades = [];
-                              });
-                              if (val != null)
-                                _fetchCiudades(val.idDepartamento);
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    )
-                  : Text(""),
+
+              Visibility(
+                visible: selectedPais?.id == 'Paraguay',
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    IgnorePointer(
+                      ignoring:
+                          selectedPais?.descripcion?.compareTo("Paraguay") == 0
+                          ? false
+                          : true,
+                      child: DropdownCustom<Departamento>(
+                        label: "Departamento",
+                        items: listaDepartamentos,
+                        value: selectedDept,
+                        displayBuilder: (d) => d.nombre!,
+                        validator: (val) =>
+                            val == null ? "Seleccione un Departamento" : null,
+                        onChanged: (val) {
+                          setState(() {
+                            selectedDept = val;
+                            selectedCiudad = null;
+                            ciudades = [];
+                          });
+                          if (val != null) _fetchCiudades(val.idDepartamento);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
 
               selectedPais?.id == 'Paraguay'
                   ? Column(
@@ -546,8 +621,6 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
                 },
               ),
               const SizedBox(height: 10),
-
-          
             ],
           ),
         ),

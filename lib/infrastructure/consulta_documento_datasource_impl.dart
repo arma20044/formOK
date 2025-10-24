@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:form/core/enviromens/Enrivoment.dart';
 import 'package:form/model/model.dart';
+import 'package:form/presentation/components/common/custom_show_dialog.dart';
 
 import '../core/api/mi_ande_api.dart';
 
@@ -44,7 +46,17 @@ class ConsultaDocumentoDatasourceImpl extends ConsultaDocumentoDatasource {
     print('URL llamada: ${response.requestOptions.uri}');
 
     if (response.statusCode == 200) {
+      final result = response.data;
+      if(result['error']){
+          //AlertDialog(title: result['errorValList'][0],);
+           throw  Exception("No se encontró persona.");
+        //return;
+      }
       final rawMap = response.data['resultado'] as Map<String, dynamic>;
+      if(rawMap.isEmpty){
+        AlertDialog(title: result['No retornó datos.']);
+        throw  Exception("No retornó datos.");
+      }
       return ConsultaDocumentoResultado.fromJson(rawMap);
       /*return ConsultaDocumentoResponse(
         error: true,
