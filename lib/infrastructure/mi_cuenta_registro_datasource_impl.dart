@@ -57,7 +57,7 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
       'tipoCliente': tipoCliente,
       'tipoSolicitante': tipoSolicitante,
       'tipoDocumento': tipoDocumento,
-      'cedulaRepresentante': cedulaRepresentante,
+     
       'documentoIdentificacion': numeroDocumento,
       'nombre': nombre,
       'apellido': apellido,
@@ -75,6 +75,9 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
 
       'solicitudOTP': solicitudOTP,
       'codigoOTP': codigoOTP,
+
+       'cedulaRepresentante': cedulaRepresentante,
+       
     };
 
     // Solo agregar archivo si existe
@@ -143,10 +146,18 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
       url = '${Environment.hostCtxRegistroUnico}/v1/agregar';
     }
 
+    var headers = {
+  //'Content-Type': 'application/x-www-form-urlencoded'
+  'Content-Type': "multipart/form-data; charset=ISO-8859-1",
+};
+
     final response = await dio.post(
       url,
       data: data,
       // options: Options(contentType: Headers.formUrlEncodedContentType),
+      options: Options(
+        headers: headers
+      )
     );
 
     if (response.statusCode == 200) {

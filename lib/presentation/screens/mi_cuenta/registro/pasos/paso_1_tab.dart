@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/config/tipo_tramite_model.dart';
@@ -47,11 +48,11 @@ List<Ciudad> listaCiudades = [];
   '2': checkboxesInicial(false),
 };*/
 
-  // 🔹 Checkboxes iniciales desmarcados
-  Map<String, List<CustomCheckbox>> checkboxesBySelection = {};
+// 🔹 Checkboxes iniciales desmarcados
+Map<String, List<CustomCheckbox>> checkboxesBySelection = {};
 
-
-class Paso1TabState extends ConsumerState<Paso1Tab> with AutomaticKeepAliveClientMixin {
+class Paso1TabState extends ConsumerState<Paso1Tab>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -70,6 +71,9 @@ class Paso1TabState extends ConsumerState<Paso1Tab> with AutomaticKeepAliveClien
       "correo": correoController.text,
       "telefonoFijo": numeroTelefonoFijoController.text,
       "telefonoCelular": numeroTelefonoCelularController.text,
+       "documentoRepresentante": documentoRepresentanteController.text,
+    "nombreRepresentante": nombreRepresentanteObtenido.text,
+    "apellidoRepresentante": apellidoRepresentanteObtenido.text,
     };
   }
 
@@ -206,9 +210,6 @@ class Paso1TabState extends ConsumerState<Paso1Tab> with AutomaticKeepAliveClien
     }
   }
 
-
-  
-
   // 🔹 Inicializar todo el formulario
   void resetForm() {
     setState(() {
@@ -232,14 +233,20 @@ class Paso1TabState extends ConsumerState<Paso1Tab> with AutomaticKeepAliveClien
 
       // 🔹 Checkboxes desmarcados
       checkboxesBySelection = {
-        '1': checkboxesInicial(true).map((c) => CustomCheckbox(fragments: c.fragments, value: false)).toList(),
-        '2': checkboxesInicial(false).map((c) => CustomCheckbox(fragments: c.fragments, value: false)).toList(),
+        '1': checkboxesInicial(true)
+            .map((c) => CustomCheckbox(fragments: c.fragments, value: false))
+            .toList(),
+        '2': checkboxesInicial(false)
+            .map((c) => CustomCheckbox(fragments: c.fragments, value: false))
+            .toList(),
       };
 
       // 🔹 Inicializar provider si hay tipo seleccionado
       if (selectedTipoTramite != null) {
         final options = getFreshCheckboxes(selectedTipoTramite!.id!);
-        ref.read(formProvider.notifier).updateDropdown(selectedTipoTramite!.id!, options);
+        ref
+            .read(formProvider.notifier)
+            .updateDropdown(selectedTipoTramite!.id!, options);
       }
     });
   }
@@ -247,7 +254,9 @@ class Paso1TabState extends ConsumerState<Paso1Tab> with AutomaticKeepAliveClien
   // 🔹 Obtener checkboxes frescos desmarcados
   List<CustomCheckbox> getFreshCheckboxes(String tipoId) {
     final base = checkboxesBySelection[tipoId] ?? [];
-    return base.map((c) => CustomCheckbox(fragments: c.fragments, value: false)).toList();
+    return base
+        .map((c) => CustomCheckbox(fragments: c.fragments, value: false))
+        .toList();
   }
 
   @override
@@ -255,7 +264,7 @@ class Paso1TabState extends ConsumerState<Paso1Tab> with AutomaticKeepAliveClien
     super.initState();
     //_fetchDepartamentos();
     resetForm();
-     Future(() {
+    Future(() {
       ref.read(formProvider.notifier).reset();
     });
 
@@ -637,9 +646,10 @@ class Paso1TabState extends ConsumerState<Paso1Tab> with AutomaticKeepAliveClien
                   : Text(""),
 
               TextFormField(
+              
                 //focusNode: _focusNode,
                 controller: direccionController,
-                keyboardType: TextInputType.text,
+                // keyboardType: TextInputType.text,
                 decoration: const InputDecoration(
                   labelText: "Dirección",
                   border: OutlineInputBorder(),

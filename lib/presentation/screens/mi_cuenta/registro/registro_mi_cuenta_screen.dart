@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common/custom_message_dialog.dart';
@@ -120,16 +122,16 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
         .getMiCuentaRegistro(
           actualizarDatos: 'S',
           tipoCliente: num.parse(datosPaso1!['tipoCliente']),
-          tipoSolicitante: datosPaso1['tipoSolicitante'],
+          tipoSolicitante: Uri.encodeComponent(datosPaso1['tipoSolicitante']),
           tipoDocumento: datosPaso1['tipoDocumento'],
-          cedulaRepresentante: datosPaso1['cedulaRepresentante'] ?? 'lteor',
+          cedulaRepresentante: datosPaso1['documentoRepresentante'] ?? 'lteor',
           numeroDocumento: datosPaso1['numeroDocumento'] ?? '',
           nombre: datosPaso1['nombre'] ?? '',
           apellido: datosPaso1['apellido'] ?? '',
           pais: datosPaso1['pais'] ?? '',
-          departamento: datosPaso1['departamento'] ?? 'NINGUNO',
-          ciudad: datosPaso1['ciudad'] ?? 'NINGUNO',
-          direccion: datosPaso1['direccion'] ?? '',
+          departamento: datosPaso1['departamento'] != null ? Uri.encodeComponent(datosPaso1['departamento']) : 'NINGUNO',
+          ciudad: datosPaso1['ciudad'] != null ? Uri.encodeComponent(datosPaso1['ciudad']) : 'NINGUNO',
+          direccion: datosPaso1['direccion'] != null ? Uri.encodeComponent(datosPaso1['direccion']) : '',
           correo: datosPaso1['correo'] ?? '',
           telefonoFijo: datosPaso1['telefonoFijo'] ?? '',
           numeroTelefonoCelular: datosPaso1['telefonoCelular'] ?? '',

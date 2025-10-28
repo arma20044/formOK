@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -12,11 +13,9 @@ class MiAndeApi {
     : dio = Dio(
         BaseOptions(
           //baseUrl: Environment.hostCtxSiga, // 👈 usa el Environment global
-          connectTimeout: const Duration(seconds: 15),
-          receiveTimeout: const Duration(seconds: 15),
-          headers: {
-            'x-so' : Platform.isAndroid ? 'android': 'ios'
-          }
+          connectTimeout: const Duration(seconds: 60),
+          receiveTimeout: const Duration(seconds: 60),
+          headers: {'x-so': Platform.isAndroid ? 'android' : 'ios'},
           //queryParameters: {'clientKey':Environment.clientKey}
         ),
       ) {
@@ -25,7 +24,17 @@ class MiAndeApi {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           final formData = options.data as FormData;
-          formData.fields.add(MapEntry('clientKey', Environment.clientKey));
+
+         
+
+          // Agregamos clientKey
+          formData.fields.add(
+            MapEntry(
+              'clientKey',
+              utf8.decode(utf8.encode(Environment.clientKey)),
+            ),
+          );
+
           print(
             '➡️ [${Environment.name}] Petición: ${options.method} ${options.uri}',
           );
