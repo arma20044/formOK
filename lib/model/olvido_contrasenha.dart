@@ -1,51 +1,69 @@
 class OlvidoContrasenhaResponse {
   final dynamic resultado;
-  final List<dynamic> mensajeList;
-  final String mensaje;
+  final List<dynamic>? mensajeList;
+  final String? mensaje;
   final bool error;
-  final List<dynamic> errorValList;
+  final List<dynamic>? errorValList;
 
   OlvidoContrasenhaResponse({
-    required this.resultado,
+    this.resultado,
     required this.mensajeList,
-    required this.mensaje,
+    this.mensaje,
     required this.error,
     required this.errorValList,
   });
 
   factory OlvidoContrasenhaResponse.fromJson(Map<String, dynamic> json) {
-    return OlvidoContrasenhaResponse(
-      resultado: json['resultado'],
-       mensajeList: List<dynamic>.from(json['mensajeList'].map((item) => item)),
-      mensaje: json['mensaje'],
-      error: json['error'],
-       errorValList: List<dynamic>.from(json['errorValList'].map((item) => item)),
-    );
+    final bool esError = json['error'] ?? false;
+
+    if (esError) {
+      // 🔴 Caso de error
+      return OlvidoContrasenhaResponse(
+        resultado: null,
+        mensajeList: [],
+        mensaje: json['mensaje'] ?? 'Error en validación',
+        error: true,
+        errorValList: List<dynamic>.from(json['errorValList'] ?? []),
+      );
+    } else {
+      // 🟢 Caso sin error
+      return OlvidoContrasenhaResponse(
+        resultado: json['resultado'],
+        mensajeList: List<String>.from(json['mensajeList'] ?? []),
+        mensaje: json['mensaje'],
+        error: false,
+        errorValList: [],
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'resultado': resultado,
-      'mensajeList': mensajeList.map((item) => item).toList(),
-      'mensaje': mensaje,
-      'error': error,
-      'errorValList': errorValList.map((item) => item).toList(),
-    };
+    if (error) {
+      // 🔴 Caso error
+      return {'error': error, 'mensaje': mensaje, 'errorValList': errorValList};
+    } else {
+      // 🟢 Caso sin error
+      return {
+        'resultado': resultado,
+        'error': error,
+        'mensajeList': mensajeList,
+      };
+    }
   }
 
   OlvidoContrasenhaResponse copyWith({
-    required dynamic resultado,
-    required List<dynamic> mensajeList,
-    required String mensaje,
+    dynamic resultado,
+    List<dynamic>? mensajeList,
+    String? mensaje,
     required bool error,
-    required List<dynamic> errorValList,
+    List<dynamic>? errorValList,
   }) {
     return OlvidoContrasenhaResponse(
-      resultado: resultado,
-      mensajeList: mensajeList,
-      mensaje: mensaje,
+      resultado: resultado ?? this.resultado,
+      mensajeList: mensajeList ?? this.mensajeList,
+      mensaje: mensaje ?? this.mensaje,
       error: error,
-      errorValList: errorValList,
+      errorValList: errorValList ?? this.errorValList,
     );
   }
 }

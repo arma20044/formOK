@@ -41,42 +41,47 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
   );
 
   void _enviarFormulario() async {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedRadio == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Seleccione medio de notificación')),
-        );
-        return;
-      }
-
-      setState(() {
-        _isLoadingOlvidoContrasenha = true;
-      });
-      final olvidoContrasenhaResponse = await repoOlvidoContrasenha
-          .getOlvidoContrasenha(
-            selectedTipoDocumento!.id,
-            documentoIdentificacionController.text,
-            _selectedRadio!,
-            //cedulaRepresenante ?? 'lteor',
-            'lteor',
-            //tipoSolicitante
-            'Sin registros',
+    try {
+      if (_formKey.currentState!.validate()) {
+        if (_selectedRadio == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Seleccione medio de notificación')),
           );
+          return;
+        }
 
-      if (!mounted) return;
-      if (olvidoContrasenhaResponse.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(olvidoContrasenhaResponse.errorValList[0])),
-        );
-        return;
-      } else {
-        // Si todo está correcto:
+        setState(() {
+          _isLoadingOlvidoContrasenha = true;
+        });
+        final olvidoContrasenhaResponse = await repoOlvidoContrasenha
+            .getOlvidoContrasenha(
+              selectedTipoDocumento!.id,
+              documentoIdentificacionController.text,
+              _selectedRadio!,
+              documentoIdentificacionRepresentanteController.text,
+              selectedTipoSolicitante!.id!
+            );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(olvidoContrasenhaResponse.mensaje)),
-        );
-        GoRouter.of(context).pop();
+        if (!mounted) return;
+        if (olvidoContrasenhaResponse.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(style: TextStyle(color: Colors.white), olvidoContrasenhaResponse.errorValList![0]),backgroundColor: Colors.red,),
+          );
+          return;
+        } else {
+          // Si todo está correcto:
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(olvidoContrasenhaResponse.mensaje!)),
+          );
+          GoRouter.of(context).pop();
+        }
       }
+    } catch (e) {
+    } finally {
+      setState(() {
+        _isLoadingOlvidoContrasenha = false;
+      });
     }
   }
 
@@ -150,7 +155,8 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
                           val == null ? "Seleccione un Tipo Solicitante" : null,
                       onChanged: (val) => setState(() {
                         selectedTipoSolicitante = val;
-                        documentoIdentificacionRepresentanteController.text= "";
+                        documentoIdentificacionRepresentanteController.text =
+                            "";
                       }),
                     ),
                   ],

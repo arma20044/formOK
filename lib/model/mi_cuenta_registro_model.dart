@@ -1,12 +1,12 @@
 class MiCuentaRegistroResponse {
   final dynamic resultado;
-  final List<String> mensajeList;
+  final List<String>? mensajeList;
   final String? mensaje;
   final bool error;
-  final List<dynamic> errorValList;
+  final List<dynamic>? errorValList;
 
   MiCuentaRegistroResponse({
-    required this.resultado,
+    this.resultado,
     required this.mensajeList,
      this.mensaje,
     required this.error,
@@ -14,38 +14,60 @@ class MiCuentaRegistroResponse {
   });
 
   factory MiCuentaRegistroResponse.fromJson(Map<String, dynamic> json) {
-    return MiCuentaRegistroResponse(
-      resultado: json['resultado'],
-       mensajeList: List<String>.from(json['mensajeList'].map((item) => item)),
-      mensaje: json['mensaje'],
-      error: json['error'],
-       errorValList: List<dynamic>.from(json['errorValList'].map((item) => item)),
-    );
+final bool esError = json['error'] ?? false;
+
+   if (esError) {
+      // 🔴 Caso de error
+      return MiCuentaRegistroResponse(
+        resultado: null,
+        mensajeList: [],
+        mensaje: json['mensaje'] ?? 'Error en validación',
+        error: true,
+        errorValList: List<dynamic>.from(json['errorValList'] ?? []),
+      );
+    } else {
+      // 🟢 Caso sin error
+      return MiCuentaRegistroResponse(
+        resultado: json['resultado'],
+        mensajeList: List<String>.from(json['mensajeList'] ?? []),
+        mensaje: json['mensaje'],
+        error: false,
+        errorValList: [],
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'resultado': resultado,
-      'mensajeList': mensajeList.map((item) => item).toList(),
-      'mensaje': mensaje,
-      'error': error,
-      'errorValList': errorValList.map((item) => item).toList(),
-    };
+    if (error) {
+      // 🔴 Caso error
+      return {
+        'error': error,
+        'mensaje': mensaje,
+        'errorValList': errorValList,
+      };
+    } else {
+      // 🟢 Caso sin error
+      return {
+        'resultado': resultado,
+        'error': error,
+        'mensajeList': mensajeList,
+      };
+    }
   }
 
   MiCuentaRegistroResponse copyWith({
-    required dynamic resultado,
-    required List<String> mensajeList,
-    required String mensaje,
+     dynamic resultado,
+     List<String>? mensajeList,
+     String? mensaje,
     required bool error,
-    required List<dynamic> errorValList,
+     List<dynamic>? errorValList,
   }) {
     return MiCuentaRegistroResponse(
-      resultado: resultado,
-      mensajeList: mensajeList,
-      mensaje: mensaje,
+      resultado: resultado ?? this.resultado,
+      mensajeList: mensajeList ?? this.mensajeList,
+      mensaje: mensaje ?? this.mensaje,
       error: error,
-      errorValList: errorValList,
+      errorValList: errorValList ?? this.errorValList,
     );
   }
 }

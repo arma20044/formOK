@@ -124,14 +124,20 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           tipoCliente: num.parse(datosPaso1!['tipoCliente']),
           tipoSolicitante: Uri.encodeComponent(datosPaso1['tipoSolicitante']),
           tipoDocumento: datosPaso1['tipoDocumento'],
-          cedulaRepresentante: datosPaso1['documentoRepresentante'] ?? 'lteor',
+          cedulaRepresentante: datosPaso1['documentoRepresentante'].toString().isEmpty ? 'lteor' :datosPaso1['documentoRepresentante'],
           numeroDocumento: datosPaso1['numeroDocumento'] ?? '',
           nombre: datosPaso1['nombre'] ?? '',
           apellido: datosPaso1['apellido'] ?? '',
           pais: datosPaso1['pais'] ?? '',
-          departamento: datosPaso1['departamento'] != null ? Uri.encodeComponent(datosPaso1['departamento']) : 'NINGUNO',
-          ciudad: datosPaso1['ciudad'] != null ? Uri.encodeComponent(datosPaso1['ciudad']) : 'NINGUNO',
-          direccion: datosPaso1['direccion'] != null ? Uri.encodeComponent(datosPaso1['direccion']) : '',
+          departamento: datosPaso1['departamento'] != null
+              ? Uri.encodeComponent(datosPaso1['departamento'])
+              : 'NINGUNO',
+          ciudad: datosPaso1['ciudad'] != null
+              ? Uri.encodeComponent(datosPaso1['ciudad'])
+              : 'NINGUNO',
+          direccion: datosPaso1['direccion'] != null
+              ? Uri.encodeComponent(datosPaso1['direccion'])
+              : '',
           correo: datosPaso1['correo'] ?? '',
           telefonoFijo: datosPaso1['telefonoFijo'] ?? '',
           numeroTelefonoCelular: datosPaso1['telefonoCelular'] ?? '',
@@ -199,7 +205,7 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           context,
           MessageType.error,
           'Error',
-          result.errorValList[0],
+          result.errorValList![0],
         );
 
         setState(() {
@@ -220,20 +226,23 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     OtpInputWidget(
-                    isLoading: _isLoadingRegistroMiCuenta,
-                    tipoVerificacion: tipoVerificacion!,
-                    phoneNumber: celular!,
-                    correo: correo!,
-                    onSubmit: (otp) {
-                      setState(() {
-                        codigoOTPObtenido = otp;
-                        this.solicitarOTP = 'N';
-                      });
+                      isLoading: _isLoadingRegistroMiCuenta,
+                      tipoVerificacion: tipoVerificacion!,
+                      phoneNumber: celular!,
+                      correo: correo!,
+                      onSubmit: (otp) {
+                    
 
-                      _enviarFormulario(false);
-                      print("Código ingresado: $otp");
-                    },
-                  )
+                        setState(() {
+                          codigoOTPObtenido = otp;
+
+                          this.solicitarOTP = 'N';
+                        });
+
+                        _enviarFormulario(false);
+                        print("Código ingresado: $otp");
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -251,11 +260,9 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           context,
           MessageType.success,
           'Éxito',
-          tipoVerificacion!.contains("CEL") 
-          ?"Te enviamos un código a tu celular, favor ingresa para confirmar el registro."
-          : "Te enviamos un código a tu correo, favor ingresa para confirmar el registro."
-
-          ,
+          tipoVerificacion!.contains("CEL")
+              ? "Te enviamos un código a tu celular, favor ingresa para confirmar el registro."
+              : "Te enviamos un código a tu correo, favor ingresa para confirmar el registro.",
           //duration: const Duration(seconds: 3),
         );
       }
@@ -331,7 +338,6 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
                 ],
               ),
             ),
-            
           ],
         ),
       ),
