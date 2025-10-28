@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/presentation/components/common/checkbox_group.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-
 // Estado del formulario
 class FormStateTerminosCondiciones {
   final String selectedDropdown;
@@ -30,10 +29,7 @@ class FormNotifier extends StateNotifier<FormStateTerminosCondiciones> {
 
   /// Actualiza el dropdown y reemplaza la lista de checkboxes
   void updateDropdown(String value, List<CustomCheckbox> options) {
-    state = state.copyWith(
-      selectedDropdown: value,
-      tab4Checkboxes: options,
-    );
+    state = state.copyWith(selectedDropdown: value, tab4Checkboxes: options);
   }
 
   /// Alterna el valor de un checkbox por índice
@@ -54,9 +50,18 @@ class FormNotifier extends StateNotifier<FormStateTerminosCondiciones> {
   bool areAllCheckboxesChecked() {
     return state.tab4Checkboxes.every((cb) => cb.value);
   }
+
+  // ← Este es el reset
+  void reset() {
+    state = FormStateTerminosCondiciones(
+      selectedDropdown: '', // reset del dropdown
+      tab4Checkboxes: [], // reset de los checkboxes
+    );
+  }
 }
 
 // Provider global
-final formProvider = StateNotifierProvider<FormNotifier, FormStateTerminosCondiciones>(
-  (ref) => FormNotifier(),
-);
+final formProvider =
+    StateNotifierProvider<FormNotifier, FormStateTerminosCondiciones>(
+      (ref) => FormNotifier(),
+    );

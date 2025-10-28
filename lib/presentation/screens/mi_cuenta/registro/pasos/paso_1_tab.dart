@@ -255,6 +255,9 @@ class Paso1TabState extends ConsumerState<Paso1Tab> with AutomaticKeepAliveClien
     super.initState();
     //_fetchDepartamentos();
     resetForm();
+     Future(() {
+      ref.read(formProvider.notifier).reset();
+    });
 
     _focusNode.addListener(() {
       if (selectedTipoDocumento?.id == null) return;
