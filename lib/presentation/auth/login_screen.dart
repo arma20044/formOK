@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/config/constantes.dart';
+import 'package:form/config/tipo_tramite_model.dart';
 import 'package:form/model/constans/textos.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:form/presentation/components/widgets/dropdown_custom.dart';
 import 'package:go_router/go_router.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
@@ -28,6 +31,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final numeroController = TextEditingController();
+  final documentoIdentificacionRepresentanteController =
+      TextEditingController();
   final passwordController = TextEditingController();
   DropdownItem? selectedTipoDocumento;
   final loginFormKey = GlobalKey<FormState>();
@@ -39,14 +44,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
- bool passwordInvisible = true;
+  bool passwordInvisible = true;
+
+  final List<ModalModel> listaTipoSolicitante = dataTipoSolicitanteArray;
+
+  ModalModel? selectedTipoSolicitante;
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final isLoading = authState.isLoading;
-
-   
 
     ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
       next.when(
@@ -116,21 +123,72 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       },
                       enabled: !isLoading,
                     ),
+                    Visibility(
+                      visible:
+                          selectedTipoDocumento?.id.compareTo('TD002') == 0,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 24),
+                          DropdownCustom<ModalModel>(
+                            label: "Tipo Solicitante",
+                            items: listaTipoSolicitante,
+                            value: selectedTipoSolicitante,
+                            displayBuilder: (b) => b.descripcion!,
+                            validator: (val) => val == null
+                                ? "Seleccione un Tipo Solicitante"
+                                : null,
+                            onChanged: (val) => setState(() {
+                              selectedTipoSolicitante = val;
+                              numeroController.text = "";
+                            }),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Visibility(
+                      visible:
+                          selectedTipoSolicitante != null &&
+                          selectedTipoSolicitante?.id?.compareTo(
+                                "Particular",
+                              ) !=
+                              0,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 24),
+                          TextFormField(
+                            controller:
+                                documentoIdentificacionRepresentanteController,
+                            decoration: const InputDecoration(
+                              labelText:
+                                  'Número de CI, del Representante',
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Ingrese Número de CI del Representante';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: passwordController,
-                      decoration:  InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Contraseña',
-                          suffixIcon: IconButton(
-                    icon: Icon(
-                      passwordInvisible ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        passwordInvisible = !passwordInvisible;
-                      });
-                    },
-                  ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            passwordInvisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              passwordInvisible = !passwordInvisible;
+                            });
+                          },
+                        ),
                       ),
                       obscureText: passwordInvisible,
                       validator: (value) {
@@ -155,6 +213,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         numeroController.text.trim(),
                                         passwordController.text.trim(),
                                         selectedTipoDocumento!.id,
+                                        documentoIdentificacionRepresentanteController.text.trim(),
+                                        selectedTipoSolicitante != null && selectedTipoSolicitante?.id != null ? selectedTipoSolicitante!.id! : "",
                                         false,
                                       );
                                 }
@@ -177,7 +237,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: <Widget>[
                         TextButton(
                           onPressed: () {
-                             GoRouter.of(context).push('/olvidoContrasenha');
+                            GoRouter.of(context).push('/olvidoContrasenha');
                           },
                           child: const Text('Olvido de Contraseña'),
                         ),
@@ -199,9 +259,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           width: 2,
                         ),
                       ),
-                      child: Text(estimadoCliente,style: TextStyle(
-                        fontSize: 13
-                      ),),
+                      child: Text(
+                        estimadoCliente,
+                        style: TextStyle(fontSize: 13),
+                      ),
                     ),
                   ],
                 ),

@@ -19,14 +19,17 @@ class LoginDatasourceImpl extends LoginDatasource {
     String username,
     String password,
     String tipoDocumento,
+    String tipoSolicitante,
+    String documentoSolicitante,
+    
   ) async {
     var data = FormData.fromMap({
       
       'tipoDocumento': tipoDocumento,
       'password': password,
       'documentoIdentificacion': username,
-      'cedulaRepresentante':'lteor',
-      'tipoSolicitante': 'Sin registros',
+      'cedulaRepresentante': documentoSolicitante.isEmpty ? 'lteor': documentoSolicitante,
+      'tipoSolicitante': tipoSolicitante.isEmpty ? 'Sin registros' : tipoSolicitante,
 
     });
 

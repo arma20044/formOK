@@ -5,5 +5,7 @@ abstract class LoginRepository {
     String username,
     String password,
     String tipoDocumento,
+    String tipoSolicitante,
+    String documentoSolicitante
   );
 }

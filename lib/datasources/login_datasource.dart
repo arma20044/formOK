@@ -7,5 +7,7 @@ abstract class LoginDatasource {
     String username,
     String password,
     String tipoDocumento,
+    String tipoSolicitante,
+    String documentoSolicitante
   );
 }

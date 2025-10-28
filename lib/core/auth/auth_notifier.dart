@@ -46,6 +46,8 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         datos.numeroDocumento,
         datos.password,
         datos.tipoDocumento,
+        datos.tipoSolicitante,
+        datos.cedulaRepresentante,
         true,
       );
       return user.numeroDocumento.isNotEmpty ? user : null;
@@ -59,6 +61,8 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     String numeroDocumento,
     String password,
     String tipoDocumento,
+    String tipoSolicitante,
+    String cedulaSolicitante,
     bool loginSilencioso,
   ) async {
     state = const AsyncLoading();
@@ -68,6 +72,9 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         numeroDocumento,
         password,
         tipoDocumento,
+        tipoSolicitante,
+        cedulaSolicitante,
+        
       );
 
       if (response.error) {
@@ -94,7 +101,7 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         ciudad: response.resultado!.ciudad!,
         telefonoCelular: response.resultado!.telefonoCelular!,
         tipoCliente: response.resultado!.tipoCliente!,
-        modificarPassword: response.resultado!.modificarPassword!
+        modificarPassword: response.resultado!.modificarPassword!,
       );
 
       await _storage.write(key: _userKey, value: jsonEncode(user.toMap()));
@@ -149,7 +156,10 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     final user = currentState.user!;
 
     // Crear un nuevo objeto usuario con el password actualizado
-    final updatedUser = user.copyWith(password: nuevoPassword,modificarPassword : 'N');
+    final updatedUser = user.copyWith(
+      password: nuevoPassword,
+      modificarPassword: 'N',
+    );
 
     // Guardar en el almacenamiento seguro
     await _storage.write(key: _userKey, value: jsonEncode(updatedUser.toMap()));

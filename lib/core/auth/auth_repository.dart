@@ -13,6 +13,8 @@ class AuthRepository {
     String numeroDocumento,
     String password,
     String tipoDocumento,
+     tipoSolicitante,
+     documentoSolicitante,
   ) async {
     
 
@@ -24,6 +26,8 @@ class AuthRepository {
         numeroDocumento,
         password,
         tipoDocumento,
+         tipoSolicitante,
+     documentoSolicitante
       );
 
       if (responseLogin.error) {
