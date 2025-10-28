@@ -15,14 +15,14 @@ import '../../../../../core/api/mi_ande_api.dart';
 import '../../../../../infrastructure/infrastructure.dart';
 import '../../../../../repositories/repositories.dart';
 
-class Paso1Tab extends StatefulWidget {
+class Paso1Tab extends ConsumerStatefulWidget {
   final GlobalKey<FormState> formKey;
   final Function(String?)? onTipoClienteChanged;
 
   const Paso1Tab({super.key, required this.formKey, this.onTipoClienteChanged});
 
   @override
-  State<Paso1Tab> createState() => Paso1TabState();
+  ConsumerState<Paso1Tab> createState() => Paso1TabState();
 }
 
 final List<ModalModel> listaTipoTramite = dataTipoClienteArray;
@@ -42,12 +42,16 @@ List<Ciudad> listaCiudades = [];
 
 // Este archivo debe estar accesible donde lo uses (ej: checkboxes_data.dart)
 
-final Map<String, List<CustomCheckbox>> checkboxesBySelection = {
+/*final Map<String, List<CustomCheckbox>> checkboxesBySelection = {
   '1': checkboxesInicial(true),
   '2': checkboxesInicial(false),
-};
+};*/
 
-class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
+  // 🔹 Checkboxes iniciales desmarcados
+  Map<String, List<CustomCheckbox>> checkboxesBySelection = {};
+
+
+class Paso1TabState extends ConsumerState<Paso1Tab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -202,10 +206,55 @@ class Paso1TabState extends State<Paso1Tab> with AutomaticKeepAliveClientMixin {
     }
   }
 
+
+  
+
+  // 🔹 Inicializar todo el formulario
+  void resetForm() {
+    setState(() {
+      selectedTipoTramite = null;
+      selectedTipoSolicitante = null;
+      selectedTipoDocumento = null;
+      selectedPais = null;
+      selectedDept = null;
+      selectedCiudad = null;
+
+      numeroDocumentoController.clear();
+      nombreObtenido.clear();
+      apellidoObtenido.clear();
+      correoController.clear();
+      direccionController.clear();
+      numeroTelefonoFijoController.clear();
+      numeroTelefonoCelularController.clear();
+      documentoRepresentanteController.clear();
+      nombreRepresentanteObtenido.clear();
+      apellidoRepresentanteObtenido.clear();
+
+      // 🔹 Checkboxes desmarcados
+      checkboxesBySelection = {
+        '1': checkboxesInicial(true).map((c) => CustomCheckbox(fragments: c.fragments, value: false)).toList(),
+        '2': checkboxesInicial(false).map((c) => CustomCheckbox(fragments: c.fragments, value: false)).toList(),
+      };
+
+      // 🔹 Inicializar provider si hay tipo seleccionado
+      if (selectedTipoTramite != null) {
+        final options = getFreshCheckboxes(selectedTipoTramite!.id!);
+        ref.read(formProvider.notifier).updateDropdown(selectedTipoTramite!.id!, options);
+      }
+    });
+  }
+
+  // 🔹 Obtener checkboxes frescos desmarcados
+  List<CustomCheckbox> getFreshCheckboxes(String tipoId) {
+    final base = checkboxesBySelection[tipoId] ?? [];
+    return base.map((c) => CustomCheckbox(fragments: c.fragments, value: false)).toList();
+  }
+
   @override
   void initState() {
     super.initState();
     //_fetchDepartamentos();
+    resetForm();
 
     _focusNode.addListener(() {
       if (selectedTipoDocumento?.id == null) return;
