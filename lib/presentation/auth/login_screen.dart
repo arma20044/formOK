@@ -38,23 +38,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final loginFormKey = GlobalKey<FormState>();
 
   @override
-  void dispose() {
-    numeroController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
-
-  bool passwordInvisible = true;
-
-  final List<ModalModel> listaTipoSolicitante = dataTipoSolicitanteArray;
-
-  ModalModel? selectedTipoSolicitante;
-
-  @override
-  Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-    final isLoading = authState.isLoading;
-
+  void initState() {
+    super.initState();
     ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
       next.when(
         data: (authData) {
@@ -76,6 +61,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         loading: () {},
       );
     });
+  }
+
+  @override
+  void dispose() {
+    numeroController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  bool passwordInvisible = true;
+
+  final List<ModalModel> listaTipoSolicitante = dataTipoSolicitanteArray;
+
+  ModalModel? selectedTipoSolicitante;
+
+  @override
+  Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final isLoading = authState.isLoading;
 
     return Scaffold(
       endDrawer: CustomDrawer(),
@@ -103,11 +107,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           .toList(),
                       onChanged: isLoading
                           ? null
-                          : (value)  {
-                            setState(() => selectedTipoDocumento = value);
-                            numeroController.text = "";
-                          },
-                                
+                          : (value) {
+                              setState(() => selectedTipoDocumento = value);
+                              numeroController.text = "";
+                            },
+
                       validator: (value) => value == null
                           ? 'Seleccione un tipo de documento'
                           : null,
@@ -162,8 +166,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             controller:
                                 documentoIdentificacionRepresentanteController,
                             decoration: const InputDecoration(
-                              labelText:
-                                  'Número de CI, del Representante',
+                              labelText: 'Número de CI, del Representante',
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -216,8 +219,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         numeroController.text.trim(),
                                         passwordController.text.trim(),
                                         selectedTipoDocumento!.id,
-                                        selectedTipoSolicitante != null && selectedTipoSolicitante?.id != null ? selectedTipoSolicitante!.id! : "",
-                                        documentoIdentificacionRepresentanteController.text.trim(),
+                                        selectedTipoSolicitante != null &&
+                                                selectedTipoSolicitante?.id !=
+                                                    null
+                                            ? selectedTipoSolicitante!.id!
+                                            : "",
+                                        documentoIdentificacionRepresentanteController
+                                            .text
+                                            .trim(),
                                         false,
                                       );
                                 }

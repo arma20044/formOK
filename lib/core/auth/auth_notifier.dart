@@ -13,31 +13,63 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
   late final AuthRepository _authRepository = ref.read(authRepositoryProvider);
   static const _userKey = 'user_data';
   final _storage = const FlutterSecureStorage();
+  bool _autoLoginDone = false;
 
   @override
   Future<AuthStateData> build() async {
-    // Estado inicial: cargando
-    //state = const AsyncLoading();
+    // Solo devuelve estado inicial
+    final initial = const AuthStateData(state: AuthState.unauthenticated);
 
+    // Llamar login automático **una sola vez** aquí
+    if (!_autoLoginDone) {
+      _autoLoginDone = true;
+      _attemptLoginAutoFromStorage();
+    }
+
+    return initial;
+  }
+
+
+    Future<void> _attemptLoginAutoFromStorage() async {
     try {
-      String? datosSesion = await _storage.read(key: _userKey);
-
+      final datosSesion = await _storage.read(key: _userKey);
       if (datosSesion != null) {
         final datosJson = json.decode(datosSesion);
         final datosUser = DatosUser.fromJson(datosJson);
 
         final user = await _attemptLoginAuto(datosUser);
         if (user != null) {
-          return AuthStateData(state: AuthState.authenticated, user: user);
+          state = AsyncData(AuthStateData(state: AuthState.authenticated, user: user));
+        }
+      }
+    } catch (_) {
+      state = const AsyncData(AuthStateData(state: AuthState.unauthenticated));
+    }
+  }
+
+  Future<void> attemptAutoLogin() async {
+    if (_autoLoginDone) return; // ✅ evita múltiples llamadas
+    _autoLoginDone = true;
+
+    try {
+      String? datosSesion = await _storage.read(key: _userKey);
+      if (datosSesion != null) {
+        final datosJson = json.decode(datosSesion);
+        final datosUser = DatosUser.fromJson(datosJson);
+
+        final user = await _attemptLoginAuto(datosUser);
+        if (user != null) {
+          state = AsyncData(AuthStateData(state: AuthState.authenticated, user: user));
+          return;
         }
       }
 
-      // Si no hay datos o login automático falla
-      return const AuthStateData(state: AuthState.unauthenticated);
+      state = const AsyncData(AuthStateData(state: AuthState.unauthenticated));
     } catch (_) {
-      return const AuthStateData(state: AuthState.unauthenticated);
+      state = const AsyncData(AuthStateData(state: AuthState.unauthenticated));
     }
   }
+
 
   // Login automático sin tocar state
   Future<UserModel?> _attemptLoginAuto(DatosUser datos) async {

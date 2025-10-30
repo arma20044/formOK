@@ -69,6 +69,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // 🔹 Usuario logueado e intenta ir a login → redirigir a home
       if (isLoggedIn && loggingIn) return '/';
 
+      if(isLoggedIn && state.uri.path == '/splash') return '/';
+
       // 🔹 No cambiar ruta
       return null;
     },
