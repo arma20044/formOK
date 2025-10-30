@@ -103,8 +103,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           .toList(),
                       onChanged: isLoading
                           ? null
-                          : (value) =>
-                                setState(() => selectedTipoDocumento = value),
+                          : (value)  {
+                            setState(() => selectedTipoDocumento = value);
+                            numeroController.text = "";
+                          },
+                                
                       validator: (value) => value == null
                           ? 'Seleccione un tipo de documento'
                           : null,
@@ -139,7 +142,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 : null,
                             onChanged: (val) => setState(() {
                               selectedTipoSolicitante = val;
-                              numeroController.text = "";
+                              //numeroController.text = "";
                             }),
                           ),
                         ],
@@ -213,8 +216,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         numeroController.text.trim(),
                                         passwordController.text.trim(),
                                         selectedTipoDocumento!.id,
-                                        documentoIdentificacionRepresentanteController.text.trim(),
                                         selectedTipoSolicitante != null && selectedTipoSolicitante?.id != null ? selectedTipoSolicitante!.id! : "",
+                                        documentoIdentificacionRepresentanteController.text.trim(),
                                         false,
                                       );
                                 }

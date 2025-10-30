@@ -25,8 +25,6 @@ class MiAndeApi {
         onRequest: (options, handler) {
           final formData = options.data as FormData;
 
-         
-
           // Agregamos clientKey
           formData.fields.add(
             MapEntry(
@@ -39,6 +37,20 @@ class MiAndeApi {
             '➡️ [${Environment.name}] Petición: ${options.method} ${options.uri}',
           );
           print('Datos enviados: ${options.data}');
+
+          if (options.data is FormData) {
+            final formData = options.data as FormData;
+            print('Datos enviados (FormData):');
+            for (var field in formData.fields) {
+              print('  ${field.key}: ${field.value}');
+            }
+            for (var file in formData.files) {
+              print('  Archivo: ${file.key} -> ${file.value.filename}');
+            }
+          } else {
+            print('Datos enviados: ${options.data}');
+          }
+
           return handler.next(options);
         },
         onResponse: (response, handler) {

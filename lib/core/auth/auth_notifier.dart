@@ -72,7 +72,7 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         numeroDocumento,
         password,
         tipoDocumento,
-        tipoSolicitante,
+        Uri.encodeComponent(tipoSolicitante),
         cedulaSolicitante,
         
       );
@@ -91,8 +91,8 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         numeroDocumento: numeroDocumento,
         tipoDocumento: tipoDocumento,
         password: password,
-        cedulaRepresentante: '',
-        tipoSolicitante: '',
+        cedulaRepresentante: cedulaSolicitante,
+        tipoSolicitante: tipoSolicitante,
         token: response.token!,
         correo: response.resultado!.correo!,
         direccion: response.resultado!.direccion!,
@@ -159,6 +159,7 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     final updatedUser = user.copyWith(
       password: nuevoPassword,
       modificarPassword: 'N',
+
     );
 
     // Guardar en el almacenamiento seguro
