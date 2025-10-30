@@ -6,6 +6,7 @@ import 'package:form/presentation/components/widgets/media/MediaPickerButton.dar
 import 'package:form/presentation/components/widgets/media/MediaPreview.dart';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 /// Componente reutilizable para seleccionar imagen o video
@@ -98,7 +99,24 @@ class _MediaPickerState extends State<_MediaPicker>
       _videoThumbnail = null;
     }
 
-    widget.onChanged(ArchivoAdjunto(file: file, info: {}));
+ final size = await pickedFile.length(); // int
+    final lastMod = await pickedFile.lastModified(); // DateTime
+    final lastModifiedStr = lastMod.toIso8601String(); // String o null
+
+    final mimeType = lookupMimeType(file.path) ?? 'application/octet-stream';
+
+    final archivo = ArchivoAdjunto(
+      file: file,
+      info: {
+        'origen': 'A',
+        'name': pickedFile.name,
+        'type': mimeType,
+        'size': size,
+        'lastModified': lastModifiedStr,
+      },
+    );
+
+    widget.onChanged(archivo);
     setState(() {});
   }
 

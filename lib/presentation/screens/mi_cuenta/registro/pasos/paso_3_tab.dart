@@ -20,8 +20,8 @@ class Paso3TabState extends State<Paso3Tab> with AutomaticKeepAliveClientMixin {
 
     Map<String, dynamic> getFormData() {
     return {
-      "archivo1": _archivoSeleccionado1?.file.path,
-      "archivo2": _archivoSeleccionado2?.file.path,
+      "archivo1": _archivoSeleccionado1,
+      "archivo2": _archivoSeleccionado2,
     };
   }
 

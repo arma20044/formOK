@@ -147,6 +147,8 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           tipoVerificacion: datosPaso2['tipoVerificacion'] ?? '',
           solicitudOTP: solicitarOTP ? 'S' : 'N',
           codigoOTP: codigoOTPObtenido.toString(),
+          ci1: datosPaso3?["archivo1"],
+          fotoPersonal1: datosPaso3?["archivo2"],
         );
     return miCuentaRegistroResponse;
   }
