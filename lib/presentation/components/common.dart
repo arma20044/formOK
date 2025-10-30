@@ -1,0 +1,1 @@
+export '../components/common/custom_text.dart';
