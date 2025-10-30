@@ -40,27 +40,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
-      next.when(
-        data: (authData) {
-          if (!mounted) return;
-          if (authData.state == AuthState.authenticated) {
-            context.go('/'); // navegar solo cuando autenticado
-          } else if (authData.state == AuthState.error) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Login fallido')));
-          }
-        },
-        error: (err, stack) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error inesperado: $err')));
-        },
-        loading: () {},
-      );
-    });
   }
 
   @override
@@ -75,11 +54,59 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final List<ModalModel> listaTipoSolicitante = dataTipoSolicitanteArray;
 
   ModalModel? selectedTipoSolicitante;
+  bool _listenerAttached = false;
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final isLoading = authState.isLoading;
+
+    // 🔹 Navegación inmediata si ya autenticado
+    authState.whenOrNull(
+      data: (authData) {
+        if (!mounted) return;
+
+        if (authData.state == AuthState.authenticated) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            GoRouter.of(context).go('/'); // navega al home
+          });
+        }
+      },
+    );
+
+    // 🔹 Adjuntar listener una sola vez
+    if (!_listenerAttached) {
+      ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
+        next.when(
+          data: (authData) {
+            if (!mounted) return;
+
+            // Navegación post-frame
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              if (authData.state == AuthState.authenticated) {
+                GoRouter.of(context).go('/'); // Login correcto → Home
+              } else if (authData.state == AuthState.error) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Login fallido')));
+              }
+            });
+          },
+          error: (err, stack) {
+            if (!mounted) return;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Error inesperado: $err')));
+            });
+          },
+          loading: () {},
+        );
+      });
+      _listenerAttached = true;
+    }
 
     return Scaffold(
       endDrawer: CustomDrawer(),
