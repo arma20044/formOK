@@ -6,7 +6,6 @@ import '../core/api/mi_ande_api.dart';
 
 import '../datasources/Login_datasource.dart';
 
-
 class LoginDatasourceImpl extends LoginDatasource {
   late final Dio dio;
 
@@ -21,16 +20,17 @@ class LoginDatasourceImpl extends LoginDatasource {
     String tipoDocumento,
     String tipoSolicitante,
     String documentoSolicitante,
-    
   ) async {
     var data = FormData.fromMap({
-      
       'tipoDocumento': tipoDocumento,
       'password': password,
       'documentoIdentificacion': username,
-      'cedulaRepresentante': documentoSolicitante.isEmpty ? 'lteor': documentoSolicitante,
-      'tipoSolicitante': tipoSolicitante.isEmpty ? 'Sin registros' : tipoSolicitante,
-
+      'cedulaRepresentante': documentoSolicitante.isEmpty
+          ? 'lteor'
+          : documentoSolicitante,
+      'tipoSolicitante': tipoSolicitante.isEmpty
+          ? 'Sin registros'
+          : tipoSolicitante,
     });
 
     final response = await dio.post(
@@ -46,11 +46,10 @@ class LoginDatasourceImpl extends LoginDatasource {
     if (response.statusCode == 200) {
       //final List<dynamic> rawList = response.data;
       //return rawList.map((json) => Login.fromJson(json)).toList();
-     // return rawList.map((json) => Login.fromJson(json)).first;
-   final loginResponse = Login.fromJson(response.data);
+      // return rawList.map((json) => Login.fromJson(json)).first;
+      final loginResponse = Login.fromJson(response.data);
 
-   return loginResponse;
-
+      return loginResponse;
     } else {
       throw Exception('Error ${response.statusCode}');
     }

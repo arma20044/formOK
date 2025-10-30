@@ -71,17 +71,14 @@ class _ConfiguracionTabState extends ConsumerState<ConfiguracionTab>
   Widget build(BuildContext context) {
     super.build(context);
 
-    final authState = ref.watch(authProvider);
+
 
     // Get the full screen size
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
     final double screenHeight = screenSize.height;
 
-    SuministrosList? selectedNIS;
-
-    final List<SuministrosList?>? dropDownItemsSuministro =
-        authState.value?.user?.userDatosAnexos;
+  final authState = ref.watch(authProvider);
 
     return Scaffold(
       body: Padding(
@@ -89,25 +86,7 @@ class _ConfiguracionTabState extends ConsumerState<ConfiguracionTab>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Suministro Seleccionado:'),
-            DropdownButtonFormField<SuministrosList>(
-              initialValue: selectedNIS,
-              hint: const Text("Seleccionar NIS"),
-              items: dropDownItemsSuministro!
-                  .map(
-                    (item) => DropdownMenuItem(
-                      value: item,
-                      child: Text('NIS: ${item!.nisRad.toString()}'),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (value) {
-                //setState(() => selectedTipoDocumento = value);
-                // numeroController.text = "";
-              },
-
-              validator: (value) => value == null ? 'Seleccione un NIS' : null,
-            ),
+            
             CustomText(
               "Bloquear Suministro ${_isSwitched}",
               fontWeight: FontWeight.bold,

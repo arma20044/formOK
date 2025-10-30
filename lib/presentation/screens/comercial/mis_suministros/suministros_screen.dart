@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/model/login_model.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/screens/comercial/mis_suministros/tabs/configuracion_tab.dart';
 import 'package:form/presentation/screens/comercial/mis_suministros/tabs/facturas_tab.dart';
@@ -6,14 +9,14 @@ import 'package:form/presentation/screens/comercial/mis_suministros/tabs/histori
 import 'package:form/presentation/screens/comercial/mis_suministros/tabs/lectura_tab.dart';
 import 'package:form/presentation/screens/comercial/mis_suministros/tabs/mensajes_tab.dart';
 
-class SuministrosScreen extends StatefulWidget {
+class SuministrosScreen extends ConsumerStatefulWidget {
   const SuministrosScreen({super.key});
 
   @override
-  State<SuministrosScreen> createState() => _SuministrosScreenState();
+  ConsumerState<SuministrosScreen> createState() => _SuministrosScreenState();
 }
 
-class _SuministrosScreenState extends State<SuministrosScreen>
+class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _formKey = GlobalKey<FormState>();
@@ -40,7 +43,8 @@ class _SuministrosScreenState extends State<SuministrosScreen>
       setState(() {
         _showLeftArrow = _scrollController.offset > 0;
         _showRightArrow =
-            _scrollController.offset < _scrollController.position.maxScrollExtent;
+            _scrollController.offset <
+            _scrollController.position.maxScrollExtent;
       });
     });
   }
@@ -76,96 +80,136 @@ class _SuministrosScreenState extends State<SuministrosScreen>
     );
   }
 
+  SuministrosList? selectedNIS;
+
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
+    final List<SuministrosList?>? dropDownItemsSuministro =
+        authState.value?.user?.userDatosAnexos;
+
     return Scaffold(
       endDrawer: CustomDrawer(),
       appBar: AppBar(
         title: const Text("Mis Suministros"),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(50),
-          child: Stack(
-            children: [
-              SingleChildScrollView(
-                controller: _scrollController,
-                scrollDirection: Axis.horizontal,
-                child: TabBar(
-                  isScrollable: true,
-                  controller: _tabController,
-                  labelStyle: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.bold),
-                  unselectedLabelStyle: const TextStyle(fontSize: 12),
-                  tabs: tabs
-                      .map(
-                        (t) => Tab(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(t),
+          child: SizedBox(
+            height: 200,
+            child: Column(
+              children: [
+                Stack(
+                  children: [
+                    Text('Suministro Seleccionado:'),
+                    DropdownButtonFormField<SuministrosList>(
+                      initialValue: selectedNIS,
+                      hint: const Text("Seleccionar NIS"),
+                      items: dropDownItemsSuministro!
+                          .map(
+                            (item) => DropdownMenuItem(
+                              value: item,
+                              child: Text('NIS: ${item!.nisRad.toString()}'),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        //setState(() => selectedTipoDocumento = value);
+                        // numeroController.text = "";
+                      },
+
+                      validator: (value) =>
+                          value == null ? 'Seleccione un NIS' : null,
+                    ),
+                    SingleChildScrollView(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      child: Column(
+                        children: [
+                          TabBar(
+                            isScrollable: true,
+                            controller: _tabController,
+                            labelStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            unselectedLabelStyle: const TextStyle(fontSize: 12),
+                            tabs: tabs
+                                .map(
+                                  (t) => Tab(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(t),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Flecha izquierda
+                    if (_showLeftArrow)
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: GestureDetector(
+                          onTap: _scrollLeft,
+                          child: Container(
+                            width: 20,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white,
+                                  Colors.white.withOpacity(0.8),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back_ios,
+                              size: 14,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
-                      )
-                      .toList(),
-                ),
-              ),
-              // Flecha izquierda
-              if (_showLeftArrow)
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: GestureDetector(
-                    onTap: _scrollLeft,
-                    child: Container(
-                      width: 20,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white,
-                            Colors.white.withOpacity(0.8),
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
+                      ),
+                    // Flecha derecha
+                    if (_showRightArrow)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: GestureDetector(
+                          onTap: _scrollRight,
+                          child: Container(
+                            width: 20,
+                            decoration: BoxDecoration(
+                              //borderRadius: BorderRadius.horizontal(),
+                              //borderRadius: BorderRadiusDirectional.circular(10),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white,
+                                  Colors.white.withOpacity(0.8),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ),
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_ios,
-                        size: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-              // Flecha derecha
-              if (_showRightArrow)
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: GestureDetector(
-                    onTap: _scrollRight,
-                    child: Container(
-                      width: 20,
-                      decoration: BoxDecoration(
-                        //borderRadius: BorderRadius.horizontal(),
-                        //borderRadius: BorderRadiusDirectional.circular(10),
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white,
-                            Colors.white.withOpacity(0.8),
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
