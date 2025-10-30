@@ -1,3 +1,5 @@
+import 'package:form/model/login_model.dart';
+
 class UserModel {
   final String nombre;
   final String apellido;
@@ -15,8 +17,9 @@ class UserModel {
   final String telefonoCelular;
   final String tipoCliente;
   final String modificarPassword;
+  List<SuministrosList?>? userDatosAnexos;
 
-  factory UserModel.empty() => const UserModel(
+  factory UserModel.empty() =>  UserModel(
     nombre: '',
     apellido: '',
     numeroDocumento: '',
@@ -31,10 +34,10 @@ class UserModel {
     departamento: '',
     telefonoCelular: '',
     tipoCliente: '', ciudad: '',
-    modificarPassword: ''
+    modificarPassword: '',    
   );
 
-  const UserModel({
+   UserModel({
     required this.correo,
     required this.direccion,
     required this.pais,
@@ -50,7 +53,8 @@ class UserModel {
     required this.cedulaRepresentante,
     required this.tipoSolicitante,
     required this.token,
-    required this.modificarPassword
+    required this.modificarPassword,
+    this.userDatosAnexos
   });
 
   Map<String, dynamic> toMap() => {
@@ -69,7 +73,8 @@ class UserModel {
     'cuidad': ciudad,
     'telefonoCelular': telefonoCelular,
     'tipoCliente': tipoCliente,
-    'modificarPassword':modificarPassword
+    'modificarPassword':modificarPassword,
+    'userDatosAnexos':userDatosAnexos
   };
 
   factory UserModel.fromMap(Map<String, dynamic> map) => UserModel(
@@ -88,7 +93,8 @@ class UserModel {
     ciudad: map['ciudad'],
     telefonoCelular: map['telefonoCelular'],
     tipoCliente: map['tipoCliente'],
-    modificarPassword:map['modificarPassword']
+    modificarPassword:map['modificarPassword'],
+    userDatosAnexos:map['userDatosAnexos']
   );
 
 
@@ -114,7 +120,8 @@ class UserModel {
       ciudad: ciudad,
       telefonoCelular: telefonoCelular,
       tipoCliente: tipoCliente,
-      modificarPassword:modificarPassword ?? this.modificarPassword
+      modificarPassword:modificarPassword ?? this.modificarPassword,
+      userDatosAnexos:userDatosAnexos
     );
   
 }

@@ -6,3 +6,4 @@ export 'consulta_documento_repository_impl.dart';
 export 'mi_cuenta_registro_repository_impl.dart';
 export 'olvido_contrasenha_repository_impl.dart';
 export 'cambio_contrasenha_repository_impl.dart';
+export 'bloqueo_suministro_repository_impl.dart';

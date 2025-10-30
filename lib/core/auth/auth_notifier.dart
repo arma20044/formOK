@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:form/core/auth/auth_repository.dart';
 import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/core/auth/model/user_model.dart';
+import 'package:form/model/login_model.dart';
 import 'package:form/model/storage/userDatos.dart';
 import 'model/auth_state.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthStateData> {
   late final AuthRepository _authRepository = ref.read(authRepositoryProvider);
   static const _userKey = 'user_data';
+  static const _userDatosAnexos = 'user_datos_anexos';
   final _storage = const FlutterSecureStorage();
   bool _autoLoginDone = false;
 
@@ -134,12 +136,17 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         telefonoCelular: response.resultado!.telefonoCelular!,
         tipoCliente: response.resultado!.tipoCliente!,
         modificarPassword: response.resultado!.modificarPassword!,
+        userDatosAnexos: response.resultado?.suministrosList,
       );
+
+      final List<SuministrosList?>? datosAnexos = response.resultado?.suministrosList;
+
+      await _storage.write(key: _userDatosAnexos, value: jsonEncode(datosAnexos));
 
       await _storage.write(key: _userKey, value: jsonEncode(user.toMap()));
 
       state = AsyncData(
-        AuthStateData(state: AuthState.authenticated, user: user),
+        AuthStateData(state: AuthState.authenticated, user: user, userDatosAnexos: datosAnexos),
       );
       if (!loginSilencioso) {
         _showToast("Inicio de Sesión Exitosa", true);

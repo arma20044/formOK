@@ -8,3 +8,4 @@ export 'consulta_documento_repository.dart';
 export 'mi_cuenta_registro_repository.dart';
 export 'olvido_contrasenha_repository.dart';
 export 'cambio_contrasenha_repository.dart';
+export 'bloqueo_suministro_repository.dart';
