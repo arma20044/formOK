@@ -14,7 +14,7 @@ class CustomDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-     final themeNotifier = ref.watch(themeNotifierProvider.notifier);
+    final themeNotifier = ref.watch(themeNotifierProvider.notifier);
     final themeState = ref.watch(themeNotifierProvider);
 
     Future<void> _launchUrl(String key) async {
@@ -34,17 +34,19 @@ class CustomDrawer extends ConsumerWidget {
         padding: EdgeInsets.zero,
         children: [
           // Header separado
-          const AuthHeaderSection(),
+          SizedBox(
+            height: 180,
+            child: const AuthHeaderSection()),
 
           // Login / Logout
           const AuthDrawerSection(),
 
-         
-
           // Modo Oscuro
           ListTile(
             leading: const Icon(Icons.contrast),
-            title: themeState.value!.isDarkMode ? Text('Modo Claro') : Text("Modo Oscuro"),
+            title: themeState.value!.isDarkMode
+                ? Text('Modo Claro')
+                : Text("Modo Oscuro"),
             onTap: () {
               Navigator.pop(context);
               themeNotifier.toggleDarkMode();
@@ -74,7 +76,7 @@ class CustomDrawer extends ConsumerWidget {
               _launchUrl("POLITICAS_PRIVACIDAD");
             },
           ),
-
+          const Divider(),
           // Redes sociales
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -82,23 +84,35 @@ class CustomDrawer extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.youtube,
-                      color: Colors.red, size: 50),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.youtube,
+                    color: Colors.red,
+                    size: 50,
+                  ),
                   onPressed: () => _launchUrl("YOUTUBE_URL"),
                 ),
                 IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.facebook,
-                      color: Colors.blue, size: 50),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.facebook,
+                    color: Colors.blue,
+                    size: 50,
+                  ),
                   onPressed: () => _launchUrl("FACEBOOK_URL"),
                 ),
                 IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.xTwitter,
-                      color: Colors.black, size: 50),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.xTwitter,
+                    color: Colors.black,
+                    size: 50,
+                  ),
                   onPressed: () => _launchUrl("X_URL"),
                 ),
                 IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.instagram,
-                      color: Colors.orange, size: 50),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.instagram,
+                    color: Colors.orange,
+                    size: 50,
+                  ),
                   onPressed: () => _launchUrl('INSTAGRAM_URL'),
                 ),
               ],

@@ -53,6 +53,8 @@ class AuthDrawerSection extends ConsumerWidget {
                   await ref.read(authProvider.notifier).logout();
                 },
               ),
+              const Divider(),
+             
             ],
           );
         } else {
@@ -72,7 +74,7 @@ class AuthDrawerSection extends ConsumerWidget {
                 path: '/registroMiCuenta',
                 currentPath: currentPath,
               ),
-              const Divider(),
+               const Divider(),
             ],
           );
         }
