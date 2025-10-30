@@ -28,7 +28,7 @@ class AuthDrawerSection extends ConsumerWidget {
                 context,
                 icon: Icons.electric_meter_outlined,
                 title: 'Suministros',
-                path: '/suministros',
+                path:   '/suministros',                 
                 currentPath: currentPath,
               ),
               _drawerItem(

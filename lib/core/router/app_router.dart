@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/presentation/screens/comercial/mis_suministros/suministros_screen.dart';
 import 'package:form/presentation/screens/expedientes/expedientes_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/cambio_contrasenha/cambio_constrasenha_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/mis_datos_screen.dart';
@@ -47,6 +48,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/consultaFacturas', builder: (context, state) => const ConsultaFacturasScreen()),
       GoRoute(path: '/olvidoContrasenha', builder: (context, state) => const OlvidoContrasenhaScreen()),
       GoRoute(path: '/cambioContrasenha', builder: (context, state) => const CambioContrasenhaScreen()),
+      GoRoute(path: '/suministros', builder: (context, state) => const SuministrosScreen()),
     ],
     redirect: (context, state) {
       final authState = ref.read(authProvider);
