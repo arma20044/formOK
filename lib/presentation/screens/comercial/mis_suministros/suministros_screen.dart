@@ -18,9 +18,12 @@ class SuministrosScreen extends ConsumerStatefulWidget {
 
 class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> configuracionKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
+  final _formKey = GlobalKey<FormState>();
+
+  late TabController _tabController;
+
   final List<String> tabs = [
     "Facturas",
     "Histórico",
@@ -31,8 +34,11 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
 
   bool _showLeftArrow = false;
   bool _showRightArrow = true;
+  final double _scrollAmount = 100;
 
-  final double _scrollAmount = 100; // Cantidad de scroll al tocar flecha
+  SuministrosList? selectedNIS;
+  String? _token;
+  bool _hasFetched = false; // Para controlar fetch único
 
   @override
   void initState() {
@@ -47,6 +53,11 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
             _scrollController.position.maxScrollExtent;
       });
     });
+  }
+
+  void fetchDatos(String token) {
+    // Aquí tu lógica de fetch
+    print('Fetch con token: $token');
   }
 
   @override
@@ -80,75 +91,90 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
     );
   }
 
-  SuministrosList? selectedNIS;
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-
     final List<SuministrosList?>? dropDownItemsSuministro =
         authState.value?.user?.userDatosAnexos;
 
+    final token = authState.value?.user?.token;
+
+    // Actualizar _token y selectedNIS solo si cambian
+    if (token != null && _token != token) {
+      _token = token;
+
+      // Opcional: fetch automático la primera vez que llega token
+      if (!_hasFetched) {
+        _hasFetched = true;
+        fetchDatos(_token!);
+      }
+    }
+
+    if (dropDownItemsSuministro != null &&
+        selectedNIS == null &&
+        dropDownItemsSuministro.isNotEmpty) {
+      selectedNIS = dropDownItemsSuministro.first;
+    }
+
     return Scaffold(
-      endDrawer: CustomDrawer(),
+      endDrawer: const CustomDrawer(),
       appBar: AppBar(
         title: const Text("Mis Suministros"),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: SizedBox(
-            height: 200,
+          preferredSize: const Size.fromHeight(130),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text('Suministro Seleccionado:'),
+                const SizedBox(height: 4),
+                DropdownButtonFormField<SuministrosList>(
+                  value: selectedNIS,
+                  hint: const Text("Seleccionar NIS"),
+                  items: (dropDownItemsSuministro ?? [])
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item,
+                          child: Text('NIS: ${item?.nisRad ?? ""}'),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() => selectedNIS = value);
+                  },
+                  validator: (value) =>
+                      value == null ? 'Seleccione un NIS' : null,
+                ),
+                const SizedBox(height: 10),
                 Stack(
                   children: [
-                    Text('Suministro Seleccionado:'),
-                    DropdownButtonFormField<SuministrosList>(
-                      initialValue: selectedNIS,
-                      hint: const Text("Seleccionar NIS"),
-                      items: dropDownItemsSuministro!
-                          .map(
-                            (item) => DropdownMenuItem(
-                              value: item,
-                              child: Text('NIS: ${item!.nisRad.toString()}'),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        //setState(() => selectedTipoDocumento = value);
-                        // numeroController.text = "";
-                      },
-
-                      validator: (value) =>
-                          value == null ? 'Seleccione un NIS' : null,
-                    ),
                     SingleChildScrollView(
                       controller: _scrollController,
                       scrollDirection: Axis.horizontal,
-                      child: Column(
-                        children: [
-                          TabBar(
-                            isScrollable: true,
-                            controller: _tabController,
-                            labelStyle: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            unselectedLabelStyle: const TextStyle(fontSize: 12),
-                            tabs: tabs
-                                .map(
-                                  (t) => Tab(
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(t),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ],
+                      child: TabBar(
+                        isScrollable: true,
+                        controller: _tabController,
+                        labelStyle: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        unselectedLabelStyle: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                        tabs: tabs
+                            .map(
+                              (t) => Tab(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(t),
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
-                    // Flecha izquierda
                     if (_showLeftArrow)
                       Positioned(
                         left: 0,
@@ -176,7 +202,6 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
                           ),
                         ),
                       ),
-                    // Flecha derecha
                     if (_showRightArrow)
                       Positioned(
                         right: 0,
@@ -187,8 +212,6 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
                           child: Container(
                             width: 20,
                             decoration: BoxDecoration(
-                              //borderRadius: BorderRadius.horizontal(),
-                              //borderRadius: BorderRadiusDirectional.circular(10),
                               gradient: LinearGradient(
                                 colors: [
                                   Colors.white,
@@ -219,12 +242,15 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
           child: TabBarView(
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
-            children: const [
-              FacturasTab(),
-              HistoricoTab(),
-              MensajesTab(),
-              LecturaTab(),
-              ConfiguracionTab(),
+            children: [
+              const FacturasTab(),
+              const HistoricoTab(),
+              const MensajesTab(),
+              const LecturaTab(),
+              if (selectedNIS != null && _token != null)
+                ConfiguracionTab(key: configuracionKey, selectedNIS!, _token!)
+              else
+                const Center(child: CircularProgressIndicator()),
             ],
           ),
         ),

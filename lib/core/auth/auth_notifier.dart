@@ -16,6 +16,7 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
   static const _userDatosAnexos = 'user_datos_anexos';
   final _storage = const FlutterSecureStorage();
   bool _autoLoginDone = false;
+  static const _indicadorBloqueo = 'user_indicador_bloqueo';
 
   @override
   Future<AuthStateData> build() async {
@@ -31,8 +32,7 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     return initial;
   }
 
-
-    Future<void> _attemptLoginAutoFromStorage() async {
+  Future<void> _attemptLoginAutoFromStorage() async {
     try {
       final datosSesion = await _storage.read(key: _userKey);
       if (datosSesion != null) {
@@ -41,7 +41,9 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
 
         final user = await _attemptLoginAuto(datosUser);
         if (user != null) {
-          state = AsyncData(AuthStateData(state: AuthState.authenticated, user: user));
+          state = AsyncData(
+            AuthStateData(state: AuthState.authenticated, user: user),
+          );
         }
       }
     } catch (_) {
@@ -61,7 +63,9 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
 
         final user = await _attemptLoginAuto(datosUser);
         if (user != null) {
-          state = AsyncData(AuthStateData(state: AuthState.authenticated, user: user));
+          state = AsyncData(
+            AuthStateData(state: AuthState.authenticated, user: user),
+          );
           return;
         }
       }
@@ -71,7 +75,6 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
       state = const AsyncData(AuthStateData(state: AuthState.unauthenticated));
     }
   }
-
 
   // Login automático sin tocar state
   Future<UserModel?> _attemptLoginAuto(DatosUser datos) async {
@@ -108,7 +111,6 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         tipoDocumento,
         Uri.encodeComponent(tipoSolicitante),
         cedulaSolicitante,
-        
       );
 
       if (response.error) {
@@ -139,14 +141,22 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         userDatosAnexos: response.resultado?.suministrosList,
       );
 
-      final List<SuministrosList?>? datosAnexos = response.resultado?.suministrosList;
+      final List<SuministrosList?>? datosAnexos =
+          response.resultado?.suministrosList;
 
-      await _storage.write(key: _userDatosAnexos, value: jsonEncode(datosAnexos));
+      await _storage.write(
+        key: _userDatosAnexos,
+        value: jsonEncode(datosAnexos),
+      );
 
       await _storage.write(key: _userKey, value: jsonEncode(user.toMap()));
 
       state = AsyncData(
-        AuthStateData(state: AuthState.authenticated, user: user, userDatosAnexos: datosAnexos),
+        AuthStateData(
+          state: AuthState.authenticated,
+          user: user,
+          userDatosAnexos: datosAnexos,
+        ),
       );
       if (!loginSilencioso) {
         _showToast("Inicio de Sesión Exitosa", true);
@@ -198,7 +208,6 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     final updatedUser = user.copyWith(
       password: nuevoPassword,
       modificarPassword: 'N',
-
     );
 
     // Guardar en el almacenamiento seguro
@@ -207,6 +216,24 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     // Actualizar el estado global
     state = AsyncData(
       AuthStateData(state: AuthState.authenticated, user: updatedUser),
+    );
+  }
+
+  Future<void> actualizarIndicadorBloqueoNIS(bool indicadorBloqueoNIS) async {
+    final currentState = state.value;
+    if (currentState == null || currentState.user == null) return;
+
+    //en el state y storage
+    await _storage.write(
+      key: _indicadorBloqueo,
+      value: jsonEncode(indicadorBloqueoNIS),
+    );
+
+    state = AsyncData(
+      AuthStateData(
+        state: currentState.state,
+        indicadorBloqueoNIS: indicadorBloqueoNIS,
+      ),
     );
   }
 }

@@ -12,11 +12,13 @@ class BloqueoSuministroRepositoryImpl extends BloqueoSuministroRepository {
   @override
   Future<BloqueoSuministroResponse> getBloqueoSuministro(
     String nis,
-    num indicadorBloqueo
+    num indicadorBloqueo,
+    String token
   ) {
     return datasource.getBloqueoSuministro(
       nis,
-      indicadorBloqueo
+      indicadorBloqueo,
+      token
     );
   }
 }

@@ -9,6 +9,9 @@ import 'package:form/provider/theme_provider.dart';
 
 import 'presentation/components/menu/menu_data.dart';
 
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
+
 void main() {
   runApp(ProviderScope(child: MyApp()));
 }
@@ -24,6 +27,7 @@ class MyApp extends ConsumerWidget {
     return themeStateAsync.when(
       data: (themeState) {
         return MaterialApp.router(
+           scaffoldMessengerKey: rootScaffoldMessengerKey,
           theme: AppTheme(selectedColor: themeState.selectedColor, isDarkMode: false).getTheme(),
           darkTheme: AppTheme(selectedColor: themeState.selectedColor, isDarkMode: true).getTheme(),
           themeMode: themeState.isDarkMode ? ThemeMode.dark : ThemeMode.light,

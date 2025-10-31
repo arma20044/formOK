@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:form/core/errors/error_interceptor.dart';
 
 import '../enviromens/Enrivoment.dart';
 
@@ -20,6 +21,7 @@ class MiAndeApi {
         ),
       ) {
     // Interceptor para debug
+    dio.interceptors.add(ErrorInterceptor());
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
@@ -69,5 +71,6 @@ class MiAndeApi {
         },
       ),
     );
+
   }
 }

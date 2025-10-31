@@ -19,8 +19,9 @@ class BloqueoSuministroDatasourceImpl extends BloqueoSuministroDatasource {
   Future<BloqueoSuministroResponse> getBloqueoSuministro(
     String nis,
     num indicadorBloqueo,
+    String token
   ) async {
-    final formMap = {'indicadorBloqueo': indicadorBloqueo, 'nis': nis};
+    final formMap = {'indicadorBloqueo': indicadorBloqueo, 'nis': nis, 'kwfxtoken':token };
 
     // Crear FormData
     final data = FormData.fromMap(formMap);

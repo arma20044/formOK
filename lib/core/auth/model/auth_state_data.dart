@@ -7,23 +7,27 @@ class AuthStateData {
   final UserModel? user;
   final String? errorMessage;
   final List<SuministrosList?>? userDatosAnexos;
+  final bool? indicadorBloqueoNIS;
 
   const AuthStateData({
     required this.state,
     this.user,
     this.errorMessage,
     this.userDatosAnexos,
+    this.indicadorBloqueoNIS,
   });
 
   AuthStateData copyWith({
     AuthState? state,
     UserModel? user,
     String? errorMessage,
-    List<SuministrosList?>? userDatosAnexos
+    List<SuministrosList?>? userDatosAnexos,
+    bool? indicadorBloqueoNIS,
   }) => AuthStateData(
     state: state ?? this.state,
     user: user ?? this.user,
     errorMessage: errorMessage ?? this.errorMessage,
-    userDatosAnexos : userDatosAnexos ?? this.userDatosAnexos
+    userDatosAnexos: userDatosAnexos ?? this.userDatosAnexos,
+    indicadorBloqueoNIS: indicadorBloqueoNIS,
   );
 }

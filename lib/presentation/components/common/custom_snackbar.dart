@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:form/config/constantes.dart';
 
-enum MessageType { success, error, warning }
+
 
 class CustomSnackbar {
   static void show(
@@ -23,6 +24,10 @@ class CustomSnackbar {
         break;
       case MessageType.warning:
         backgroundColor = Colors.orange;
+        icon = const Icon(Icons.warning, color: Colors.white);
+        break;
+      case MessageType.info:
+        backgroundColor = Colors.blue;
         icon = const Icon(Icons.warning, color: Colors.white);
         break;
     }

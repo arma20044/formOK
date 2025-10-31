@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:form/config/constantes.dart';
 
 /// Tipos de mensaje disponibles
-enum MessageType { success, error, info }
+
 
 /// Widget del diálogo reutilizable
 class CustomMessageDialog extends StatelessWidget {

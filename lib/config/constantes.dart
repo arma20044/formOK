@@ -49,3 +49,7 @@ final dataTipoVerificacion = [
 
 
 final infoTipoVerificacion = "Conforme la RP N° 45.385 de fecha 1 de julio de 2021, que aplica lo establecido en la Ley 4017/2010, la contraseña suministrada para autenticarse en la plataforma digital de la institución, es personal e intransferible y constituye su firma electrónica. El usuario al utilizarla como su medio de identificación, manifiesta en carácter de declaración jurada que la misma fue creada personalmente y se obliga a mantenerlo bajo su exclusivo control y conocimiento; permitiendo identificarlo en forma inequívoca, asumiendo en consecuencia, toda la responsabilidad emergente de su uso.";
+
+
+
+enum MessageType { success, error, info,warning }
