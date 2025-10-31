@@ -223,18 +223,52 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     final currentState = state.value;
     if (currentState == null || currentState.user == null) return;
 
-    //en el state y storage
-    await _storage.write(
-      key: _indicadorBloqueo,
-      value: jsonEncode(indicadorBloqueoNIS),
-    );
+    try {
+      await _storage.write(
+        key: _indicadorBloqueo,
+        value: jsonEncode(indicadorBloqueoNIS),
+      );
 
-    state = AsyncData(
-      AuthStateData(
-        state: currentState.state,
-        indicadorBloqueoNIS: indicadorBloqueoNIS,
-      ),
-    );
+      state = AsyncData(
+        currentState.copyWith(indicadorBloqueoNIS: indicadorBloqueoNIS),
+      );
+    } catch (e) {
+      debugPrint('Error actualizando indicadorBloqueoNIS: $e');
+    }
+  }
+
+  Future<void> actualizarBloqueoWeb({
+    required num nis,
+    required bool valor,
+  }) async {
+    final currentState = state.value;
+    if (currentState == null || currentState.userDatosAnexos == null) return;
+
+    // Crear nueva lista con el suministro actualizado
+    final nuevaLista = currentState.userDatosAnexos!.map((suministro) {
+      if (suministro?.nisRad == nis) {
+        return SuministrosList(
+          indicadorAcuerdoLey6524: suministro?.indicadorAcuerdoLey6524,
+          indicadorLey6524: suministro?.indicadorLey6524,
+          nisRad: suministro?.nisRad,
+          indicadorBloqueoWeb: valor ? 1 : 0,
+        );
+      }
+      return suministro;
+    }).toList();
+
+    // Actualizar el estado global
+    state = AsyncData(currentState.copyWith(userDatosAnexos: nuevaLista));
+
+    // Opcional: actualizar almacenamiento seguro si necesitas persistirlo
+    try {
+      await _storage.write(
+        key: _userDatosAnexos,
+        value: jsonEncode(nuevaLista),
+      );
+    } catch (e) {
+      debugPrint('Error guardando userDatosAnexos: $e');
+    }
   }
 }
 

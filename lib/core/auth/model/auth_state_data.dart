@@ -31,3 +31,27 @@ class AuthStateData {
     indicadorBloqueoNIS: indicadorBloqueoNIS,
   );
 }
+
+
+extension AuthStateDataX on AuthStateData {
+  AuthStateData actualizarBloqueoWeb({
+    required num nis,
+    required bool valor,
+  }) {
+    if (userDatosAnexos == null) return this;
+
+    final nuevaLista = userDatosAnexos!.map((suministro) {
+      if (suministro?.nisRad == nis) {
+        return SuministrosList(
+          indicadorAcuerdoLey6524: suministro?.indicadorAcuerdoLey6524,
+          indicadorLey6524: suministro?.indicadorLey6524,
+          nisRad: suministro?.nisRad,
+          indicadorBloqueoWeb: valor ? 1 : 0,
+        );
+      }
+      return suministro;
+    }).toList();
+
+    return copyWith(userDatosAnexos: nuevaLista);
+  }
+}

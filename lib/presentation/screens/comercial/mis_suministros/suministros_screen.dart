@@ -38,26 +38,21 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
 
   SuministrosList? selectedNIS;
   String? _token;
+  bool? _indicador;
   bool _hasFetched = false; // Para controlar fetch único
+
+  bool _isListenerSet = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: tabs.length, vsync: this);
 
-    _scrollController.addListener(() {
-      setState(() {
-        _showLeftArrow = _scrollController.offset > 0;
-        _showRightArrow =
-            _scrollController.offset <
-            _scrollController.position.maxScrollExtent;
-      });
-    });
+    _tabController = TabController(length: tabs.length, vsync: this);
   }
 
   void fetchDatos(String token) {
-    // Aquí tu lógica de fetch
-    print('Fetch con token: $token');
+    print('🚀 Fetch con token: $token');
+    //print('🔐 Indicador de bloqueo: $indicador');
   }
 
   @override
@@ -68,7 +63,7 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
   }
 
   void _scrollLeft() {
-    double newOffset = (_scrollController.offset - _scrollAmount).clamp(
+    final newOffset = (_scrollController.offset - _scrollAmount).clamp(
       0.0,
       _scrollController.position.maxScrollExtent,
     );
@@ -80,7 +75,7 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
   }
 
   void _scrollRight() {
-    double newOffset = (_scrollController.offset + _scrollAmount).clamp(
+    final newOffset = (_scrollController.offset + _scrollAmount).clamp(
       0.0,
       _scrollController.position.maxScrollExtent,
     );
@@ -94,16 +89,31 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+
+    // 🧩 Esperar a que el provider tenga valor
+    if (authState.value == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    // ✅ Ahora es seguro acceder a los valores
     final List<SuministrosList?>? dropDownItemsSuministro =
-        authState.value?.user?.userDatosAnexos;
+        authState.value!.user?.userDatosAnexos;
 
-    final token = authState.value?.user?.token;
+    // Registrar listener solo una vez
+    if (!_isListenerSet) {
+      _isListenerSet = true;
+      ref.listen(authProvider, (previous, next) {
+        final nuevoIndicador = next.value?.indicadorBloqueoNIS;
+        print('🔄 indicadorBloqueoNIS cambió: $nuevoIndicador');
+      });
+    }
 
-    // Actualizar _token y selectedNIS solo si cambian
+    final token = authState.value!.user?.token;
+
+    // Actualizar token e indicador si cambian
     if (token != null && _token != token) {
       _token = token;
 
-      // Opcional: fetch automático la primera vez que llega token
       if (!_hasFetched) {
         _hasFetched = true;
         fetchDatos(_token!);
@@ -114,6 +124,10 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
         selectedNIS == null &&
         dropDownItemsSuministro.isNotEmpty) {
       selectedNIS = dropDownItemsSuministro.first;
+
+      final indicador = selectedNIS!.indicadorBloqueoWeb == 1 ? true : false;
+
+      print('📊 indicador actual: $indicador');
     }
 
     return Scaffold(
