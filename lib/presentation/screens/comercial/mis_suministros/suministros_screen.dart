@@ -90,6 +90,9 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
+    final theme = Theme.of(context);
+final isDark = theme.brightness == Brightness.dark;
+
     // 🧩 Esperar a que el provider tenga valor
     if (authState.value == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -169,13 +172,14 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
                       child: TabBar(
                         isScrollable: true,
                         controller: _tabController,
-                        labelStyle: const TextStyle(
+                        labelStyle:  TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                        ),
-                        unselectedLabelStyle: const TextStyle(
+                          color: isDark ? Colors.white : Colors.black,       // Tab seleccionado
+                        ),                        
+                        unselectedLabelStyle:  TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: isDark ? Colors.grey[90] : Colors.white, // Tab no seleccionado
                         ),
                         tabs: tabs
                             .map(
