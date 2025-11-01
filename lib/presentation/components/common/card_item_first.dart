@@ -37,7 +37,7 @@ class CardItemFirst extends StatelessWidget {
     final backgroundColor = isDark ? Colors.black : Colors.white;
     final borderColor = isDark ? Colors.green : Colors.black;
     final mainTextColor = isDark ? Colors.white : Colors.black;
-    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+    final secondaryTextColor = isDark ? Colors.white : Colors.black54;
     final accentColor = Colors.green; // acento verde para ambos temas
 
     return SizedBox(
@@ -65,46 +65,49 @@ class CardItemFirst extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 _infoRow(
-                  'Monto en Gs',
+                  'Monto en Gs:',
                   monto,
                   secondaryTextColor,
-                  accentColor,
+                  mainTextColor,
                   theme,
+                  fontWeight: FontWeight.bold
                 ),
                 _infoRow(
-                  'Fecha de lectura',
+                  'Fecha de lectura:',
                   fechaLectura,
                   secondaryTextColor,
                   mainTextColor,
                   theme,
+                  
                 ),
                 _infoRow(
-                  'Lectura',
+                  'Lectura:',
                   lectura,
                   secondaryTextColor,
                   mainTextColor,
                   theme,
                 ),
                 _infoRow(
-                  'Consumo',
+                  'Consumo:',
                   consumo,
                   secondaryTextColor,
                   mainTextColor,
                   theme,
                 ),
                 _infoRow(
-                  'Fecha de vencimiento',
+                  'Fecha de vencimiento:',
                   fechaVencimiento,
                   secondaryTextColor,
                   mainTextColor,
                   theme,
                 ),
                 _infoRow(
-                  'Total con comisión',
+                  'Total con comisión:',
                   totalConComision,
                   secondaryTextColor,
-                  accentColor,
+                  mainTextColor,
                   theme,
+                  fontWeight: FontWeight.bold
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -137,31 +140,30 @@ class CardItemFirst extends StatelessWidget {
     );
   }
 
-  Widget _infoRow(
-    String label,
-    String value,
-    Color labelColor,
-    Color valueColor,
-    ThemeData theme,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(color: labelColor),
-          ),
-          Text(
-            value,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: valueColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+Widget _infoRow(
+  String label,
+  String value,
+  Color labelColor,
+  Color valueColor,
+  ThemeData theme, {
+  FontWeight fontWeight = FontWeight.normal, // valor por defecto
+}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 2),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.bodyMedium?.copyWith(color: labelColor, fontWeight: fontWeight),
+        ),
+        Text(
+          value,
+          style: theme.textTheme.bodyMedium?.copyWith(color: valueColor, fontWeight: fontWeight),
+        ),
+      ],
+    ),
+  );
+}
+
 }
