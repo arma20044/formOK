@@ -261,7 +261,7 @@ final isDark = theme.brightness == Brightness.dark;
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
             children: [
-               FacturasTab(),
+               FacturasTab(selectedNIS:  selectedNIS!,token:   _token),
               const HistoricoTab(),
                MensajesTab(selectedNIS),
               const LecturaTab(),

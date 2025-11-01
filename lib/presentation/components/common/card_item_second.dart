@@ -78,7 +78,7 @@ class CardItemSecond extends StatelessWidget {
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: mainTextColor,
                         fontWeight: FontWeight.bold,
-                        backgroundColor: Colors.orange
+                        backgroundColor: estadoPago == 'Pagado' ? Colors.green : Colors.orange
                       ),
                     ),
                   ],

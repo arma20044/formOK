@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/model/model.dart';
 

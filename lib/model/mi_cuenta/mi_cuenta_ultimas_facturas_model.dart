@@ -16,7 +16,7 @@ class MiCuentaUltimasFacturasResponse {
   factory MiCuentaUltimasFacturasResponse.fromJson(Map<String, dynamic>? json) {
     json ??= {};
     return MiCuentaUltimasFacturasResponse(
-      micuentaultimasfacturasresultado: json['micuentaultimasfacturasresultado'] != null ? MiCuentaUltimasFacturasResultado.fromJson(json['micuentaultimasfacturasresultado']) : null,
+      micuentaultimasfacturasresultado: json['resultado'] != null ? MiCuentaUltimasFacturasResultado.fromJson(json['resultado']) : null,
        mensajeList: json['mensajeList'] != null ? List<dynamic>.from(json['mensajeList'].map((item) => item)) : null,
       mensaje: json['mensaje'],
       error: json['error'],

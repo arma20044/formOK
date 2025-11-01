@@ -1,76 +1,123 @@
 import 'package:flutter/material.dart';
-import 'package:form/presentation/components/common/card_item_first.dart';
+import 'package:form/core/api/mi_ande_api.dart';
+import 'package:form/infrastructure/mi_cuenta/mi_cuenta_ultimas_facturas_datasource_impl.dart';
+import 'package:form/model/consulta_facturas.dart';
+import 'package:form/model/mi_cuenta/mi_cuenta_ultimas_facturas_model.dart';
+import 'package:form/presentation/components/common/card_item_second.dart';
 import 'package:form/presentation/components/common/horizontal_cards.dart';
-import 'package:form/presentation/components/common/vertical_scroll_cards.dart';
+import 'package:form/repositories/repositories.dart';
+import '../../../../../model/login_model.dart';
 
+class FacturasTab extends StatefulWidget {
+  const FacturasTab({super.key, this.selectedNIS, this.token});
 
-// Modelo de datos
-class Factura {
-  final String titulo;
-  final String monto;
-  final String fechaLectura;
-  final String lectura;
-  final String consumo;
-  final String fechaVencimiento;
-  final String totalConComision;
+  final SuministrosList? selectedNIS;
+  final String? token;
 
-  Factura({
-    required this.titulo,
-    required this.monto,
-    required this.fechaLectura,
-    required this.lectura,
-    required this.consumo,
-    required this.fechaVencimiento,
-    required this.totalConComision,
-  });
+  @override
+  State<FacturasTab> createState() => _FacturasTabState();
 }
 
-// Simulación de fetch de datos
-Future<List<Factura>> fetchFacturas() async {
-  await Future.delayed(const Duration(seconds: 2));
-  return [
-    Factura(
-      titulo: 'Factura 1',
-      monto: '150.000',
-      fechaLectura: '01/11/2025',
-      lectura: '12345',
-      consumo: '150',
-      fechaVencimiento: '10/11/2025',
-      totalConComision: '155.000',
-    ),
-    Factura(
-      titulo: 'Factura 2',
-      monto: '200.000',
-      fechaLectura: '01/11/2025',
-      lectura: '23456',
-      consumo: '200',
-      fechaVencimiento: '10/11/2025',
-      totalConComision: '206.000',
-    ),
-  ];
-}
+class _FacturasTabState extends State<FacturasTab> {
+  final repoMiCuentaUltimasFacturas = MiCuentaUltimasFacturasRepositoryImpl(
+    MiCuentaUltimasFacturasDatasourceImpl(MiAndeApi()),
+  );
 
+  List<MiCuentaUltimasFacturasLista> _facturas = [];
+  bool _isLoading = false;
+  String? _errorMessage;
 
-// Pantalla completa combinada
-class FacturasTab extends StatelessWidget {
-  const FacturasTab({super.key});
+  @override
+  void initState() {
+    super.initState();
+    consultarUltimasFacturas();
+  }
+
+  void consultarUltimasFacturas() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final ultimasFacturasResponse = await repoMiCuentaUltimasFacturas
+          .getMiCuentaUltimasFacturas(
+            widget.selectedNIS!.nisRad!.toString(),
+            "15",
+            widget.token!,
+          );
+
+      if (!mounted) return;
+
+      if (ultimasFacturasResponse.error!) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(ultimasFacturasResponse.errorValList![0])),
+        );
+        return;
+      }
+
+      final data = ultimasFacturasResponse.micuentaultimasfacturasresultado;
+
+      // ✅ Convertimos y filtramos nulos
+      final facturas = (data?.lista ?? [])
+          .whereType<
+            MiCuentaUltimasFacturasLista
+          >() // elimina nulls automáticamente
+          .toList();
+
+      setState(() {
+        _facturas = facturas;
+      });
+    } catch (e) {
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final horizontalTitles = ['Dueda Total', 'Deuda Anterior'];
+    final horizontalTitles = ['Deuda Total', 'Deuda Anterior'];
 
     return Scaffold(
-      
-      body:  
-      // VerticalScrollCards()
-      //HorizontalCards(titles: horizontalTitles),
-      Column(
+      body: Column(
         children: [
           const SizedBox(height: 10),
           HorizontalCards(titles: horizontalTitles),
           const SizedBox(height: 16),
-          // Vertical scroll ocupa el resto de la pantalla
-          const Expanded(child: VerticalScrollCards()),
+
+          // ✅ Contenido dinámico
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _errorMessage != null
+                ? Center(child: Text(_errorMessage!))
+                : _facturas.isEmpty
+                ? const Center(child: Text("No hay facturas disponibles"))
+                : ListView.builder(
+                    padding: const EdgeInsets.all(8),
+                    itemCount: _facturas.length,
+                    itemBuilder: (context, index) {
+                      final factura = _facturas[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: CardItemSecond(
+                          monto: factura.importe.toString(),
+                          estadoPago: factura.estadoFactura ?? '',
+                          estadoColor: factura.esPagado == true
+                              ? Colors.green
+                              : Colors.red,
+                          fechaEmision: factura.fechaEmision ?? 'Sin dato',
+                          fechaVencimiento:
+                              factura.fechaVencimiento ?? 'Sin dato',
+                          onVerFacturaPressed: () {
+                            print('🧾 Ver factura ${factura.fechaFacturacion}');
+                          },
+                        ),
+                      );
+                    },
+                  ),
+          ),
         ],
       ),
     );
