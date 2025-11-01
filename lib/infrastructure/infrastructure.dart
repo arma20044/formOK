@@ -10,3 +10,4 @@ export 'olvido_contrasenha_datasource_impl.dart';
 export 'cambio_contrasenha_datasource_impl.dart';
 export 'bloqueo_suministro_datasource_impl.dart';
 export 'servicios_nis_datasource_impl.dart';
+export './mi_cuenta/mi_cuenta_ultimas_facturas_datasource_impl.dart';

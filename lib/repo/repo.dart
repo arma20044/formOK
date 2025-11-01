@@ -10,3 +10,4 @@ export 'olvido_contrasenha_repository.dart';
 export 'cambio_contrasenha_repository.dart';
 export 'bloqueo_suministro_repository.dart';
 export 'servicios_nis_repository.dart';
+export './mi_cuenta/mi_cuenta_ultimas_facturas_repository.dart';

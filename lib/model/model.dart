@@ -9,3 +9,4 @@ export 'consulta_documento_model.dart';
 export 'mi_cuenta_registro_model.dart';
 export 'bloqueo_suministro_model.dart';
 export 'servicios_nis_telefono.dart';
+export './mi_cuenta/mi_cuenta_ultimas_facturas_model.dart';
