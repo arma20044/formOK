@@ -259,7 +259,7 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
             children: [
               const FacturasTab(),
               const HistoricoTab(),
-              const MensajesTab(),
+               MensajesTab(selectedNIS),
               const LecturaTab(),
               if (selectedNIS != null && _token != null)
                 ConfiguracionTab(key: configuracionKey, selectedNIS!, _token!)

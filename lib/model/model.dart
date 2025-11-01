@@ -8,3 +8,4 @@ export 'archivo_adjunto_model.dart';
 export 'consulta_documento_model.dart';
 export 'mi_cuenta_registro_model.dart';
 export 'bloqueo_suministro_model.dart';
+export 'servicios_nis_telefono.dart';
