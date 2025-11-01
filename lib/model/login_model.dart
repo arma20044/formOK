@@ -147,6 +147,21 @@ class SuministrosList {
     this.nisRad,
   });
 
+   SuministrosList copyWith({
+    num? indicadorAcuerdoLey6524,
+    num? indicadorBloqueoWeb,
+    num? indicadorLey6524,
+    num? nisRad,
+  }) {
+    return SuministrosList(
+      indicadorAcuerdoLey6524:
+          indicadorAcuerdoLey6524 ?? this.indicadorAcuerdoLey6524,
+      indicadorBloqueoWeb: indicadorBloqueoWeb ?? this.indicadorBloqueoWeb,
+      indicadorLey6524: indicadorLey6524 ?? this.indicadorLey6524,
+      nisRad: nisRad ?? this.nisRad,
+    );
+  }
+
   factory SuministrosList.fromJson(Map<String, dynamic>? json) {
     json ??= {};
     return SuministrosList(

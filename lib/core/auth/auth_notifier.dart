@@ -219,22 +219,32 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     );
   }
 
-  Future<void> actualizarIndicadorBloqueoNIS(bool indicadorBloqueoNIS) async {
+  Future<void> actualizarIndicadorBloqueoNIS(
+    num nisRad,
+    bool nuevoValor,
+  ) async {
     final currentState = state.value;
-    if (currentState == null || currentState.user == null) return;
+    if (currentState == null) return;
 
-    try {
-      await _storage.write(
-        key: _indicadorBloqueo,
-        value: jsonEncode(indicadorBloqueoNIS),
-      );
+    final user = currentState.user;
+    if (user == null) return;
 
-      state = AsyncData(
-        currentState.copyWith(indicadorBloqueoNIS: indicadorBloqueoNIS),
-      );
-    } catch (e) {
-      debugPrint('Error actualizando indicadorBloqueoNIS: $e');
-    }
+    final suministros = user.userDatosAnexos;
+    if (suministros == null || suministros.isEmpty) return;
+
+    // Actualizamos solo el suministro con el NIS indicado
+    final updatedSuministros = suministros.map((s) {
+      if (s!.nisRad == nisRad) {
+        return s.copyWith(indicadorBloqueoWeb: nuevoValor ? 1 : 2);
+      }
+      return s;
+    }).toList();
+
+    // Clonamos el usuario con los datos actualizados
+    final updatedUser = user.copyWith(userDatosAnexos: updatedSuministros);
+
+    // Actualizamos el estado global
+    state = AsyncData(currentState.copyWith(user: updatedUser));
   }
 
   Future<void> actualizarBloqueoWeb({

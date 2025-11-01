@@ -1,21 +1,16 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/model/login_model.dart';
 import 'package:form/model/model.dart';
-import 'package:form/presentation/auth/login_screen.dart';
-import 'package:form/presentation/components/common/custom_message_dialog.dart';
-import 'package:form/presentation/components/common/custom_show_dialog.dart';
-import 'package:form/presentation/components/common/custom_snackbar.dart'
-    hide MessageType;
+import 'package:form/presentation/components/common/custom_snackbar.dart';
+    
 
-import '../../../../../core/auth/model/user_model.dart';
+
 import '../../../../../infrastructure/infrastructure.dart';
 import '../../../../../repositories/repositories.dart';
 import '../../../../components/common.dart';
@@ -40,15 +35,55 @@ class _ConfiguracionTabState extends ConsumerState<ConfiguracionTab>
   );
   bool _isLoadingBloqueoSuministro = false;
 
-  /// Bloquea o desbloquea el suministro
-  void bloquearDesloquearSuministro(
+  // Copia local del NIS seleccionado para actualizar el valor visual
+  SuministrosList? _localSelectedNIS;
+
+  @override
+  void initState() {
+    super.initState();
+    _localSelectedNIS = widget.selectedNIS;
+  }
+
+  /// Llama al backend para bloquear/desbloquear
+  Future<BloqueoSuministroResponse> _fetchBloqueoSuministro(
     AuthStateData authStateData,
     bool newValue,
   ) async {
-    BloqueoSuministroResponse result = await _fetchBloqueoSuministro(
-      authStateData,
-      newValue,
-    );
+    try {
+      setState(() => _isLoadingBloqueoSuministro = true);
+
+      return await repoBloqueoSuministro.getBloqueoSuministro(
+        _localSelectedNIS!.nisRad.toString(),
+        newValue ? 1 : 2,
+        widget.token!,
+      );
+    } catch (e) {
+      debugPrint("Error en _fetchBloqueoSuministro: $e");
+      CustomSnackbar.show(
+        context,
+        message: "No se pudo comunicar con el servidor. Intente más tarde.",
+        type: MessageType.error,
+      );
+      return BloqueoSuministroResponse(
+        error: true,
+        mensaje: "Error al comunicarse con el servidor",
+        mensajeList: [],
+        errorValList: [],
+        resultado: null,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingBloqueoSuministro = false);
+      }
+    }
+  }
+
+  /// Bloquea o desbloquea el suministro
+  Future<void> bloquearDesloquearSuministro(
+    AuthStateData authStateData,
+    bool newValue,
+  ) async {
+    final result = await _fetchBloqueoSuministro(authStateData, newValue);
     if (!mounted) return;
 
     if (result.error) {
@@ -58,43 +93,21 @@ class _ConfiguracionTabState extends ConsumerState<ConfiguracionTab>
         type: MessageType.error,
       );
       return;
-    } else {
-      CustomSnackbar.show(context, message: result.mensaje);
-      await ref
-          .read(authProvider.notifier)
-          .actualizarIndicadorBloqueoNIS(newValue);
     }
-  }
 
-  /// Llama al backend para bloquear/desbloquear
-  Future<BloqueoSuministroResponse> _fetchBloqueoSuministro(
-    AuthStateData authStateData,
-    bool newValue,
-  ) async {
-    try {
-      setState(() {
-        _isLoadingBloqueoSuministro = true;
-      });
+    // Éxito → actualiza el local y muestra mensaje
+    setState(() {
+      _localSelectedNIS = _localSelectedNIS?.copyWith(
+        indicadorBloqueoWeb: newValue ? 1 : 2,
+      );
+    });
 
-      return await repoBloqueoSuministro.getBloqueoSuministro(
-        widget.selectedNIS!.nisRad.toString(),
-        newValue ? 1 : 2,
-        widget.token!,
-      );
-    } catch (e) {
-      debugPrint("Error en _fetchBloqueoSuministro: $e");
-      return BloqueoSuministroResponse(
-        error: true,
-        mensaje: "Ocurrió un error al comunicarse con el servidor",
-        mensajeList: [],
-        errorValList: [],
-        resultado: null,
-      );
-    } finally {
-      setState(() {
-        _isLoadingBloqueoSuministro = false;
-      });
-    }
+    CustomSnackbar.show(context, message: result.mensaje);
+
+    // Actualiza el estado global (si lo necesitás para otros tabs)
+    await ref
+        .read(authProvider.notifier)
+        .actualizarBloqueoWeb(nis: _localSelectedNIS!.nisRad!, valor: newValue);
   }
 
   @override
@@ -102,11 +115,7 @@ class _ConfiguracionTabState extends ConsumerState<ConfiguracionTab>
     super.build(context);
 
     final authState = ref.watch(authProvider);
-
-    // Valor del switch tomado directamente del state global
-    final isSwitched = widget.selectedNIS?.indicadorBloqueoWeb == 1
-        ? true
-        : false;
+    final isSwitched = _localSelectedNIS?.indicadorBloqueoWeb == 1;
 
     return Scaffold(
       body: Padding(
@@ -115,7 +124,7 @@ class _ConfiguracionTabState extends ConsumerState<ConfiguracionTab>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomText(
-              "Bloquear Suministro: $isSwitched",
+              "Bloquear Suministro: ${isSwitched ? 'Sí' : 'No'}",
               fontWeight: FontWeight.bold,
             ),
             const SizedBox(height: 8),
@@ -123,29 +132,20 @@ class _ConfiguracionTabState extends ConsumerState<ConfiguracionTab>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: CustomText(
+                  child: Text(
+                    "Con el bloqueo del suministro no se podrán consultar ni descargar las facturas desde el acceso público en la Página Web ni desde la APP de la ANDE.",
+                    style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.justify,
-                    overflow: TextOverflow.visible,
-                    "Con el bloqueo del suministro no se podrán consultar ni descargar las facturas desde el acceso público en la Página Web ni desde la APP de la ANDE",
                   ),
                 ),
                 const SizedBox(width: 20),
                 _isLoadingBloqueoSuministro
                     ? const CircularProgressIndicator()
                     : Switch(
-                        value: isSwitched,
+                        value: isSwitched ?? false,
                         onChanged: (newValue) async {
-                          // Actualizamos el backend primero
-                          
-                          bloquearDesloquearSuministro(authState.value!, newValue);
-
-                          // Actualizamos el state global
-                          ref
-                              .read(authProvider.notifier)
-                              .actualizarBloqueoWeb(
-                                nis: widget.selectedNIS!.nisRad!,
-                                valor: newValue,
-                              );
+                          await bloquearDesloquearSuministro(
+                              authState.value!, newValue);
                         },
                       ),
               ],

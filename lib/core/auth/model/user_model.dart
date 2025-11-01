@@ -19,7 +19,7 @@ class UserModel {
   final String modificarPassword;
   List<SuministrosList?>? userDatosAnexos;
 
-  factory UserModel.empty() =>  UserModel(
+  factory UserModel.empty() => UserModel(
     nombre: '',
     apellido: '',
     numeroDocumento: '',
@@ -33,11 +33,12 @@ class UserModel {
     pais: '',
     departamento: '',
     telefonoCelular: '',
-    tipoCliente: '', ciudad: '',
-    modificarPassword: '',    
+    tipoCliente: '',
+    ciudad: '',
+    modificarPassword: '',
   );
 
-   UserModel({
+  UserModel({
     required this.correo,
     required this.direccion,
     required this.pais,
@@ -54,7 +55,7 @@ class UserModel {
     required this.tipoSolicitante,
     required this.token,
     required this.modificarPassword,
-    this.userDatosAnexos
+    this.userDatosAnexos,
   });
 
   Map<String, dynamic> toMap() => {
@@ -73,8 +74,8 @@ class UserModel {
     'cuidad': ciudad,
     'telefonoCelular': telefonoCelular,
     'tipoCliente': tipoCliente,
-    'modificarPassword':modificarPassword,
-    'userDatosAnexos':userDatosAnexos
+    'modificarPassword': modificarPassword,
+    'userDatosAnexos': userDatosAnexos,
   };
 
   factory UserModel.fromMap(Map<String, dynamic> map) => UserModel(
@@ -93,16 +94,15 @@ class UserModel {
     ciudad: map['ciudad'],
     telefonoCelular: map['telefonoCelular'],
     tipoCliente: map['tipoCliente'],
-    modificarPassword:map['modificarPassword'],
-    userDatosAnexos:map['userDatosAnexos']
+    modificarPassword: map['modificarPassword'],
+    userDatosAnexos: map['userDatosAnexos'],
   );
 
-
- 
   UserModel copyWith({
     String? password,
     String? token,
     String? modificarPassword,
+    List<SuministrosList?>? userDatosAnexos,
   }) {
     return UserModel(
       nombre: nombre,
@@ -120,10 +120,8 @@ class UserModel {
       ciudad: ciudad,
       telefonoCelular: telefonoCelular,
       tipoCliente: tipoCliente,
-      modificarPassword:modificarPassword ?? this.modificarPassword,
-      userDatosAnexos:userDatosAnexos
+      modificarPassword: modificarPassword ?? this.modificarPassword,
+      userDatosAnexos: userDatosAnexos,
     );
-  
-}
-
+  }
 }
