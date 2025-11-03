@@ -281,7 +281,7 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
             children: [
-              FacturasTab(selectedNIS: selectedNIS!, token: _token),
+              FacturasTab( selectedNIS!,  _token),
               const HistoricoTab(),
               MensajesTab(selectedNIS),
               const LecturaTab(),

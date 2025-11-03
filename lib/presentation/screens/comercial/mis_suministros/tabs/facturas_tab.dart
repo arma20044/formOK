@@ -12,155 +12,111 @@ import 'package:form/provider/suministro_provider.dart';
 import 'package:form/repositories/repositories.dart';
 import '../../../../../model/login_model.dart';
 
-
-
-class FacturasTab extends ConsumerStatefulWidget  {
-  const FacturasTab({super.key, this.selectedNIS, this.token});
-
-  final SuministrosList? selectedNIS;
-  final String? token;
-
-  @override
-  ConsumerState<FacturasTab> createState() => _FacturasTabState();
-}
-
-
-
 /// Provider que obtiene las facturas del NIS actual
-final facturasProvider = FutureProvider.autoDispose<List<MiCuentaUltimasFacturasLista>>((ref) async {
-  final nis = ref.watch(selectedNISProvider);
-  if (nis == null) return [];
+final facturasProvider =
+    FutureProvider.autoDispose<List<MiCuentaUltimasFacturasLista>>((ref) async {
+      final nis = ref.watch(selectedNISProvider);
+      if (nis == null) return [];
 
-//  final token = ref.watch(_tokenProvider); // si querés pasar token
-    final authState = ref.watch(authProvider);
+      //  final token = ref.watch(_tokenProvider); // si querés pasar token
+      final authState = ref.watch(authProvider);
 
-  final token = authState.value?.user?.token;
+      final token = authState.value?.user?.token;
 
-  final repo = MiCuentaUltimasFacturasRepositoryImpl(
-    MiCuentaUltimasFacturasDatasourceImpl(MiAndeApi()),
-  );
+      final repo = MiCuentaUltimasFacturasRepositoryImpl(
+        MiCuentaUltimasFacturasDatasourceImpl(MiAndeApi()),
+      );
 
-  final response = await repo.getMiCuentaUltimasFacturas(
-    nis.nisRad!.toString(),
-    "15",
-    token ?? "",
-  );
+      final response = await repo.getMiCuentaUltimasFacturas(
+        nis.nisRad!.toString(),
+        "15",
+        token ?? "",
+      );
 
-  if (response.error == true) {
-    throw Exception(response.errorValList?.first ?? 'Error desconocido');
-  }
+      if (response.error == true) {
+        throw Exception(response.errorValList?.first ?? 'Error desconocido');
+      }
 
-  final data = response.micuentaultimasfacturasresultado?.lista ?? [];
-  return data.whereType<MiCuentaUltimasFacturasLista>().toList();
-});
+      final data = response.micuentaultimasfacturasresultado?.lista ?? [];
+      return data.whereType<MiCuentaUltimasFacturasLista>().toList();
+    });
 
 // (Opcional) si querés manejar token global también:
 //final _tokenProvider = StateProvider<String?>((ref) => null);
 
-class _FacturasTabState extends ConsumerState<FacturasTab> {
-  final repoMiCuentaUltimasFacturas = MiCuentaUltimasFacturasRepositoryImpl(
-    MiCuentaUltimasFacturasDatasourceImpl(MiAndeApi()),
-  );
+class FacturasTab extends ConsumerWidget {
+  final SuministrosList? selectedNIS;
+  final String? token;
 
-  List<MiCuentaUltimasFacturasLista> _facturas = [];
-  bool _isLoading = false;
-  String? _errorMessage;
+  const FacturasTab(this.selectedNIS, this.token, {super.key});
 
   @override
-  void initState() {
-    super.initState();
-    consultarUltimasFacturas();
-  }
-
-  void consultarUltimasFacturas() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final ultimasFacturasResponse = await repoMiCuentaUltimasFacturas
-          .getMiCuentaUltimasFacturas(
-            widget.selectedNIS!.nisRad!.toString(),
-            "15",
-            widget.token!,
-          );
-
-      if (!mounted) return;
-
-      if (ultimasFacturasResponse.error!) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(ultimasFacturasResponse.errorValList![0])),
-        );
-        return;
-      }
-
-      final data = ultimasFacturasResponse.micuentaultimasfacturasresultado;
-
-      // ✅ Convertimos y filtramos nulos
-      final facturas = (data?.lista ?? [])
-          .whereType<
-            MiCuentaUltimasFacturasLista
-          >() // elimina nulls automáticamente
-          .toList();
-
-      setState(() {
-        _facturas = facturas;
-      });
-    } catch (e) {
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final asyncFacturas = ref.watch(facturasProvider);
     final horizontalTitles = ['Deuda Total', 'Deuda Anterior'];
 
-    return Scaffold(
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-          HorizontalCards(titles: horizontalTitles),
-          const SizedBox(height: 16),
-    Expanded(
-            child: asyncFacturas.when(
-              data: (facturas) {
-                if (facturas.isEmpty) {
-                  return const Center(child: Text("No hay facturas disponibles"));
-                }
-                return ListView.builder(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: facturas.length,
-                  itemBuilder: (context, index) {
-                    final factura = facturas[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: CardItemSecond(
-                        monto: factura.importe.toString(),
-                        estadoPago: factura.estadoFactura ?? '',
-                        estadoColor: factura.esPagado == true
-                            ? Colors.green
-                            : Colors.red,
-                        fechaEmision: factura.fechaEmision ?? 'Sin dato',
-                        fechaVencimiento:
-                            factura.fechaVencimiento ?? 'Sin dato',
-                        onVerFacturaPressed: () {
-                          print('🧾 Ver factura ${factura.fechaFacturacion}');
-                        },
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        HorizontalCards(titles: horizontalTitles),
+        const SizedBox(height: 16),
+
+        Expanded(
+          child: asyncFacturas.when(
+            data: (facturas) {
+              if (facturas.isEmpty) {
+                return const Center(child: Text("No hay facturas disponibles"));
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      "Comprobantes",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  },
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) => Center(child: Text('Error: $error')),
-            ),
+                    ),
+                  ),
+                  // Usar Flexible para el ListView
+                  Flexible(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(8),
+                      itemCount: facturas.length,
+                      itemBuilder: (context, index) {
+                        final factura = facturas[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: CardItemSecond(
+                            monto: factura.importe.toString(),
+                            estadoPago: factura.estadoFactura ?? '',
+                            estadoColor: factura.esPagado == true
+                                ? Colors.green
+                                : Colors.red,
+                            fechaEmision: factura.fechaEmision ?? 'Sin dato',
+                            fechaVencimiento:
+                                factura.fechaVencimiento ?? 'Sin dato',
+                            onVerFacturaPressed: () {
+                              print(
+                                '🧾 Ver factura ${factura.fechaFacturacion}',
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => Center(child: Text('Error: $error')),
           ),
-         ],
-      ),
+        ),
+      ],
     );
   }
 }
