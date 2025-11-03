@@ -1,48 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:form/core/api/mi_ande_api.dart';
-import 'package:form/core/auth/auth_notifier.dart';
-import 'package:form/infrastructure/mi_cuenta/mi_cuenta_ultimas_facturas_datasource_impl.dart';
+import 'package:form/presentation/components/common/UI/custom_loading.dart';
+import 'package:form/presentation/components/common/card_item_first.dart';
 
-import 'package:form/model/mi_cuenta/mi_cuenta_ultimas_facturas_model.dart';
 import 'package:form/presentation/components/common/card_item_second.dart';
 import 'package:form/presentation/components/common/horizontal_cards.dart';
-import 'package:form/provider/suministro_provider.dart';
-import 'package:form/repositories/repositories.dart';
+import 'package:form/provider/situacion_actual_provider.dart';
+import 'package:form/provider/ultimas_facturas_provider.dart';
 import '../../../../../model/login_model.dart';
-
-/// Provider que obtiene las facturas del NIS actual
-final facturasProvider =
-    FutureProvider.autoDispose<List<MiCuentaUltimasFacturasLista>>((ref) async {
-      final nis = ref.watch(selectedNISProvider);
-      if (nis == null) return [];
-
-      //  final token = ref.watch(_tokenProvider); // si querés pasar token
-      final authState = ref.watch(authProvider);
-
-      final token = authState.value?.user?.token;
-
-      final repo = MiCuentaUltimasFacturasRepositoryImpl(
-        MiCuentaUltimasFacturasDatasourceImpl(MiAndeApi()),
-      );
-
-      final response = await repo.getMiCuentaUltimasFacturas(
-        nis.nisRad!.toString(),
-        "15",
-        token ?? "",
-      );
-
-      if (response.error == true) {
-        throw Exception(response.errorValList?.first ?? 'Error desconocido');
-      }
-
-      final data = response.micuentaultimasfacturasresultado?.lista ?? [];
-      return data.whereType<MiCuentaUltimasFacturasLista>().toList();
-    });
-
-// (Opcional) si querés manejar token global también:
-//final _tokenProvider = StateProvider<String?>((ref) => null);
 
 class FacturasTab extends ConsumerWidget {
   final SuministrosList? selectedNIS;
@@ -53,12 +18,89 @@ class FacturasTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncFacturas = ref.watch(facturasProvider);
+
+    final asyncSituacionActual = ref.watch(situacionActualProvider);
+
+    print(asyncSituacionActual);
+
     final horizontalTitles = ['Deuda Total', 'Deuda Anterior'];
 
     return Column(
       children: [
         const SizedBox(height: 10),
-        HorizontalCards(titles: horizontalTitles),
+        //HorizontalCards(titles: horizontalTitles),
+        Expanded(
+          child: asyncSituacionActual.when(
+            data: (situacionActual) {
+              if (situacionActual.facturaDatos.length == 0) {
+                return const Center(child: Text("No hay factuas sin pagar."));
+              }
+
+              //logica para mostrar cards
+              return Column(
+                children: [
+                  situacionActual.tieneDeuda!
+                      ? CardItemFirst(
+                          title: "Deuda Total",
+                          monto: situacionActual
+                              .facturaDatos['recibo']['importeRecibo']
+                              .toString(),
+                          fechaLectura: situacionActual
+                              .facturaDatos['recibo']['fechaVencimiento'],
+                          lectura: situacionActual.calculoConsumo['consumo']
+                              .toString(),
+                          consumo: "",
+                          fechaVencimiento:
+                              situacionActual
+                                  .facturaDatos['recibo']['fechaVencimiento'] ??
+                              'Sin dato',
+                          totalConComision: situacionActual
+                              .facturaDatos['otrosImportes']['totalconComision']
+                              .toString(),
+                          onPrimaryPressed: () {
+                            print("Ver Ultima Factura");
+                          },
+                          onSecondaryPressed: () {
+                            print("Pagar");
+                          },
+                        )
+                      : Text(""),
+
+                  situacionActual.tieneDeuda! &&
+                          situacionActual.facturaDatos['recibo']['cantidad'] > 1
+                      ? CardItemFirst(
+                          title: "Deuda Anterior",
+                          monto: situacionActual
+                              .facturaPenultima['recibo']['importeRecibo']
+                              .toString(),
+                          fechaLectura: situacionActual
+                              .facturaPenultima['recibo']['fechaVencimiento'],
+                          lectura: situacionActual.calculoConsumo['consumo']
+                              .toString(),
+                          consumo: "",
+                          fechaVencimiento:
+                              situacionActual
+                                  .facturaPenultima['recibo']['fechaVencimiento'] ??
+                              'Sin dato',
+                          totalConComision: situacionActual
+                              .facturaPenultima['otrosImportes']['totalconComision']
+                              .toString(),
+                          onPrimaryPressed: () {
+                            print("Ver Ultima Factura");
+                          },
+                          onSecondaryPressed: () {
+                            print("Pagar");
+                          },
+                        )
+                      : Text(""),
+                ],
+              );
+            },
+            loading: () => const CustomLoading(text: "Cargando..."),
+            error: (error, _) => Center(child: Text('Error: $error')),
+          ),
+        ),
+
         const SizedBox(height: 16),
 
         Expanded(
@@ -74,7 +116,7 @@ class FacturasTab extends ConsumerWidget {
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Text(
-                      "Comprobantes",
+                      "Últimos Comprobantes",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -112,7 +154,7 @@ class FacturasTab extends ConsumerWidget {
                 ],
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const CustomLoading(text: "Cargando..."),
             error: (error, _) => Center(child: Text('Error: $error')),
           ),
         ),
