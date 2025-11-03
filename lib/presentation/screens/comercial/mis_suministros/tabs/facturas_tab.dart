@@ -8,20 +8,26 @@ import 'package:form/presentation/components/common/UI/custom_loading.dart';
 import 'package:form/presentation/components/common/card_item_first.dart';
 
 import 'package:form/presentation/components/common/card_item_second.dart';
-import 'package:form/presentation/components/common/horizontal_cards.dart';
 import 'package:form/provider/situacion_actual_provider.dart';
 import 'package:form/provider/ultimas_facturas_provider.dart';
 import 'package:form/utils/utils.dart';
 import '../../../../../model/login_model.dart';
 
-class FacturasTab extends ConsumerWidget {
+class FacturasTab extends ConsumerStatefulWidget {
   final SuministrosList? selectedNIS;
   final String? token;
 
   const FacturasTab(this.selectedNIS, this.token, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _FacturasTabState();
+}
+
+bool _isLoadingFactura = false;
+
+class _FacturasTabState extends ConsumerState<FacturasTab> {
+  @override
+  Widget build(BuildContext context) {
     final asyncFacturas = ref.watch(facturasProvider);
 
     final asyncSituacionActual = ref.watch(situacionActualProvider);
@@ -135,7 +141,7 @@ class FacturasTab extends ConsumerWidget {
                         final factura = facturas[index];
 
                         num nisParcial = int.parse(
-                          selectedNIS!.nisRad.toString().substring(0, 3),
+                          widget.selectedNIS!.nisRad.toString().substring(0, 3),
                         );
                         List<String> fechaObtenida = factura.fechaVencimiento!
                             .split('-');
@@ -144,14 +150,15 @@ class FacturasTab extends ConsumerWidget {
                         num anho = int.parse(fechaObtenida[0]);
                         num mejunje = (anho - (dia * mes));
                         num oper =
-                            (((selectedNIS!.nisRad! * nisParcial) +
-                            selectedNIS!.nisRad!));
+                            (((widget.selectedNIS!.nisRad! * nisParcial) +
+                            widget.selectedNIS!.nisRad!));
                         num res = oper * mejunje;
                         String cifra = res.toString();
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: CardItemSecond(
+                            isLoadingFactura: _isLoadingFactura,
                             monto: factura.importe.toString(),
                             estadoPago: factura.estadoFactura ?? '',
                             estadoColor: factura.esPagado == true
@@ -161,13 +168,19 @@ class FacturasTab extends ConsumerWidget {
                             fechaVencimiento:
                                 factura.fechaVencimiento ?? 'Sin dato',
                             onVerFacturaPressed: () async {
+                              setState(() {
+                                _isLoadingFactura = true;
+                              });
                               print("Ver Ultima Factura");
                               try {
                                 final fecha = factura.fechaVencimiento;
-                                final fecha_fac = formatearFecha(fecha: factura.fechaFacturacion!,formatoSalida: '/');
+                                final fecha_fac = formatearFecha(
+                                  fecha: factura.fechaFacturacion!,
+                                  formatoSalida: '/',
+                                );
                                 final String urlFinal =
                                     factura.facturaElectronica!
-                                    ? '${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?nro_nis=${selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fecha&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}&f_fact=$fecha_fac'
+                                    ? '${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?nro_nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fecha&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}&f_fact=$fecha_fac'
                                     : "";
 
                                 print(urlFinal);
@@ -178,6 +191,10 @@ class FacturasTab extends ConsumerWidget {
                                       'factura_${factura.nirSecuencial}.pdf',
                                     );
 
+                                setState(() {
+                                  _isLoadingFactura = false;
+                                });
+
                                 mostrarCustomModal(context, archivoDescargado);
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -185,6 +202,10 @@ class FacturasTab extends ConsumerWidget {
                                     content: Text('Error al abrir PDF: $e'),
                                   ),
                                 );
+                              } finally {
+                                setState(() {
+                                  _isLoadingFactura = false;
+                                });
                               }
                             },
                           ),

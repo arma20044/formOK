@@ -7,6 +7,7 @@ class CardItemSecond extends StatelessWidget {
   final String fechaEmision;
   final String fechaVencimiento;
   final VoidCallback onVerFacturaPressed;
+  final bool isLoadingFactura;
 
   const CardItemSecond({
     super.key,
@@ -16,6 +17,7 @@ class CardItemSecond extends StatelessWidget {
     required this.fechaEmision,
     required this.fechaVencimiento,
     required this.onVerFacturaPressed,
+    required this.isLoadingFactura,
   });
 
   @override
@@ -48,7 +50,9 @@ class CardItemSecond extends StatelessWidget {
               children: [
                 Text(
                   'Monto en Gs.',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: secondaryTextColor),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: secondaryTextColor,
+                  ),
                 ),
                 Text(
                   monto,
@@ -67,18 +71,21 @@ class CardItemSecond extends StatelessWidget {
               children: [
                 Text(
                   'Estado del pago',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: secondaryTextColor),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: secondaryTextColor,
+                  ),
                 ),
                 Row(
                   children: [
-                   
                     const SizedBox(width: 6),
                     Text(
                       estadoPago,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: mainTextColor,
                         fontWeight: FontWeight.bold,
-                        backgroundColor: estadoPago == 'Pagado' ? Colors.green : Colors.orange
+                        backgroundColor: estadoPago == 'Pagado'
+                            ? Colors.green
+                            : Colors.orange,
                       ),
                     ),
                   ],
@@ -93,11 +100,15 @@ class CardItemSecond extends StatelessWidget {
               children: [
                 Text(
                   'Emisión',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: secondaryTextColor),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: secondaryTextColor,
+                  ),
                 ),
                 Text(
                   fechaEmision,
-                  style: theme.textTheme.bodyMedium?.copyWith(color: mainTextColor),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: mainTextColor,
+                  ),
                 ),
               ],
             ),
@@ -109,32 +120,49 @@ class CardItemSecond extends StatelessWidget {
               children: [
                 Text(
                   'Vencimiento',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: secondaryTextColor),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: secondaryTextColor,
+                  ),
                 ),
                 Text(
                   fechaVencimiento,
-                  style: theme.textTheme.bodyMedium?.copyWith(color: mainTextColor),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: mainTextColor,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
 
+            Column(
+              children: [
+                if (isLoadingFactura)
+                  Container(
+                    color: Colors.black.withOpacity(0.5),
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 3,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             // 🔘 Botón Ver factura
             SizedBox(
               width: double.infinity,
-               
-                child: ElevatedButton(
-                  onPressed: onVerFacturaPressed,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+
+              child: ElevatedButton(
+                onPressed: onVerFacturaPressed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: accentColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text('Ver factura'),
                 ),
-              
+                child:isLoadingFactura ? Text("Cargando..."): Text('Ver factura'),
+              ),
             ),
           ],
         ),
