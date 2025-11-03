@@ -1,5 +1,9 @@
+import 'dart:ffi';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/core/enviromens/Enrivoment.dart';
 import 'package:form/presentation/components/common/UI/custom_loading.dart';
 import 'package:form/presentation/components/common/card_item_first.dart';
 
@@ -7,6 +11,7 @@ import 'package:form/presentation/components/common/card_item_second.dart';
 import 'package:form/presentation/components/common/horizontal_cards.dart';
 import 'package:form/provider/situacion_actual_provider.dart';
 import 'package:form/provider/ultimas_facturas_provider.dart';
+import 'package:form/utils/utils.dart';
 import '../../../../../model/login_model.dart';
 
 class FacturasTab extends ConsumerWidget {
@@ -85,9 +90,7 @@ class FacturasTab extends ConsumerWidget {
                           totalConComision: situacionActual
                               .facturaPenultima['otrosImportes']['totalconComision']
                               .toString(),
-                          onPrimaryPressed: () {
-                            print("Ver Ultima Factura");
-                          },
+                          onPrimaryPressed: () async {},
                           onSecondaryPressed: () {
                             print("Pagar");
                           },
@@ -130,6 +133,22 @@ class FacturasTab extends ConsumerWidget {
                       itemCount: facturas.length,
                       itemBuilder: (context, index) {
                         final factura = facturas[index];
+
+                        num nisParcial = int.parse(
+                          selectedNIS!.nisRad.toString().substring(0, 3),
+                        );
+                        List<String> fechaObtenida = factura.fechaVencimiento!
+                            .split('-');
+                        num dia = int.parse(fechaObtenida[2]);
+                        num mes = int.parse(fechaObtenida[1]);
+                        num anho = int.parse(fechaObtenida[0]);
+                        num mejunje = (anho - (dia * mes));
+                        num oper =
+                            (((selectedNIS!.nisRad! * nisParcial) +
+                            selectedNIS!.nisRad!));
+                        num res = oper * mejunje;
+                        String cifra = res.toString();
+
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: CardItemSecond(
@@ -141,10 +160,32 @@ class FacturasTab extends ConsumerWidget {
                             fechaEmision: factura.fechaEmision ?? 'Sin dato',
                             fechaVencimiento:
                                 factura.fechaVencimiento ?? 'Sin dato',
-                            onVerFacturaPressed: () {
-                              print(
-                                '🧾 Ver factura ${factura.fechaFacturacion}',
-                              );
+                            onVerFacturaPressed: () async {
+                              print("Ver Ultima Factura");
+                              try {
+                                final fecha = factura.fechaVencimiento;
+                                final fecha_fac = formatearFecha(fecha: factura.fechaFacturacion!,formatoSalida: '/');
+                                final String urlFinal =
+                                    factura.facturaElectronica!
+                                    ? '${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?nro_nis=${selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fecha&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}&f_fact=$fecha_fac'
+                                    : "";
+
+                                print(urlFinal);
+
+                                final File archivoDescargado =
+                                    await descargarPdfConPipe(
+                                      urlFinal, // URL del PDF
+                                      'factura_${factura.nirSecuencial}.pdf',
+                                    );
+
+                                mostrarCustomModal(context, archivoDescargado);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error al abrir PDF: $e'),
+                                  ),
+                                );
+                              }
                             },
                           ),
                         );

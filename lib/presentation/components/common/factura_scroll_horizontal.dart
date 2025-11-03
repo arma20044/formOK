@@ -1,18 +1,12 @@
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/model/consulta_facturas.dart';
-import 'package:form/presentation/components/common/custom_ask_modal.dart';
-import 'package:form/presentation/components/common/custom_pdf_modal.dart';
-import 'package:form/presentation/components/common/pdf_viewer.dart';
 import 'package:form/provider/theme_provider.dart';
+import 'package:form/utils/utils.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 
 
@@ -25,58 +19,6 @@ class FacturaScrollHorizontal extends ConsumerWidget {
     required this.facturas,
     required this.nis,
   });
-
-  Future<File> descargarPdfConPipe(String url, String nombreArchivo) async {
-    Dio dio = Dio();
-
-    Directory dir = await getTemporaryDirectory();
-    String ruta = '${dir.path}/$nombreArchivo';
-    File archivo = File(ruta);
-
-    try {
-      final response = await dio.get(
-        url,
-        options: Options(
-          responseType: ResponseType.stream,
-          headers: {
-            'Accept': 'application/pdf',
-            'x-so': Platform.isAndroid ? 'Android' : 'IOS',
-          },
-        ),
-      );
-
-      final body = response.data as ResponseBody;
-
-      final total = body.contentLength ?? -1;
-      int recibido = 0;
-
-      print('Status code: ${response.statusCode}');
-      print('Headers: ${response.headers}');
-
-      final sink = archivo.openWrite();
-
-      // Esto descarga y escribe automáticamente el stream en el archivo
-      await for (final chunk in body.stream) {
-        recibido += chunk.length;
-        if (total != -1) {
-          print('Descargando: ${(recibido / total * 100).toStringAsFixed(0)}%');
-        }
-        sink.add(chunk);
-      }
-
-      await sink.close();
-      print('Descarga completada: ${archivo.path}');
-
-      print('Tamaño del archivo: ${await archivo.length()} bytes');
-
-      final bytes = await archivo.readAsBytes();
-      print('Primeros bytes: ${String.fromCharCodes(bytes.take(100))}');
-
-      return archivo;
-    } catch (e) {
-      throw Exception('Error al descargar PDF: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -212,25 +154,4 @@ class FacturaScrollHorizontal extends ConsumerWidget {
   }
 }
 
-void mostrarCustomModal(BuildContext context, File pdfFile) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return CustomPdfModal(
-        pdfFile: pdfFile,
-        title: 'Confirmar acción',
-        content: const Text(
-          '¿Deseas continuar con esta acción?',
-          textAlign: TextAlign.center,
-        ),
-        onConfirm: () {
-          // acción de confirmación
-          debugPrint('Confirmado ✅');
-        },
-        onCancel: () {
-          debugPrint('Cancelado ❌');
-        },
-      );
-    },
-  );
-}
+

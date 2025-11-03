@@ -1,6 +1,12 @@
-    import 'package:flutter/material.dart';
+    import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:form/model/constans/mensajes_servicios.dart';
 import 'package:form/model/servicios_nis_telefono.dart';
+import 'package:form/presentation/components/common/custom_pdf_modal.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 
 final RegExp emailRegex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
@@ -51,3 +57,103 @@ List<NumberItem> processServiciosClase(ResultadoServiciosNisTelefono resultado) 
 
 
 
+
+  Future<File> descargarPdfConPipe(String url, String nombreArchivo) async {
+    Dio dio = Dio();
+
+    Directory dir = await getTemporaryDirectory();
+    String ruta = '${dir.path}/$nombreArchivo';
+    File archivo = File(ruta);
+
+    try {
+      final response = await dio.get(
+        url,
+        options: Options(
+          responseType: ResponseType.stream,
+          headers: {
+            'Accept': 'application/pdf',
+            'x-so': Platform.isAndroid ? 'Android' : 'IOS',
+          },
+        ),
+      );
+
+      final body = response.data as ResponseBody;
+
+      final total = body.contentLength ?? -1;
+      int recibido = 0;
+
+      print('Status code: ${response.statusCode}');
+      print('Headers: ${response.headers}');
+
+      final sink = archivo.openWrite();
+
+      // Esto descarga y escribe automáticamente el stream en el archivo
+      await for (final chunk in body.stream) {
+        recibido += chunk.length;
+        if (total != -1) {
+          print('Descargando: ${(recibido / total * 100).toStringAsFixed(0)}%');
+        }
+        sink.add(chunk);
+      }
+
+      await sink.close();
+      print('Descarga completada: ${archivo.path}');
+
+      print('Tamaño del archivo: ${await archivo.length()} bytes');
+
+      final bytes = await archivo.readAsBytes();
+      print('Primeros bytes: ${String.fromCharCodes(bytes.take(100))}');
+
+      return archivo;
+    } catch (e) {
+      throw Exception('Error al descargar PDF: $e');
+    }
+  }
+
+
+
+void mostrarCustomModal(BuildContext context, File pdfFile) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return CustomPdfModal(
+        pdfFile: pdfFile,
+        title: 'Confirmar acción',
+        content: const Text(
+          '¿Deseas continuar con esta acción?',
+          textAlign: TextAlign.center,
+        ),
+        onConfirm: () {
+          // acción de confirmación
+          debugPrint('Confirmado ✅');
+        },
+        onCancel: () {
+          debugPrint('Cancelado ❌');
+        },
+      );
+    },
+  );
+}
+
+/// Convierte una fecha de formato YYYY-DD-MM a DD/MM/YYYY
+String formatearFecha({
+  required String fecha,
+  String formatoSalida = '/',
+}) {
+  try {
+    // Separar los componentes
+    List<String> partes = fecha.split('-');
+    if (partes.length != 3) throw FormatException("Formato inválido");
+
+    int year = int.parse(partes[0]);
+    int day = int.parse(partes[1]);
+    int month = int.parse(partes[2]);
+
+    
+
+    return '$month$formatoSalida$day$formatoSalida$year';
+  } catch (e) {
+    // En caso de error, devuelve el string original
+    return fecha;
+  }
+}
