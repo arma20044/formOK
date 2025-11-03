@@ -9,3 +9,8 @@ A new Flutter project.
 
 
 ## agregar Uri.encodeComponent cuando se envia parametro con caracteres especiales para garantizar que tenga el encoding correcto
+
+### llamadas al provider no se puede hacer directamente en el build por lo que se necesita que este dentro de un:
+ WidgetsBinding.instance.addPostFrameCallback((_) {}
+
+ 

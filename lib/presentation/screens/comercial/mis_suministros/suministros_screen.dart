@@ -8,6 +8,7 @@ import 'package:form/presentation/screens/comercial/mis_suministros/tabs/factura
 import 'package:form/presentation/screens/comercial/mis_suministros/tabs/historico_tab.dart';
 import 'package:form/presentation/screens/comercial/mis_suministros/tabs/lectura_tab.dart';
 import 'package:form/presentation/screens/comercial/mis_suministros/tabs/mensajes_tab.dart';
+import 'package:form/provider/suministro_provider.dart';
 
 class SuministrosScreen extends ConsumerStatefulWidget {
   const SuministrosScreen({super.key});
@@ -91,7 +92,7 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
     final authState = ref.watch(authProvider);
 
     final theme = Theme.of(context);
-final isDark = theme.brightness == Brightness.dark;
+    final isDark = theme.brightness == Brightness.dark;
 
     // 🧩 Esperar a que el provider tenga valor
     if (authState.value == null) {
@@ -126,11 +127,17 @@ final isDark = theme.brightness == Brightness.dark;
     if (dropDownItemsSuministro != null &&
         selectedNIS == null &&
         dropDownItemsSuministro.isNotEmpty) {
+      // Selecciona el primer NIS
       selectedNIS = dropDownItemsSuministro.first;
 
+      // Calcula indicador si querés
       final indicador = selectedNIS!.indicadorBloqueoWeb == 1 ? true : false;
-
       print('📊 indicador actual: $indicador');
+
+      // 🔹 Posponer actualización del provider
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(selectedNISProvider.notifier).set(selectedNIS);
+      });
     }
 
     return Scaffold(
@@ -158,8 +165,17 @@ final isDark = theme.brightness == Brightness.dark;
                       )
                       .toList(),
                   onChanged: (value) {
+                    if (value == null) return;
+
                     setState(() => selectedNIS = value);
+
+                    // 🔥 Actualizamos el provider global
+                    ref.read(selectedNISProvider.notifier).set(value);
+
+                    // (opcional) mover al primer tab
+                    _tabController.animateTo(0);
                   },
+
                   validator: (value) =>
                       value == null ? 'Seleccione un NIS' : null,
                 ),
@@ -172,14 +188,18 @@ final isDark = theme.brightness == Brightness.dark;
                       child: TabBar(
                         isScrollable: true,
                         controller: _tabController,
-                        labelStyle:  TextStyle(
+                        labelStyle: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black,       // Tab seleccionado
-                        ),                        
-                        unselectedLabelStyle:  TextStyle(
+                          color: isDark
+                              ? Colors.white
+                              : Colors.black, // Tab seleccionado
+                        ),
+                        unselectedLabelStyle: TextStyle(
                           fontSize: 12,
-                          color: isDark ? Colors.grey[90] : Colors.white, // Tab no seleccionado
+                          color: isDark
+                              ? Colors.grey[90]
+                              : Colors.white, // Tab no seleccionado
                         ),
                         tabs: tabs
                             .map(
@@ -261,9 +281,9 @@ final isDark = theme.brightness == Brightness.dark;
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
             children: [
-               FacturasTab(selectedNIS:  selectedNIS!,token:   _token),
+              FacturasTab(selectedNIS: selectedNIS!, token: _token),
               const HistoricoTab(),
-               MensajesTab(selectedNIS),
+              MensajesTab(selectedNIS),
               const LecturaTab(),
               if (selectedNIS != null && _token != null)
                 ConfiguracionTab(key: configuracionKey, selectedNIS!, _token!)
