@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form/presentation/components/common/UI/custom_loading.dart';
-import 'package:form/provider/historico_consumo_monto_provider.dart';
+import 'package:form/core/api/mi_ande_api.dart';
+import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/infrastructure/infrastructure.dart';
+import 'package:form/provider/recuperar_historico_by_id_provider.dart';
+import 'package:form/provider/suministro_provider.dart';
+import 'package:form/repositories/repositories.dart';
 
 class HistoricoTab extends ConsumerStatefulWidget {
   const HistoricoTab({super.key});
@@ -11,25 +15,57 @@ class HistoricoTab extends ConsumerStatefulWidget {
 }
 
 class _HistoricoTabState extends ConsumerState<HistoricoTab> {
+  String? idHistorico;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarID();
+  }
+
+  Future<void> _cargarID() async {
+    final authState = ref.read(authProvider);
+    final token = authState.value?.user?.token ?? "";
+
+    final nis = ref.read(selectedNISProvider);
+
+    if (nis == null) {
+      // manejar error
+      return;
+    }
+
+    final repo = HistoricoConsumoMontoRepositoryImpl(
+      HistoricoConsumoMontoDatasourceImpl(MiAndeApi()),
+    );
+
+    final response = await repo.getHistoricoConsumoMonto(
+      nis.nisRad!.toString(),
+      "N",
+      token,
+    );
+
+    if (response.error) {
+      // manejar error
+      return;
+    }
+
+    setState(() {
+      idHistorico = response.resultado.id; // guardar ID
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final asyncHistoricoConsumoMontoDatos = ref.watch(historicoConsumoMontoProvider);
+    if (idHistorico == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    return asyncHistoricoConsumoMontoDatos.when(
-        data: (historico) {
-          if ( historico.error ) {
-            return  Center(child: Text("No hay datos disponibles"));
-          }
+    final asyncHistorico = ref.watch(recuperarHistoricoProvider(idHistorico!));
 
-          return Column(children: [
-            Text(historico.resultado.id)
-          ]);
-        },
-        loading: () => const CustomLoading(text: "Cargando..."),
-        error: (error, _) => Center(child: Text('Error: $error')),
-      
+    return asyncHistorico.when(
+      data: (data) => Text('Datos cargados: ${data.resultado.lista[0]}'),
+      loading: () => const CircularProgressIndicator(),
+      error: (e, _) => Text('Error: $e'),
     );
-    //return
-    //Text("historico tab");
   }
 }

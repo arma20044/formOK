@@ -13,3 +13,4 @@ export 'servicios_nis_datasource_impl.dart';
 export './mi_cuenta/mi_cuenta_ultimas_facturas_datasource_impl.dart';
 export './mi_cuenta/mi_cuenta_situacion_actual_datasource_impl.dart';
 export './comercial/historico_consumo_monto_datasource_impl.dart';
+export 'comercial/recuperar_historico_datasource_impl.dart';

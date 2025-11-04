@@ -8,22 +8,22 @@ import '../model/model.dart';
 import '../repositories/repositories.dart';
 import 'suministro_provider.dart';
 
-final historicoConsumoMontoProvider =
-    FutureProvider.autoDispose<HistoricoConsumoMonto>((ref) async {
+final recuperarHistoricoProvider = FutureProvider.autoDispose
+    .family<RecuperarHistorico, String>((ref, idHistorico) async {
       final nis = ref.watch(selectedNISProvider);
       if (nis == null) Exception("NO LLEGO NIS");
 
       final authState = ref.watch(authProvider);
+
       final token = authState.value?.user?.token;
 
-      final repo = HistoricoConsumoMontoRepositoryImpl(
-        HistoricoConsumoMontoDatasourceImpl(MiAndeApi()),
+      final repo = RecuperarHistoricoRepositoryImpl(
+        RecuperarHistoricoDatasourceImpl(MiAndeApi()),
       );
 
-      final response = await repo.getHistoricoConsumoMonto(
-        nis!.nisRad!.toString(),
-        "N",
-        token ?? "",
+      final response = await repo.getRecuperarHistorico(
+        idHistorico,
+        token!,
       );
 
       if (response.error) {
