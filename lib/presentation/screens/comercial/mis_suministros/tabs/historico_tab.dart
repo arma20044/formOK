@@ -7,6 +7,8 @@ import 'package:form/provider/recuperar_historico_by_id_provider.dart';
 import 'package:form/provider/suministro_provider.dart';
 import 'package:form/repositories/repositories.dart';
 
+import '../../../../components/comercial/grafico_consumo_horizontal.dart';
+
 class HistoricoTab extends ConsumerStatefulWidget {
   const HistoricoTab({super.key});
 
@@ -63,7 +65,23 @@ class _HistoricoTabState extends ConsumerState<HistoricoTab> {
     final asyncHistorico = ref.watch(recuperarHistoricoProvider(idHistorico!));
 
     return asyncHistorico.when(
-      data: (data) => Text('Datos cargados: ${data.resultado.lista[0]}'),
+      //data: (data) => Text('Datos cargados: ${data.resultado.lista[0]}'),
+      data: (data) =>  SingleChildScrollView(
+        child: Column(
+          children: [
+            HorizontalComparativaChart(
+            facturas: data.resultado.lista,
+            mostrarConsumo: true,
+            anioActual: DateTime.now().year,
+                ),
+                HorizontalComparativaChart(
+            facturas: data.resultado.lista,
+            mostrarConsumo: false,
+            anioActual: DateTime.now().year,
+                ),
+          ],
+        ),
+      ),
       loading: () => const CircularProgressIndicator(),
       error: (e, _) => Text('Error: $e'),
     );

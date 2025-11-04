@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:form/model/comercial/factura_grafico.dart';
+import 'package:form/model/model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 
 class HorizontalComparativaChart extends StatelessWidget {
-  final List<ListaFacturaGrafico> facturas;
+  final List<ListaRecuperarHistorico> facturas;
   final bool mostrarConsumo; // true = consumo, false = importe
   final int anioActual;
 
