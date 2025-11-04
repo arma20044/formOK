@@ -49,6 +49,8 @@ class LoginDatasourceImpl extends LoginDatasource {
       // return rawList.map((json) => Login.fromJson(json)).first;
       final loginResponse = Login.fromJson(response.data);
 
+      print(loginResponse.token);
+
       return loginResponse;
     } else {
       throw Exception('Error ${response.statusCode}');

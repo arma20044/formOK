@@ -8,6 +8,8 @@ import 'package:form/presentation/components/common/custom_pdf_modal.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../model/comercial/factura_grafico.dart';
+
 final RegExp emailRegex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
 
@@ -157,3 +159,6 @@ String formatearFecha({
     return fecha;
   }
 }
+
+
+
