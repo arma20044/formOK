@@ -11,3 +11,4 @@ export 'bloqueo_suministro_datasource.dart';
 export 'servicios_nis_datasource.dart';
 export './mi_cuenta/mi_cuenta_ultimas_facturas_datasource.dart';
 export './mi_cuenta/mi_cuenta_situacion_actual_datasource.dart';
+export 'comercial/historico_consumo_monto_datasource.dart';

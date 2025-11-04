@@ -10,3 +10,4 @@ export 'bloqueo_suministro_repository_impl.dart';
 export 'servicios_nis_repository_impl.dart';
 export './mi_cuenta/mi_cuenta_ultimas_facturas_repository_impl.dart';
 export './mi_cuenta/mi_cuenta_situacion_actual_repository_impl.dart';
+export 'comercial/historico_consumo_monto_repository_impl.dart';
