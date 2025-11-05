@@ -78,20 +78,9 @@ class HorizontalComparativaChart extends StatelessWidget {
                 primaryXAxis: CategoryAxis(),
                 primaryYAxis: NumericAxis(
                   title: AxisTitle(
-                      text: mostrarConsumo ? 'Consumo' : 'Importe (miles)'),
+                      text: mostrarConsumo ? 'Consumo (kW/h)' : 'Importe (Guaraníes)'),
                 ),
                 series: <CartesianSeries<ListaFacturaGrafico, String>>[
-                  // Año anterior
-                  BarSeries<ListaFacturaGrafico, String>(
-                    name: 'Año ${anioActual - 1}',
-                    dataSource: listaAnterior,
-                    xValueMapper: (ListaFacturaGrafico f, _) => f.fechaFacturacionMask ?? '',
-                    yValueMapper: (ListaFacturaGrafico f, _) => f.importeFacturado ?? 0,
-                    gradient: const LinearGradient(
-                        colors: [Colors.grey, Colors.black26]),
-                    spacing: 0.2,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
                   // Año actual
                   BarSeries<ListaFacturaGrafico, String>(
                     name: 'Año $anioActual',
@@ -103,6 +92,18 @@ class HorizontalComparativaChart extends StatelessWidget {
                     spacing: 0.2,
                     borderRadius: BorderRadius.circular(6),
                   ),
+                  // Año anterior
+                  BarSeries<ListaFacturaGrafico, String>(
+                    name: 'Año ${anioActual - 1}',
+                    dataSource: listaAnterior,
+                    xValueMapper: (ListaFacturaGrafico f, _) => f.fechaFacturacionMask ?? '',
+                    yValueMapper: (ListaFacturaGrafico f, _) => f.importeFacturado ?? 0,
+                    gradient: const LinearGradient(
+                        colors: [Colors.red, Colors.redAccent]),
+                    spacing: 0.2,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  
                 ],
                 isTransposed: false, // horizontal
               ),

@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:form/core/errors/error_interceptor.dart';
+import 'package:form/core/router/app_router.dart';
+import 'package:form/main.dart';
 
 import '../enviromens/Enrivoment.dart';
 
@@ -22,6 +24,26 @@ class MiAndeApi {
       ) {
     // Interceptor para debug
     dio.interceptors.add(ErrorInterceptor());
+    dio.interceptors.add(
+    InterceptorsWrapper(
+      onError: (DioException e, handler) {
+        if (e.response?.statusCode == 200) {
+          if(e.error == true ){
+            print(e.message);
+
+          }
+          // Token expirado → limpiar sesión
+          //container.read(authProvider.) = false;
+          //container.read(tokenProvider.notifier).state = null;
+
+          // Redirigir al login globalmente
+          final router = container.read(goRouterProvider);
+          router.go('/login');
+        }
+        handler.next(e);
+      },
+    ),
+  );
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {

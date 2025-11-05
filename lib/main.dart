@@ -12,8 +12,14 @@ import 'presentation/components/menu/menu_data.dart';
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
+// Container global para acceso a providers desde cualquier parte
+final container = ProviderContainer();
+
+
 void main() {
-  runApp(ProviderScope(child: MyApp()));
+  runApp( UncontrolledProviderScope(
+    container: container,
+    child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {

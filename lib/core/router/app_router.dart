@@ -7,6 +7,7 @@ import 'package:form/presentation/screens/mi_cuenta/mis_datos_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/olvido_contrasenha/olvido_contrasenha_screen.dart';
 import 'package:form/presentation/screens/mi_cuenta/registro/registro_mi_cuenta_screen.dart';
 import 'package:form/presentation/screens/splash_screen.dart';
+import 'package:form/provider/router_history_notifier.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:form/core/auth/auth_notifier.dart';
@@ -24,7 +25,7 @@ final publicRoutes = ['/login', '/register', '/splash','/'];
 final privateRoutes = ['/miCuenta', '/misDatos','/settings','/consultaFacturas','cambioContrasenha'];
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  // Notificador para forzar rebuild cuando cambie authProvider
+  // 🔸 Forzar rebuild cuando cambie el authProvider
   final refreshListenable = ValueNotifier<int>(0);
 
   ref.listen<AsyncValue<AuthStateData>>(authProvider, (previous, next) {
@@ -33,7 +34,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
   ref.onDispose(refreshListenable.dispose);
 
-  return GoRouter(
+  // 🔸 Instancia del history notifier
+  final routeHistory = ref.read(routeHistoryProvider.notifier);
+
+  final router = GoRouter(
     initialLocation: '/splash',
     refreshListenable: refreshListenable,
     routes: [
@@ -50,8 +54,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/cambioContrasenha', builder: (context, state) => const CambioContrasenhaScreen()),
       GoRoute(path: '/suministros', builder: (context, state) => const SuministrosScreen()),
     ],
+
     redirect: (context, state) {
       final authState = ref.read(authProvider);
+
+      // 🔹 Guardamos la ruta actual para tener historial
+      Future.microtask(() {
+        routeHistory.update(state.uri);
+      });
 
       // 🔹 Mientras cargamos, no redirigir
       if (authState.isLoading) return null;
@@ -60,21 +70,45 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final loggingIn = state.uri.path == '/login';
       final currentPath = state.matchedLocation;
       final forzarCambioContrasenha = authState.value?.user?.modificarPassword;
+      final from = state.uri.queryParameters['from'];
 
-      if(forzarCambioContrasenha != null && forzarCambioContrasenha.contains('S')) return '/cambioContrasenha';
+      if (forzarCambioContrasenha != null &&
+          forzarCambioContrasenha.contains('S')) {
+        return '/cambioContrasenha';
+      }
 
-      // 🔹 Usuario no logueado y no está en login → ir a login
-      if (!isLoggedIn && !loggingIn && privateRoutes.contains(currentPath)) return '/login';
-      
+      // 🔹 Usuario no logueado y accede a rutas privadas → login
+      if (!isLoggedIn && !loggingIn && privateRoutes.contains(currentPath)) {
+        return '/login?from=${state.uri.toString()}';
+      }
+
+      // 🔹 Usuario logueado e intenta ir al login → home o destino anterior
+      if (isLoggedIn && loggingIn) {
+        return from ?? '/';
+      }
+
+      if (isLoggedIn && state.uri.path == '/splash') return '/';
       if (!isLoggedIn && !loggingIn && publicRoutes.contains(currentPath)) return '/';
 
-      // 🔹 Usuario logueado e intenta ir a login → redirigir a home
-      if (isLoggedIn && loggingIn) return '/';
-
-      if(isLoggedIn && state.uri.path == '/splash') return '/';
-
-      // 🔹 No cambiar ruta
-      return null;
+      return null; // no redirigir
     },
   );
+
+  // 🔹 Listener global (opcional, si querés ver el historial)
+   // ✅ go_router 16.x → escuchamos el routerDelegate en vez de router directamente
+  router.routerDelegate.addListener(() {
+    final configuration = router.routerDelegate.currentConfiguration;
+    if (configuration.isNotEmpty) {
+      final loc = configuration.last.matchedLocation;
+      Future.microtask(() {
+        routeHistory.update(Uri.parse(loc));
+         debugPrint('➡️ Navegando a: $loc');
+      });
+    }
+  });
+
+  
+
+
+  return router;
 });
