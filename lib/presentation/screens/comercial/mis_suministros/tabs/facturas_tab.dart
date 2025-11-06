@@ -46,6 +46,27 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
               if (situacionActual.facturaDatos.length == 0) {
                 return const Center(child: Text("No hay factuas sin pagar."));
               }
+              final fechaVencimiento =
+                  situacionActual.facturaDatos['recibo']['fechaVencimiento'];
+
+            
+
+              final factura = situacionActual.facturaDatos;
+              
+
+              num nisParcial = int.parse(
+                widget.selectedNIS!.nisRad.toString().substring(0, 3),
+              );
+              List<String> fechaObtenida = fechaVencimiento.split('/');
+              num dia = int.parse(fechaObtenida[0]);
+              num mes = int.parse(fechaObtenida[1]);
+              num anho = int.parse(fechaObtenida[2]);
+              num mejunje = (anho - (dia * mes));
+              num oper =
+                  (((widget.selectedNIS!.nisRad! * nisParcial) +
+                  widget.selectedNIS!.nisRad!));
+              num res = oper * mejunje;
+              String cifra = res.toString();
 
               //logica para mostrar cards
               return Column(
@@ -71,8 +92,25 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                           onPrimaryPressed: () {
                             print("Ver Ultima Factura");
                           },
-                          onSecondaryPressed: () {
-                            print("Pagar");
+                          onSecondaryPressed: () async {
+                            final String urlFinal =
+                                situacionActual.facturaDatos['facturaElectronica']
+                                //? '${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?nro_nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fecha&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}&f_fact=$fecha_fac'
+                                ? "${Environment.hostCtxOpen}/v5/suministro/ultimaFacturaElectronicaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento"
+                                : "${Environment.hostCtxOpen}/v4/suministro/ultimaFacturaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento";
+
+
+                                final File archivoDescargado =
+                                    await descargarPdfConPipe(
+                                      urlFinal, // URL del PDF
+                                      'factura_${factura['recibo']['nirSecuencial']}.pdf',
+                                    );
+
+                                setState(() {
+                                  _isLoadingFactura = false;
+                                });
+
+                                mostrarCustomModal(context, archivoDescargado);
                           },
                         )
                       : Text(""),
