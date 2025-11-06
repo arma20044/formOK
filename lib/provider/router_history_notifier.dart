@@ -9,6 +9,8 @@ class RouteHistoryNotifier extends StateNotifier<Map<String, Uri?>> {
       'previous': state['current'],
       'current': newUri,
     };
+    print("guardada prev: ${state['current']}");
+    print("guardada current: $newUri");
   }
 }
 

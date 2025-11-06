@@ -25,7 +25,9 @@ final List<DropdownItem> dropDownItems = [
 ];
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+final String from;
+
+  const LoginScreen(   {super.key,required this.from,});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -71,7 +73,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (authData.state == AuthState.authenticated) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
-            GoRouter.of(context).go('/'); // navega al home
+
+             
+            if (widget.from.isNotEmpty) {
+              //return '/$previousUri';
+                context.pushReplacement(widget.from);
+            } else {
+              GoRouter.of(context).go('/'); // navega al home
+            }
           });
         }
       },
@@ -89,13 +98,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               if (!mounted) return;
               if (authData.state == AuthState.authenticated) {
                 final previousUri = ref.read(routeHistoryProvider)['previous'];
-                if (previousUri != null &&
-                    previousUri.path != '/login' &&
-                    previousUri.path != '/splash') {
-                  // Volver a la ruta anterior
+                if (previousUri != null) {
                   ref.read(goRouterProvider).go(previousUri.toString());
                 } else {
-                  // Si no hay historial válido → ir al home
                   ref.read(goRouterProvider).go('/');
                 }
 
