@@ -51,15 +51,15 @@ class CardItemSecond extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Monto en Gs.',
+                  'Monto en Gs.:',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: secondaryTextColor,
+                    color: mainTextColor,
                   ),
                 ),
                 Text(
                   formatearNumeroString(monto),
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: accentColor,
+                    color: mainTextColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -72,9 +72,9 @@ class CardItemSecond extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Estado del pago',
+                  'Estado del pago:',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: secondaryTextColor,
+                    color: mainTextColor,
                   ),
                 ),
                 Row(
@@ -122,9 +122,9 @@ class CardItemSecond extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Emisión',
+                  'Emisión:',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: secondaryTextColor,
+                    color: mainTextColor,
                   ),
                 ),
                 Text(
@@ -142,9 +142,9 @@ class CardItemSecond extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Vencimiento',
+                  'Vencimiento: ',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: secondaryTextColor,
+                    color: mainTextColor,
                   ),
                 ),
                 Text(

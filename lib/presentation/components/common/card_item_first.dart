@@ -58,112 +58,108 @@ class CardItemFirst extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: ConstrainedBox(
             constraints: BoxConstraints(minWidth: width, minHeight: height),
-            child: 
-              
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: accentColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _infoRow(
+                  'Monto en Gs: ',
+                  monto,
+                  secondaryTextColor,
+                  mainTextColor,
+                  theme,
+                  fontWeight: FontWeight.bold,
+                ),
+                _infoRow(
+                  'Fecha de lectura: ',
+                  fechaLectura,
+                  secondaryTextColor,
+                  mainTextColor,
+                  theme,
+                ),
+                _infoRow(
+                  'Lectura: ',
+                  lectura,
+                  secondaryTextColor,
+                  mainTextColor,
+                  theme,
+                ),
+                _infoRow(
+                  'Consumo :',
+                  consumo,
+                  secondaryTextColor,
+                  mainTextColor,
+                  theme,
+                ),
+                _infoRow(
+                  'Fecha de vencimiento: ',
+                  fechaVencimiento,
+                  secondaryTextColor,
+                  mainTextColor,
+                  theme,
+                ),
+                _infoRow(
+                  'Total con comisión Gs.: ',
+                  totalConComision,
+                  secondaryTextColor,
+                  mainTextColor,
+                  theme,
+                  fontWeight: FontWeight.bold,
+                ),
+                const SizedBox(height: 12),
+                Row(
                   children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: accentColor,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: isLoadingFacturaDeudaTotal
+                            ? null
+                            : onSecondaryPressed,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: accentColor,
+                          side: BorderSide(color: accentColor),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: isLoadingFacturaDeudaTotal
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Text("Cargando..."),
+                                  SizedBox(width: 8),
+                                  CustomLoaderButton(),
+                                ],
+                              )
+                            : const Text('Ver Última factura'),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    _infoRow(
-                      'Monto en Gs: ',
-                      monto,
-                      secondaryTextColor,
-                      mainTextColor,
-                      theme,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    _infoRow(
-                      'Fecha de lectura: ',
-                      fechaLectura,
-                      secondaryTextColor,
-                      mainTextColor,
-                      theme,
-                    ),
-                    _infoRow(
-                      'Lectura: ',
-                      lectura,
-                      secondaryTextColor,
-                      mainTextColor,
-                      theme,
-                    ),
-                    _infoRow(
-                      'Consumo :',
-                      consumo,
-                      secondaryTextColor,
-                      mainTextColor,
-                      theme,
-                    ),
-                    _infoRow(
-                      'Fecha de vencimiento: ',
-                      fechaVencimiento,
-                      secondaryTextColor,
-                      mainTextColor,
-                      theme,
-                    ),
-                    _infoRow(
-                      'Total con comisión Gs.: ',
-                      totalConComision,
-                      secondaryTextColor,
-                      mainTextColor,
-                      theme,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: isLoadingFacturaDeudaTotal
-                                ? null
-                                : onSecondaryPressed,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: accentColor,
-                              side: BorderSide(color: accentColor),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: isLoadingFacturaDeudaTotal
-                                ? Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Text("Cargando..."),
-                                      SizedBox(width: 8),
-                                      CustomLoaderButton(),
-                                    ],
-                                  )
-                                : const Text('Ver Última factura'),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      // 👈 Agregamos esto para que ambos botones se expandan igual
+                      child: ElevatedButton(
+                        onPressed: onPrimaryPressed,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: accentColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          // 👈 Agregamos esto para que ambos botones se expandan igual
-                          child: ElevatedButton(
-                            onPressed: onPrimaryPressed,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: accentColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text('Pagar'),
-                          ),
-                        ),
-                      ],
+                        child: const Text('Pagar'),
+                      ),
                     ),
                   ],
                 ),
-             
-           
+              ],
+            ),
           ),
         ),
       ),
