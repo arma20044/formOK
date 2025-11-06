@@ -21,3 +21,10 @@ A new Flutter project.
 
 **push** agrega una nueva ruta encima de la pila.
  
+
+
+ ____________
+
+
+ Expanded no puede estar dentro de un SizedBox (ni de ningún widget con ancho fijo como Container o Padding).
+Expanded solo tiene sentido como hijo directo de un Row, Column o Flex, y su propósito es ocupar el espacio restante dentro de ese Row o Column.

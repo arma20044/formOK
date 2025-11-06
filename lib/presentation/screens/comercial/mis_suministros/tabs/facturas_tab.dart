@@ -106,7 +106,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                             final File
                             archivoDescargado = await descargarPdfConPipe(
                               urlFinal, // URL del PDF
-                              'factura_${factura!.recibo!.nirSecuencial}.pdf',
+                              'factura_${factura!.recibo.nirSecuencial}.pdf',
                             );
 
                             setState(() {

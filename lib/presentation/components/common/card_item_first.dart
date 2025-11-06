@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:form/presentation/components/common/UI/custom_loader_botton.dart';
+import 'package:form/presentation/components/common/UI/custom_loading.dart';
 import 'package:form/utils/utils.dart';
 
 class CardItemFirst extends StatelessWidget {
@@ -56,8 +58,8 @@ class CardItemFirst extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: ConstrainedBox(
             constraints: BoxConstraints(minWidth: width, minHeight: height),
-            child: Row(
-              children: [
+            child: 
+              
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -115,45 +117,53 @@ class CardItemFirst extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        OutlinedButton(
-                          onPressed: onSecondaryPressed,
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: accentColor),
-                            foregroundColor: accentColor,
-                          ),
-                          child: Column(
-                            children: [
-                              const Text('Ver Última Factura'),
-                              if(isLoadingFacturaDeudaTotal)
-                              Container(
-                                color: Colors.black.withOpacity(0.5),
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 3,
-                                  ),
-                                ),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: isLoadingFacturaDeudaTotal
+                                ? null
+                                : onSecondaryPressed,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: accentColor,
+                              side: BorderSide(color: accentColor),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            ],
+                            ),
+                            child: isLoadingFacturaDeudaTotal
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Text("Cargando..."),
+                                      SizedBox(width: 8),
+                                      CustomLoaderButton(),
+                                    ],
+                                  )
+                                : const Text('Ver Última factura'),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: onPrimaryPressed,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: accentColor,
-                            foregroundColor: Colors.white,
+                        Expanded(
+                          // 👈 Agregamos esto para que ambos botones se expandan igual
+                          child: ElevatedButton(
+                            onPressed: onPrimaryPressed,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: accentColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text('Pagar'),
                           ),
-                          child: const Text('Pagar'),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ],
-            ),
+             
+           
           ),
         ),
       ),

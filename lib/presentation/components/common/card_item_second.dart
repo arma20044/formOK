@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form/presentation/components/common/UI/custom_loader_botton.dart';
 import 'package:form/utils/utils.dart';
 
 class CardItemSecond extends StatelessWidget {
@@ -156,26 +157,13 @@ class CardItemSecond extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            Column(
-              children: [
-                if (isLoadingFactura)
-                  Container(
-                    color: Colors.black.withOpacity(0.5),
-                    child: const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 3,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+           
             // 🔘 Botón Ver factura
             SizedBox(
               width: double.infinity,
 
               child: ElevatedButton(
-                onPressed: onVerFacturaPressed,
+                onPressed: isLoadingFactura ? null : onVerFacturaPressed,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accentColor,
                   foregroundColor: Colors.white,
@@ -184,7 +172,13 @@ class CardItemSecond extends StatelessWidget {
                   ),
                 ),
                 child: isLoadingFactura
-                    ? Text("Cargando...")
+                    ? Row(
+                      children: [
+                        Text("Cargando..."),
+                        const SizedBox(width: 8),
+                         CustomLoaderButton(),
+                      ],
+                    )
                     : Text('Ver factura'),
               ),
             ),
