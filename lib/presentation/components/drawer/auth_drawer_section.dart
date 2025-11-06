@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form/config/constantes.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
+import 'package:form/presentation/components/common/custom_show_dialog.dart';
+import 'package:form/presentation/components/common/logout_dialog.dart';
 import 'package:go_router/go_router.dart';
 
 class AuthDrawerSection extends ConsumerWidget {
@@ -10,6 +13,7 @@ class AuthDrawerSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
+    final authNotifier = ref.read(authProvider.notifier);
 
     // Obtener ruta actual de manera segura
     String? currentPath;
@@ -28,7 +32,7 @@ class AuthDrawerSection extends ConsumerWidget {
                 context,
                 icon: Icons.electric_meter_outlined,
                 title: 'Suministros',
-                path:   '/suministros',                 
+                path: '/suministros',
                 currentPath: currentPath,
               ),
               _drawerItem(
@@ -50,11 +54,32 @@ class AuthDrawerSection extends ConsumerWidget {
                 title: const Text('Cerrar Sesión'),
                 onTap: () async {
                   Navigator.pop(context);
-                  await ref.read(authProvider.notifier).logout();
+                  showDialog(
+                    context: context,
+                    builder: (context) => LogoutDialog(
+                      onConfirm: () async {
+                        // Cierra sesión
+                        await authNotifier.logout();
+
+                        // Redirige luego de cerrar sesión
+                        if (context.mounted) {
+                          context.go('/login');
+                        }
+                      },
+                    ),
+                  );
+
+                  /*DialogHelper.showMessage(
+                    context,
+                    MessageType.info,
+                    'Éxito',
+                     "Te enviamos un código a tu correo, favor ingresa para confirmar el registro.",
+                    //duration: const Duration(seconds: 3),
+                  );*/
+                  //
                 },
               ),
               const Divider(),
-             
             ],
           );
         } else {
@@ -74,7 +99,7 @@ class AuthDrawerSection extends ConsumerWidget {
                 path: '/registroMiCuenta',
                 currentPath: currentPath,
               ),
-               const Divider(),
+              const Divider(),
             ],
           );
         }
