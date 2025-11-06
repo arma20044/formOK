@@ -161,15 +161,15 @@ class CardItemSecond extends StatelessWidget {
             SizedBox(
               width: double.infinity,
 
-              child: ElevatedButton(
+              child: OutlinedButton(
                 onPressed: isLoadingFactura ? null : onVerFacturaPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: accentColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: OutlinedButton.styleFrom(
+                          foregroundColor: accentColor,
+                          side: BorderSide(color: accentColor),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                 child: isLoadingFactura
                     ? Row(
                         mainAxisAlignment:

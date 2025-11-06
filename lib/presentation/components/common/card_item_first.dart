@@ -144,11 +144,11 @@ class CardItemFirst extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       // 👈 Agregamos esto para que ambos botones se expandan igual
-                      child: ElevatedButton(
+                      child: OutlinedButton(
                         onPressed: onPrimaryPressed,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: accentColor,
-                          foregroundColor: Colors.white,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: accentColor,
+                          side: BorderSide(color: accentColor),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
