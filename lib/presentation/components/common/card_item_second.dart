@@ -57,7 +57,7 @@ class CardItemSecond extends StatelessWidget {
                   ),
                 ),
                 Text(
-                formatearNumeroString(monto),
+                  formatearNumeroString(monto),
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: accentColor,
                     fontWeight: FontWeight.bold,
@@ -80,7 +80,7 @@ class CardItemSecond extends StatelessWidget {
                 Row(
                   children: [
                     const SizedBox(width: 6),
-                   /* Text(
+                    /* Text(
                       estadoPago,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: mainTextColor,
@@ -93,22 +93,22 @@ class CardItemSecond extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8.0), // Relleno interior
                       decoration: BoxDecoration(
-                        color:  estadoPago == 'Pagado'
+                        color: estadoPago == 'Pagado'
                             ? Colors.green
                             : Colors.orange,
                         borderRadius: BorderRadius.circular(
                           12.0,
                         ), // Bordes redondeados
                       ),
-                      child:  Text(
+                      child: Text(
                         estadoPago,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                        color: mainTextColor,
-                        fontWeight: FontWeight.bold,
-                        //backgroundColor: estadoPago == 'Pagado'
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: mainTextColor,
+                          fontWeight: FontWeight.bold,
+                          //backgroundColor: estadoPago == 'Pagado'
                           //  ? Colors.green
-                            //: Colors.orange,
-                      ),
+                          //: Colors.orange,
+                        ),
                       ),
                     ),
                   ],
@@ -128,7 +128,7 @@ class CardItemSecond extends StatelessWidget {
                   ),
                 ),
                 Text(
-                 formatearFecha( fecha: fechaEmision,formatoSalida: '/'),
+                  formatearFecha(fecha: fechaEmision, formatoSalida: '/'),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: mainTextColor,
                   ),
@@ -148,7 +148,7 @@ class CardItemSecond extends StatelessWidget {
                   ),
                 ),
                 Text(
-                   formatearFecha( fecha: fechaVencimiento,formatoSalida: '/'),
+                  formatearFecha(fecha: fechaVencimiento, formatoSalida: '/'),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: mainTextColor,
                   ),
@@ -157,7 +157,6 @@ class CardItemSecond extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-           
             // 🔘 Botón Ver factura
             SizedBox(
               width: double.infinity,
@@ -173,12 +172,16 @@ class CardItemSecond extends StatelessWidget {
                 ),
                 child: isLoadingFactura
                     ? Row(
-                      children: [
-                        Text("Cargando..."),
-                        const SizedBox(width: 8),
-                         CustomLoaderButton(),
-                      ],
-                    )
+                        mainAxisAlignment:
+                            MainAxisAlignment.center, // 👈 centra el contenido
+                        mainAxisSize: MainAxisSize
+                            .min, // 👈 evita que ocupe todo el ancho
+                        children: const [
+                          Text("Cargando..."),
+                          SizedBox(width: 8),
+                          CustomLoaderButton(),
+                        ],
+                      )
                     : Text('Ver factura'),
               ),
             ),
