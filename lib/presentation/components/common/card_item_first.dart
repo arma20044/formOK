@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form/utils/utils.dart';
 
 class CardItemFirst extends StatelessWidget {
   final String title;
@@ -12,6 +13,7 @@ class CardItemFirst extends StatelessWidget {
   final VoidCallback onSecondaryPressed;
   final double width;
   final double height;
+  final bool isLoadingFacturaDeudaTotal;
 
   const CardItemFirst({
     super.key,
@@ -26,6 +28,7 @@ class CardItemFirst extends StatelessWidget {
     required this.onSecondaryPressed,
     this.width = double.infinity,
     this.height = 250,
+    required this.isLoadingFacturaDeudaTotal,
   });
 
   @override
@@ -53,82 +56,99 @@ class CardItemFirst extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: ConstrainedBox(
             constraints: BoxConstraints(minWidth: width, minHeight: height),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: accentColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                _infoRow(
-                  'Monto en Gs:',
-                  monto,
-                  secondaryTextColor,
-                  mainTextColor,
-                  theme,
-                  fontWeight: FontWeight.bold
-                ),
-                _infoRow(
-                  'Fecha de lectura:',
-                  fechaLectura,
-                  secondaryTextColor,
-                  mainTextColor,
-                  theme,
-                  
-                ),
-                _infoRow(
-                  'Lectura:',
-                  lectura,
-                  secondaryTextColor,
-                  mainTextColor,
-                  theme,
-                ),
-                _infoRow(
-                  'Consumo:',
-                  consumo,
-                  secondaryTextColor,
-                  mainTextColor,
-                  theme,
-                ),
-                _infoRow(
-                  'Fecha de vencimiento:',
-                  fechaVencimiento,
-                  secondaryTextColor,
-                  mainTextColor,
-                  theme,
-                ),
-                _infoRow(
-                  'Total con comisión:',
-                  totalConComision,
-                  secondaryTextColor,
-                  mainTextColor,
-                  theme,
-                  fontWeight: FontWeight.bold
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    OutlinedButton(
-                      onPressed: onSecondaryPressed,
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: accentColor),
-                        foregroundColor: accentColor,
+                    Text(
+                      title,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: accentColor,
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: const Text('Ver Última Factura'),
                     ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: onPrimaryPressed,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: accentColor,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: const Text('Pagar'),
+                    const SizedBox(height: 8),
+                    _infoRow(
+                      'Monto en Gs: ',
+                      monto,
+                      secondaryTextColor,
+                      mainTextColor,
+                      theme,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    _infoRow(
+                      'Fecha de lectura: ',
+                      fechaLectura,
+                      secondaryTextColor,
+                      mainTextColor,
+                      theme,
+                    ),
+                    _infoRow(
+                      'Lectura: ',
+                      lectura,
+                      secondaryTextColor,
+                      mainTextColor,
+                      theme,
+                    ),
+                    _infoRow(
+                      'Consumo :',
+                      consumo,
+                      secondaryTextColor,
+                      mainTextColor,
+                      theme,
+                    ),
+                    _infoRow(
+                      'Fecha de vencimiento: ',
+                      fechaVencimiento,
+                      secondaryTextColor,
+                      mainTextColor,
+                      theme,
+                    ),
+                    _infoRow(
+                      'Total con comisión Gs.: ',
+                      totalConComision,
+                      secondaryTextColor,
+                      mainTextColor,
+                      theme,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        OutlinedButton(
+                          onPressed: onSecondaryPressed,
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: accentColor),
+                            foregroundColor: accentColor,
+                          ),
+                          child: Column(
+                            children: [
+                              const Text('Ver Última Factura'),
+                              if(isLoadingFacturaDeudaTotal)
+                              Container(
+                                color: Colors.black.withOpacity(0.5),
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 3,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: onPrimaryPressed,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: accentColor,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Pagar'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -140,30 +160,35 @@ class CardItemFirst extends StatelessWidget {
     );
   }
 
-Widget _infoRow(
-  String label,
-  String value,
-  Color labelColor,
-  Color valueColor,
-  ThemeData theme, {
-  FontWeight fontWeight = FontWeight.normal, // valor por defecto
-}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 2),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(color: labelColor, fontWeight: fontWeight),
-        ),
-        Text(
-          value,
-          style: theme.textTheme.bodyMedium?.copyWith(color: valueColor, fontWeight: fontWeight),
-        ),
-      ],
-    ),
-  );
-}
-
+  Widget _infoRow(
+    String label,
+    String value,
+    Color labelColor,
+    Color valueColor,
+    ThemeData theme, {
+    FontWeight fontWeight = FontWeight.normal, // valor por defecto
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: labelColor,
+              fontWeight: fontWeight,
+            ),
+          ),
+          Text(
+            formatearNumeroString(value),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: valueColor,
+              fontWeight: fontWeight,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

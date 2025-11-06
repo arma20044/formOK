@@ -24,6 +24,7 @@ class FacturasTab extends ConsumerStatefulWidget {
 }
 
 bool _isLoadingFactura = false;
+bool _isLoadingFacturaDeudaTotal = false;
 
 class _FacturasTabState extends ConsumerState<FacturasTab> {
   @override
@@ -49,10 +50,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
               final fechaVencimiento =
                   situacionActual.facturaDatos['recibo']['fechaVencimiento'];
 
-            
-
               final factura = situacionActual.facturaDatos;
-              
 
               num nisParcial = int.parse(
                 widget.selectedNIS!.nisRad.toString().substring(0, 3),
@@ -73,6 +71,8 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                 children: [
                   situacionActual.tieneDeuda!
                       ? CardItemFirst(
+                          isLoadingFacturaDeudaTotal:
+                              _isLoadingFacturaDeudaTotal,
                           title: "Deuda Total",
                           monto: situacionActual
                               .facturaDatos['recibo']['importeRecibo']
@@ -93,24 +93,28 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                             print("Ver Ultima Factura");
                           },
                           onSecondaryPressed: () async {
+                            setState(() {
+                              _isLoadingFacturaDeudaTotal = true;
+                            });
+
                             final String urlFinal =
-                                situacionActual.facturaDatos['facturaElectronica']
+                                situacionActual
+                                    .facturaDatos['facturaElectronica']
                                 //? '${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?nro_nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fecha&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}&f_fact=$fecha_fac'
                                 ? "${Environment.hostCtxOpen}/v5/suministro/ultimaFacturaElectronicaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento"
                                 : "${Environment.hostCtxOpen}/v4/suministro/ultimaFacturaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento";
 
+                            final File
+                            archivoDescargado = await descargarPdfConPipe(
+                              urlFinal, // URL del PDF
+                              'factura_${factura['recibo']['nirSecuencial']}.pdf',
+                            );
 
-                                final File archivoDescargado =
-                                    await descargarPdfConPipe(
-                                      urlFinal, // URL del PDF
-                                      'factura_${factura['recibo']['nirSecuencial']}.pdf',
-                                    );
+                            setState(() {
+                              _isLoadingFacturaDeudaTotal = false;
+                            });
 
-                                setState(() {
-                                  _isLoadingFactura = false;
-                                });
-
-                                mostrarCustomModal(context, archivoDescargado);
+                            mostrarCustomModal(context, archivoDescargado);
                           },
                         )
                       : Text(""),
@@ -118,6 +122,8 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                   situacionActual.tieneDeuda! &&
                           situacionActual.facturaDatos['recibo']['cantidad'] > 1
                       ? CardItemFirst(
+                          isLoadingFacturaDeudaTotal:
+                              _isLoadingFacturaDeudaTotal,
                           title: "Deuda Anterior",
                           monto: situacionActual
                               .facturaPenultima['recibo']['importeRecibo']

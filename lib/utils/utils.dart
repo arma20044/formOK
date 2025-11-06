@@ -160,5 +160,24 @@ String formatearFecha({
   }
 }
 
+String formatearNumero(
+  num valor, {
+  int decimales = 0,
+  String locale = 'es_PY', // Usa es_PY para formato con puntos y comas correctas
+}) {
+  final format = NumberFormat.currency(
+    locale: locale,
+    symbol: '', // sin símbolo de moneda
+    decimalDigits: decimales,
+  );
+  return format.format(valor).trim();
+}
 
-
+String formatearNumeroString(
+  String valor, {
+  int decimales = 0,
+  String locale = 'es_PY',
+}) {
+  final numero = num.tryParse(valor.replaceAll(',', '.')) ?? 0;
+  return formatearNumero(numero, decimales: decimales, locale: locale);
+}

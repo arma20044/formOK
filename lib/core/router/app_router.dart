@@ -30,8 +30,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   });
   ref.onDispose(refreshListenable.dispose);
 
-  // 🔹 Instancia del history notifier
-  final routeHistory = ref.read(routeHistoryProvider.notifier);
+  
 
   final router = GoRouter(
     debugLogDiagnostics: true,
@@ -151,7 +150,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // No guardar login ni splash como previous
       if (currentUri.path != '/login' && currentUri.path != '/splash') {
-        routeHistory.update(currentUri);
+       // routeHistory.update(currentUri);
         debugPrint('➡️ Ruta actual guardada: ${currentUri.path}');
       }
     }
