@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form/utils/utils.dart';
 
 class CardItemSecond extends StatelessWidget {
   final String monto;
@@ -55,7 +56,7 @@ class CardItemSecond extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  monto,
+                formatearNumeroString(monto),
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: accentColor,
                     fontWeight: FontWeight.bold,
@@ -78,7 +79,7 @@ class CardItemSecond extends StatelessWidget {
                 Row(
                   children: [
                     const SizedBox(width: 6),
-                    Text(
+                   /* Text(
                       estadoPago,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: mainTextColor,
@@ -86,6 +87,27 @@ class CardItemSecond extends StatelessWidget {
                         backgroundColor: estadoPago == 'Pagado'
                             ? Colors.green
                             : Colors.orange,
+                      ),
+                    ),*/
+                    Container(
+                      padding: const EdgeInsets.all(8.0), // Relleno interior
+                      decoration: BoxDecoration(
+                        color:  estadoPago == 'Pagado'
+                            ? Colors.green
+                            : Colors.orange,
+                        borderRadius: BorderRadius.circular(
+                          12.0,
+                        ), // Bordes redondeados
+                      ),
+                      child:  Text(
+                        estadoPago,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                        color: mainTextColor,
+                        fontWeight: FontWeight.bold,
+                        //backgroundColor: estadoPago == 'Pagado'
+                          //  ? Colors.green
+                            //: Colors.orange,
+                      ),
                       ),
                     ),
                   ],
@@ -105,7 +127,7 @@ class CardItemSecond extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  fechaEmision,
+                 formatearFecha( fecha: fechaEmision,formatoSalida: '/'),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: mainTextColor,
                   ),
@@ -125,7 +147,7 @@ class CardItemSecond extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  fechaVencimiento,
+                   formatearFecha( fecha: fechaVencimiento,formatoSalida: '/'),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: mainTextColor,
                   ),
@@ -161,7 +183,9 @@ class CardItemSecond extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child:isLoadingFactura ? Text("Cargando..."): Text('Ver factura'),
+                child: isLoadingFactura
+                    ? Text("Cargando...")
+                    : Text('Ver factura'),
               ),
             ),
           ],

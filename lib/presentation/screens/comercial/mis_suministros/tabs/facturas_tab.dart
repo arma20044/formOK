@@ -44,18 +44,18 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
         Expanded(
           child: asyncSituacionActual.when(
             data: (situacionActual) {
-              if (situacionActual.facturaDatos.length == 0) {
+              /*if (situacionActual.facturaDatos) {
                 return const Center(child: Text("No hay factuas sin pagar."));
-              }
+              }*/
               final fechaVencimiento =
-                  situacionActual.facturaDatos['recibo']['fechaVencimiento'];
+                  situacionActual.facturaDatos!.recibo!.fechaVencimiento;
 
               final factura = situacionActual.facturaDatos;
 
               num nisParcial = int.parse(
                 widget.selectedNIS!.nisRad.toString().substring(0, 3),
               );
-              List<String> fechaObtenida = fechaVencimiento.split('/');
+              List<String> fechaObtenida = fechaVencimiento!.split('/');
               num dia = int.parse(fechaObtenida[0]);
               num mes = int.parse(fechaObtenida[1]);
               num anho = int.parse(fechaObtenida[2]);
@@ -75,19 +75,18 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                               _isLoadingFacturaDeudaTotal,
                           title: "Deuda Total",
                           monto: situacionActual
-                              .facturaDatos['recibo']['importeRecibo']
+                              .facturaDatos!.recibo!.importeRecibo
                               .toString(),
                           fechaLectura: situacionActual
-                              .facturaDatos['recibo']['fechaVencimiento'],
-                          lectura: situacionActual.calculoConsumo['consumo']
-                              .toString(),
-                          consumo: "",
+                              .facturaDatos!.recibo!.fechaVencimiento!,
+                          lectura: (situacionActual.facturaDatos!.lectura)!.first!.lecturaActual!,
+                          consumo: "${situacionActual.facturaDatos!.lectura!.first!.consumo} KWh",
                           fechaVencimiento:
                               situacionActual
-                                  .facturaDatos['recibo']['fechaVencimiento'] ??
+                                  .facturaDatos!.recibo!.fechaVencimiento ??
                               'Sin dato',
                           totalConComision: situacionActual
-                              .facturaDatos['otrosImportes']['totalconComision']
+                              .facturaDatos!.otrosImportes!.totalconComision
                               .toString(),
                           onPrimaryPressed: () {
                             print("Ver Ultima Factura");
@@ -99,7 +98,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
 
                             final String urlFinal =
                                 situacionActual
-                                    .facturaDatos['facturaElectronica']
+                                    .facturaDatos!.facturaElectronica!
                                 //? '${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?nro_nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fecha&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}&f_fact=$fecha_fac'
                                 ? "${Environment.hostCtxOpen}/v5/suministro/ultimaFacturaElectronicaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento"
                                 : "${Environment.hostCtxOpen}/v4/suministro/ultimaFacturaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento";
@@ -107,7 +106,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                             final File
                             archivoDescargado = await descargarPdfConPipe(
                               urlFinal, // URL del PDF
-                              'factura_${factura['recibo']['nirSecuencial']}.pdf',
+                              'factura_${factura!.recibo!.nirSecuencial}.pdf',
                             );
 
                             setState(() {
@@ -120,7 +119,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                       : Text(""),
 
                   situacionActual.tieneDeuda! &&
-                          situacionActual.facturaDatos['recibo']['cantidad'] > 1
+                          situacionActual.facturaDatos!.recibo!.cantidad! > 1
                       ? CardItemFirst(
                           isLoadingFacturaDeudaTotal:
                               _isLoadingFacturaDeudaTotal,

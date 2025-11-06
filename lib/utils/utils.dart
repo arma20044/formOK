@@ -147,11 +147,17 @@ String formatearFecha({
     List<String> partes = fecha.split('-');
     if (partes.length != 3) throw FormatException("Formato inválido");
 
-    int year = int.parse(partes[0]);
-    int day = int.parse(partes[1]);
-    int month = int.parse(partes[2]);
+    String year = (partes[0]);
+   String day = (partes[1]);
+    String month =(partes[2]);
 
-    
+    /*if(int.parse(day) < 10){
+      day = '0$day';
+    }
+
+    if(int.parse(month) < 10){
+      month='0$month';
+    }*/
 
     return '$month$formatoSalida$day$formatoSalida$year';
   } catch (e) {
