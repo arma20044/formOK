@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/config/theme/app_theme.dart';
 import 'package:form/core/router/app_router.dart';
@@ -15,11 +16,10 @@ final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
 // Container global para acceso a providers desde cualquier parte
 final container = ProviderContainer();
 
-
-void main() {
-  runApp( UncontrolledProviderScope(
-    container: container,
-    child: MyApp()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  runApp(UncontrolledProviderScope(container: container, child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -33,9 +33,15 @@ class MyApp extends ConsumerWidget {
     return themeStateAsync.when(
       data: (themeState) {
         return MaterialApp.router(
-           scaffoldMessengerKey: rootScaffoldMessengerKey,
-          theme: AppTheme(selectedColor: themeState.selectedColor, isDarkMode: false).getTheme(),
-          darkTheme: AppTheme(selectedColor: themeState.selectedColor, isDarkMode: true).getTheme(),
+          scaffoldMessengerKey: rootScaffoldMessengerKey,
+          theme: AppTheme(
+            selectedColor: themeState.selectedColor,
+            isDarkMode: false,
+          ).getTheme(),
+          darkTheme: AppTheme(
+            selectedColor: themeState.selectedColor,
+            isDarkMode: true,
+          ).getTheme(),
           themeMode: themeState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
           //home: const HomeScreen(),
           routerConfig: router,
@@ -44,8 +50,6 @@ class MyApp extends ConsumerWidget {
       loading: () => const SplashScreen(), // O un splash screen
       error: (e, st) => const Center(child: Text('Error cargando tema')),
     );
-
-    
   }
 }
 

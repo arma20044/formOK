@@ -16,8 +16,8 @@ class MiAndeApi {
     : dio = Dio(
         BaseOptions(
           //baseUrl: Environment.hostCtxSiga, // 👈 usa el Environment global
-          connectTimeout: const Duration(seconds: 60),
-          receiveTimeout: const Duration(seconds: 60),
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
           headers: {'x-so': Platform.isAndroid ? 'android' : 'ios'},
           //queryParameters: {'clientKey':Environment.clientKey}
         ),

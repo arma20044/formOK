@@ -18,7 +18,7 @@ class CustomDrawer extends ConsumerWidget {
     final themeState = ref.watch(themeNotifierProvider);
 
     Future<void> _launchUrl(String key) async {
-      await dotenv.load(fileName: ".env");
+    //  await dotenv.load(fileName: ".env");
 
       final url = dotenv.env[key];
       if (url == null) return;
