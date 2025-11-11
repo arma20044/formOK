@@ -116,182 +116,277 @@ class _SolicitudAbastecimientoScreenState
     }
   }
 
-  File? selectedFile;
-  String fileCaption = 'asdas';
+  File? selectedFileSolicitud;
+  File? selectedFileFotocopiaAutenticada;
+  File? selectedFileFotocopiaSimpleCedulaSolicitante;
+  File? selectedFileCopiaSimpleCarnetElectricista;
+  File? selectedFileOtrosDocumentos;
 
+  String fileCaption = 'asdas';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       endDrawer: CustomDrawer(),
       appBar: AppBar(title: Text("Solicitud de Abastecimiento de Energía")),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              CustomComment(
-                text:
-                    "Solicitud para nueva conexión en Baja Tensión (hasta 40 kW). Solicitud de abastecimiento de Energía Eléctrica, División de Instalación, Cambio de Sitio de Medidor, Reposición / Reconexión, Aumento de Carga, Reducción de Carga, Cambio de Nombre, Cambio de categoría Tarifaria.",
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: nombreController,
-                decoration: InputDecoration(labelText: 'Nombre(s) del Titular'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese Nombre(s) del Titular';
-                  }
-                  return null;
-                },
-                //enabled: !isLoading,
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: apellidoController,
-                decoration: InputDecoration(
-                  labelText: 'Apellido(s) del Titular',
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                CustomComment(
+                  text:
+                      "Solicitud para nueva conexión en Baja Tensión (hasta 40 kW). Solicitud de abastecimiento de Energía Eléctrica, División de Instalación, Cambio de Sitio de Medidor, Reposición / Reconexión, Aumento de Carga, Reducción de Carga, Cambio de Nombre, Cambio de categoría Tarifaria.",
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese Apellido(s) del Titular';
-                  }
-                  return null;
-                },
-                //enabled: !isLoading,
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: numeroDocumentoController,
-                decoration: InputDecoration(
-                  labelText: 'Número de Documento del Titular',
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: nombreController,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre(s) del Titular',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ingrese Nombre(s) del Titular';
+                    }
+                    return null;
+                  },
+                  //enabled: !isLoading,
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese Número de Documento del Titular';
-                  }
-                  return null;
-                },
-                //enabled: !isLoading,
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: numeroCelularController,
-                decoration: InputDecoration(
-                  labelText: 'Número de Celular del Titular',
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: apellidoController,
+                  decoration: InputDecoration(
+                    labelText: 'Apellido(s) del Titular',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ingrese Apellido(s) del Titular';
+                    }
+                    return null;
+                  },
+                  //enabled: !isLoading,
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese Número de Celular del Titular';
-                  }
-                  return null;
-                },
-                //enabled: !isLoading,
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: correoController,
-                decoration: InputDecoration(labelText: 'Correo del Titular'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese Correo del Titular';
-                  }
-                  return null;
-                },
-                //enabled: !isLoading,
-              ),
-              const SizedBox(height: 24),
-
-              OutlinedButton(
-                onPressed: () {
-                  //_openMapModal(context);
-                  _openMapModalWithPermission(context);
-                },
-                child: Row(
-                  children: [
-                    Icon(Icons.location_on),
-                    Text("Agregar punto en Mapa"),
-                  ],
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: numeroDocumentoController,
+                  decoration: InputDecoration(
+                    labelText: 'Número de Documento del Titular',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ingrese Número de Documento del Titular';
+                    }
+                    return null;
+                  },
+                  //enabled: !isLoading,
                 ),
-              ),
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: numeroCelularController,
+                  decoration: InputDecoration(
+                    labelText: 'Número de Celular del Titular',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ingrese Número de Celular del Titular';
+                    }
+                    return null;
+                  },
+                  //enabled: !isLoading,
+                ),
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: correoController,
+                  decoration: InputDecoration(labelText: 'Correo del Titular'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ingrese Correo del Titular';
+                    }
+                    return null;
+                  },
+                  //enabled: !isLoading,
+                ),
+                const SizedBox(height: 24),
 
-              Text(ubicacion?.toString() ?? ""),
-
-              const SizedBox(height: 24),
-
-              CustomCard(
-                child: Column(
-                  children: [
-                    CustomText(
-                      "Formulario de Solicitud de Abastecimiento",
-                      fontWeight: FontWeight.bold,
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                      ), // 👈 mejora el alto
                     ),
-                    CustomText(
-                      '1) Descargar formulario y completar.',
-                      fontWeight: FontWeight.bold,
+                    onPressed: () {
+                      _openMapModalWithPermission(context);
+                    },
+                    child: Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.center, // 👈 centra ícono + texto
+                      mainAxisSize: MainAxisSize
+                          .min, // 👈 evita que Row se expanda innecesariamente
+                      children: const [
+                        Icon(Icons.location_on, size: 25),
+                        SizedBox(width: 8),
+                        CustomText("Agregar punto en Mapa"),
+                      ],
                     ),
-                    TextButton(
-                      onPressed: () {
-                        lanzarUrl('URL_SOLICITUD_ABASTECIMIENTO');
-                      },
-                      child: Text(
-                        "Descargar Formulario de Solicitud de Abastecimiento.",
+                  ),
+                ),
+
+                Text(ubicacion?.toString() ?? ""),
+
+                const SizedBox(height: 8),
+
+                CustomCard(
+                  child: Column(
+                    children: [
+                      CustomText(
+                        "Formulario de Solicitud de Abastecimiento",
+                        fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    CustomText(
-                      'Solicitud de abastecimiento de Energía Eléctrica, División de Instalación, Cambio de Sitio de Medidor, Reposición / Reconexión, Aumento de Carga, Reducción de Carga, Cambio de Nombre, Cambio de categoría Tarifaria.',
-                      overflow: TextOverflow.clip,
-                    ),
-                    CustomText('2) Adjuntar como documento de respaldo.'),
-                  ],
+                      CustomText(
+                        '1) Descargar formulario y completar.',
+                        fontWeight: FontWeight.bold,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          lanzarUrl('URL_SOLICITUD_ABASTECIMIENTO');
+                        },
+                        child: Text(
+                          "Descargar Formulario de Solicitud de Abastecimiento.",
+                        ),
+                      ),
+                      CustomText(
+                        'Solicitud de abastecimiento de Energía Eléctrica, División de Instalación, Cambio de Sitio de Medidor, Reposición / Reconexión, Aumento de Carga, Reducción de Carga, Cambio de Nombre, Cambio de categoría Tarifaria.',
+                        overflow: TextOverflow.clip,
+                      ),
+                      CustomText('2) Adjuntar como documento de respaldo.'),
+                    ],
+                  ),
                 ),
-              ),
-              CustomCard(
-                child: Column(
-                  children: [
-                    CustomText(
-                      'PASO 2: Adjuntar Documentos requeridos para poder tratar la solicitud, leer las condiciones a continuación:',
-                      overflow: TextOverflow.clip,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    CustomText(
-                      '1) Se puede adjuntar documentos en formato PDF o imágenes JPG, JPEG, PNG.',
-                      overflow: TextOverflow.clip,
-                    ),
-                    CustomText(
-                      '2) El tamaño máximo de cada archivo es de 10 MB.',
-                      overflow: TextOverflow.clip,
-                    ),
-                    CustomText(
-                      '3) Los documentos deben estar legibles.',
-                      overflow: TextOverflow.clip,
-                    ),
-                    CustomText(
-                      '4) Mientras el tamaño de archivo sea más grande, la transacción tardará más y podría cortarse por condiciones de internet fluctuantes.',
-                      overflow: TextOverflow.clip,
-                    ),
-                  ],
+                CustomCard(
+                  child: Column(
+                    children: [
+                      CustomText(
+                        'PASO 2: Adjuntar Documentos requeridos para poder tratar la solicitud, leer las condiciones a continuación:',
+                        overflow: TextOverflow.clip,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      CustomText(
+                        '1) Se puede adjuntar documentos en formato PDF o imágenes JPG, JPEG, PNG.',
+                        overflow: TextOverflow.clip,
+                      ),
+                      CustomText(
+                        '2) El tamaño máximo de cada archivo es de 10 MB.',
+                        overflow: TextOverflow.clip,
+                      ),
+                      CustomText(
+                        '3) Los documentos deben estar legibles.',
+                        overflow: TextOverflow.clip,
+                      ),
+                      CustomText(
+                        '4) Mientras el tamaño de archivo sea más grande, la transacción tardará más y podría cortarse por condiciones de internet fluctuantes.',
+                        overflow: TextOverflow.clip,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 24),
 
-              FileWithCaptionPicker(
-                label: "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
-                emptyLabel: "Seleccionar archivo desde la Galería o la Cámara",
-                allowedTypes: AllowedFileType.photo,
-                onFileSelected: (file) {
-                  selectedFile = file;                 
-                  print('Archivo: ${file?.path}');
-                },
-              ),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : () => _enviarFormulario(),
-                  child: Text("Cambiar Contraseña"),
+                FileWithCaptionPicker(
+                  label:
+                      "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
+                  allowedTypes: AllowedFileType.photo,
+                  onFileSelected: (file) {
+                    setState(() {
+                      selectedFileSolicitud = file;
+                    });
+                  },
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 24),
+
+                FileWithCaptionPicker(
+                  label:
+                      "b) Fotocopia Autenticada por Escribanía del título de Propiedad o equivalente",
+                  ayuda:
+                      "(Contrato Privado de Compra /Venta con certificación de firma, Sentencia Declaratoria de adjudicación del inmueble) o Constancia de la Inmobiliaria (original) o Constancia Municipal (original).",
+                  allowedTypes: AllowedFileType.photo,
+                  onFileSelected: (file) {
+                    setState(() {
+                      selectedFileFotocopiaAutenticada = file;
+                    });
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                FileWithCaptionPicker(
+                  label: "c) Copia simple de Cédula Identidad del Solicitante",
+                  allowedTypes: AllowedFileType.photo,
+                  onFileSelected: (file) {
+                    setState(() {
+                      selectedFileFotocopiaSimpleCedulaSolicitante = file;
+                    });
+                  },
+                ),
+                const SizedBox(height: 24),
+                FileWithCaptionPicker(
+                  label:
+                      "d) Copia simple de Carnet del Electricista Matriculado en ANDE",
+                  allowedTypes: AllowedFileType.photo,
+                  onFileSelected: (file) {
+                    setState(() {
+                      selectedFileCopiaSimpleCarnetElectricista = file;
+                    });
+                  },
+                ),
+                const SizedBox(height: 24),
+                FileWithCaptionPicker(
+                  label: "e) Otros documentose",
+                  allowedTypes: AllowedFileType.photo,
+                  onFileSelected: (file) {
+                    setState(() {
+                      selectedFileOtrosDocumentos = file;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 8),
+                CustomCard(
+                  child: Column(
+                    children: [
+                      CustomText("ATENCIÓN", fontWeight: FontWeight.bold),
+                      CustomText(
+                        'Los documentos remitidos via web deberán ser entregados al técnico al momento de realizarse la conexión.',
+                        overflow: TextOverflow.clip,
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : () => _enviarFormulario(),
+                    child: Text("Enviar Solicitud"),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+                CustomCard(
+                  child: Column(
+                    children: [
+                      CustomText(
+                        '- Para conexiones nuevas en baja tensión adjuntar documentos indicados en los ítems a, b, c, d.- Para división de instalación adjuntar documentos indicados en los ítems a, c, d.- Para actualización de nombre adjuntar documentos indicados en los ítems a, b, c.- Para aumento o reducción de carga adjuntar documentos indicados en los ítems a, c, d.- Para cambio de sitio de medidor adjuntar documentos indicados en los ítems a, c, d.- Para reposición de medidor adjuntar documentos indicados en los ítems a, c, d.',
+                        overflow: TextOverflow.clip,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

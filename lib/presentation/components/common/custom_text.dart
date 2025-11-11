@@ -30,7 +30,7 @@ class CustomText extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SizedBox(
-      width: double.infinity, // ocupa todo el ancho disponible
+      //width: double.infinity, // ocupa todo el ancho disponible
       child: Text(
         text,
         textAlign: textAlign ?? TextAlign.start,

@@ -7,7 +7,7 @@ enum AllowedFileType { photo, video, both }
 
 class FileWithCaptionPicker extends StatefulWidget {
   final String label;
-  final String emptyLabel;
+  final String? ayuda;
   final Function(File?) onFileSelected;
   final AllowedFileType allowedTypes;
 
@@ -15,7 +15,7 @@ class FileWithCaptionPicker extends StatefulWidget {
     super.key,
     required this.label,
     required this.onFileSelected,
-    this.allowedTypes = AllowedFileType.both, required this.emptyLabel,
+    this.allowedTypes = AllowedFileType.both,  this.ayuda="Seleccionar archivo desde la Galería o la Cámara",
   });
 
   @override
@@ -94,11 +94,14 @@ class _FileWithCaptionPickerState extends State<FileWithCaptionPicker> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            widget.label,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.primary,
+          Align(
+            alignment: AlignmentGeometry.centerLeft,
+            child: Text(
+              widget.label,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -178,7 +181,7 @@ class _FileWithCaptionPickerState extends State<FileWithCaptionPicker> {
             ),
 
             if(_pickedFile == null)
-            Text(widget.emptyLabel)
+            Text(widget.ayuda!)
         ],
       ),
     );
