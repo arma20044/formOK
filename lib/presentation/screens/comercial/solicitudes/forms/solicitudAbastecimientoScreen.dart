@@ -278,6 +278,7 @@ class _SolicitudAbastecimientoScreenState
 
               FileWithCaptionPicker(
                 label: "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
+                allowedTypes: AllowedFileType.photo,
                 onFileSelected: (file) {
                   selectedFile = file;                 
                   print('Archivo: ${file?.path}');
