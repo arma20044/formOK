@@ -18,40 +18,39 @@ class _SolicitudesScreenState extends ConsumerState<SolicitudesScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
+    // ✅ Determinamos si el usuario está autenticado
+    final isAuthenticated =
+        authState.value?.state == AuthState.authenticated;
+
+    // ✅ Filtramos la lista según autenticación y campo necesitaAuth
+    final filteredItems = itemsSolicitudesComerciales.where((item) {
+      // Si está autenticado → mostrar solo los que necesitan auth
+      if (isAuthenticated) {
+        return item.necesitaAuth == true;
+      }
+      // Si NO está autenticado → mostrar solo los que NO necesitan auth
+      return item.necesitaAuth != true;
+    }).toList();
+
     return Scaffold(
-      appBar: AppBar(title: Text("Solicitudes")),
-      endDrawer: CustomDrawer(),
+      appBar: AppBar(title: const Text("Solicitudes")),
+      endDrawer: const CustomDrawer(),
       body: ListView.builder(
         padding: const EdgeInsets.all(8),
-        itemCount: itemsSolicitudesComerciales.length,
+        itemCount: filteredItems.length,
         itemBuilder: (context, index) {
-          final item = itemsSolicitudesComerciales[index];
+          final item = filteredItems[index];
 
-          if (authState.value!.state == AuthState.authenticated &&
-              item.necesitaAuth != null &&
-              item.necesitaAuth!) {
-            return CustomInfoCardSolicitudes(
-              title: item.title,
-              description: item.description,
-              buttonText: item.buttonText,
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Presionaste: ${item.title}')),
-                );
-              },
-            );
-          } else {
-            return CustomInfoCardSolicitudes(
-              title: item.title,
-              description: item.description,
-              buttonText: item.buttonText,
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Presionaste: ${item.title}')),
-                );
-              },
-            );
-          }
+          return CustomInfoCardSolicitudes(
+            title: item.title,
+            description: item.description,
+            buttonText: item.buttonText,
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Presionaste: ${item.title}')),
+              );
+            },
+          );
         },
       ),
     );

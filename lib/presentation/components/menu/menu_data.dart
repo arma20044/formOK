@@ -67,14 +67,13 @@ final List<MenuGroup> menuGroups = [
         id: 'consulta_factura',
         icon: Icons.document_scanner,
         label: 'Consulta de Facturas',
-        onTap: (context) =>
-            context.push('/consultaFacturas'),
+        onTap: (context) => context.push('/consultaFacturas'),
       ),
       MenuItemModel(
         id: 'history',
         icon: Icons.edit_document,
         label: 'Solicitudes',
-        // onTap: () => debugPrint('Historial'),
+        onTap: (context) => context.push('/solicitudes'),
       ),
       MenuItemModel(
         id: 'yoFacturoMiLuz',
@@ -91,8 +90,7 @@ final List<MenuGroup> menuGroups = [
         id: 'cuenta',
         icon: Icons.person,
         label: 'Mi Cuenta',
-            onTap: (context) =>
-            context.push('/miCuenta'),
+        onTap: (context) => context.push('/miCuenta'),
       ),
     ],
   ),

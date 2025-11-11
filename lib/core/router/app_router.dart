@@ -11,7 +11,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../presentation/screens/screens.dart';
 
-final publicRoutes = ['/login', '/register', '/splash', '/'];
+final publicRoutes = ['/login', '/register', '/splash', '/','/solicitudes'];
 final privateRoutes = [
   '/miCuenta',
   '/misDatos',
