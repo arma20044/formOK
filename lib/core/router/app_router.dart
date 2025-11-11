@@ -6,7 +6,7 @@ import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/main.dart';
-import 'package:form/provider/router_history_notifier.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/solicitudes_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../presentation/screens/screens.dart';
@@ -83,6 +83,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/suministros',
         builder: (context, state) => const SuministrosScreen(),
+      ),
+      GoRoute(
+        path: '/solicitudes',
+        builder: (context, state) => const SolicitudesScreen(),
       ),
     ],
 
