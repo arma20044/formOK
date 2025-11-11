@@ -8,10 +8,10 @@ class FileWithCaptionPicker extends StatefulWidget {
   final Function(File?) onFileSelected;
 
   const FileWithCaptionPicker({
-    Key? key,
+    super.key,
     required this.label,
     required this.onFileSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<FileWithCaptionPicker> createState() => _FileWithCaptionPickerState();
@@ -57,17 +57,17 @@ class _FileWithCaptionPickerState extends State<FileWithCaptionPicker> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //crossAxisAlignment: CrossAxisAlignment.center,
+      //rossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           widget.label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 15,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14,),
         ),
         const SizedBox(height: 8),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton.icon(
               onPressed: () => _pickFile(ImageSource.gallery),
@@ -82,22 +82,29 @@ class _FileWithCaptionPickerState extends State<FileWithCaptionPicker> {
             ),
           ],
         ),
+
         const SizedBox(height: 10),
-        if (_pickedFile != null)
-          _videoController != null
-              ? AspectRatio(
-                  aspectRatio: _videoController!.value.aspectRatio,
-                  child: VideoPlayer(_videoController!),
-                )
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.file(
-                    _pickedFile!,
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+        Column(
+          children: [
+            if (_pickedFile != null)
+              _videoController != null
+                  ? AspectRatio(
+                      aspectRatio: _videoController!.value.aspectRatio,
+                      child: VideoPlayer(_videoController!),
+                    )
+                  : Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(
+                          _pickedFile!,
+                          width: 150,
+                          height: 150,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+          ],
+        ),
       ],
     );
   }
