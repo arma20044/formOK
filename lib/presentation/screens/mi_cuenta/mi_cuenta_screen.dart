@@ -21,8 +21,16 @@ class MiCuentaScreen extends ConsumerWidget {
     }
 
     final botones = [
-      BotonNavegacion(icon: Icons.electric_meter, texto: 'Suministros', ruta: '/inicio'),
-      BotonNavegacion(icon: Icons.article, texto: 'Solicitudes', ruta: '/perfil'),
+      BotonNavegacion(
+        icon: Icons.electric_meter,
+        texto: 'Suministros',
+        ruta: '/suministros',
+      ),
+      BotonNavegacion(
+        icon: Icons.article,
+        texto: 'Solicitudes',
+        ruta: '/perfil',
+      ),
       BotonNavegacion(
         icon: Icons.folder,
         texto: 'Expedientes',
