@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form/presentation/components/drawer/auth_drawer_section.dart';
 import 'package:form/presentation/components/drawer/auth_header_section.dart';
+import 'package:form/utils/utils.dart';
 import '../../../provider/theme_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
@@ -17,17 +18,7 @@ class CustomDrawer extends ConsumerWidget {
     final themeNotifier = ref.watch(themeNotifierProvider.notifier);
     final themeState = ref.watch(themeNotifierProvider);
 
-    Future<void> _launchUrl(String key) async {
-    //  await dotenv.load(fileName: ".env");
-
-      final url = dotenv.env[key];
-      if (url == null) return;
-
-      final uri = Uri.parse(url);
-      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        throw Exception('No se pudo abrir $url');
-      }
-    }
+  
 
     return Drawer(
       child: ListView(
@@ -60,9 +51,9 @@ class CustomDrawer extends ConsumerWidget {
             onTap: () {
               Navigator.pop(context);
               if (Platform.isAndroid) {
-                _launchUrl("VALORAR_APP_ANDROID");
+                lanzarUrl("VALORAR_APP_ANDROID");
               } else {
-                _launchUrl("VALORAR_APP_IOS");
+                lanzarUrl("VALORAR_APP_IOS");
               }
             },
           ),
@@ -73,7 +64,7 @@ class CustomDrawer extends ConsumerWidget {
             title: const Text('Políticas de Privacidad'),
             onTap: () {
               Navigator.pop(context);
-              _launchUrl("POLITICAS_PRIVACIDAD");
+              lanzarUrl("POLITICAS_PRIVACIDAD");
             },
           ),
           const Divider(),
@@ -89,7 +80,7 @@ class CustomDrawer extends ConsumerWidget {
                     color: Colors.red,
                     size: 50,
                   ),
-                  onPressed: () => _launchUrl("YOUTUBE_URL"),
+                  onPressed: () => lanzarUrl("YOUTUBE_URL"),
                 ),
                 IconButton(
                   icon: const FaIcon(
@@ -97,7 +88,7 @@ class CustomDrawer extends ConsumerWidget {
                     color: Colors.blue,
                     size: 50,
                   ),
-                  onPressed: () => _launchUrl("FACEBOOK_URL"),
+                  onPressed: () => lanzarUrl("FACEBOOK_URL"),
                 ),
                 IconButton(
                   icon: const FaIcon(
@@ -105,7 +96,7 @@ class CustomDrawer extends ConsumerWidget {
                     color: Colors.black,
                     size: 50,
                   ),
-                  onPressed: () => _launchUrl("X_URL"),
+                  onPressed: () => lanzarUrl("X_URL"),
                 ),
                 IconButton(
                   icon: const FaIcon(
@@ -113,7 +104,7 @@ class CustomDrawer extends ConsumerWidget {
                     color: Colors.orange,
                     size: 50,
                   ),
-                  onPressed: () => _launchUrl('INSTAGRAM_URL'),
+                  onPressed: () => lanzarUrl('INSTAGRAM_URL'),
                 ),
               ],
             ),

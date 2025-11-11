@@ -2,13 +2,14 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:form/model/constans/mensajes_servicios.dart';
 import 'package:form/model/servicios_nis_telefono.dart';
 import 'package:form/presentation/components/common/custom_pdf_modal.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../model/comercial/factura_grafico.dart';
 
 final RegExp emailRegex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
@@ -187,3 +188,19 @@ String formatearNumeroString(
   final numero = num.tryParse(valor.replaceAll(',', '.')) ?? 0;
   return formatearNumero(numero, decimales: decimales, locale: locale);
 }
+
+
+
+  Future<void> lanzarUrl(String key) async {
+    //  await dotenv.load(fileName: ".env");
+
+      final url = dotenv.env[key];
+      if (url == null) return;
+
+      final uri = Uri.parse(url);
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        throw Exception('No se pudo abrir $url');
+      }
+    }
+
+    

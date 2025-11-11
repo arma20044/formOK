@@ -33,7 +33,7 @@ class _CambioContrasenhaScreenState
   void _enviarFormulario(UserModel user) async {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese todos los cambios')),
+        const SnackBar(content: Text('Ingrese todos los campos')),
       );
       return;
     }

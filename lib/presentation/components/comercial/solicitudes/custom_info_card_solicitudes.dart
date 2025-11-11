@@ -11,7 +11,7 @@ class CustomInfoCardSolicitudes extends StatelessWidget {
     required this.title,
     required this.description,
     required this.buttonText,
-    required this.onPressed,
+    required this.onPressed,   
   });
 
   @override

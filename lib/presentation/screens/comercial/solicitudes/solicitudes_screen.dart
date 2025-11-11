@@ -5,6 +5,7 @@ import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/presentation/components/comercial/solicitudes/custom_info_card_solicitudes.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:go_router/go_router.dart';
 
 class SolicitudesScreen extends ConsumerStatefulWidget {
   const SolicitudesScreen({super.key});
@@ -46,9 +47,10 @@ class _SolicitudesScreenState extends ConsumerState<SolicitudesScreen> {
             description: item.description,
             buttonText: item.buttonText,
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Presionaste: ${item.title}')),
-              );
+              context.push('/solicitudAbastecimiento');
+
+         
+        
             },
           );
         },
