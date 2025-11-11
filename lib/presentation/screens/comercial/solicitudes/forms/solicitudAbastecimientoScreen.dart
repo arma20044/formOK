@@ -7,15 +7,12 @@ import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/custom_map_modal.dart';
+import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/widgets/media/FileWithCaptionPicker.dart';
-import 'package:form/presentation/components/widgets/media/MediaPickerButton.dart';
-import 'package:form/presentation/components/widgets/media/MediaPreview.dart';
 import 'package:form/utils/utils.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mime/mime.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 class SolicitudAbastecimientoScreen extends StatefulWidget {
   const SolicitudAbastecimientoScreen({super.key});
@@ -126,6 +123,7 @@ class _SolicitudAbastecimientoScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: CustomDrawer(),
       appBar: AppBar(title: Text("Solicitud de Abastecimiento de Energía")),
       body: SingleChildScrollView(
         child: Form(
@@ -278,6 +276,7 @@ class _SolicitudAbastecimientoScreenState
 
               FileWithCaptionPicker(
                 label: "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
+                emptyLabel: "Seleccionar archivo desde la Galería o la Cámara",
                 allowedTypes: AllowedFileType.photo,
                 onFileSelected: (file) {
                   selectedFile = file;                 
