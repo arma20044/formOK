@@ -128,10 +128,31 @@ class _SolicitudAbastecimientoScreenState
 
   List<ArchivoAdjunto>? selectedFileSolicitudList;
   List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList;
+  List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList;
+  List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList;
+  List<ArchivoAdjunto>? selectedFileOtrosDocumentosList;
 
   String fileCaption = 'asdas';
 
   bool _isLoadingSolicitud = false;
+
+  void limpiarTodo() {
+    setState(() {
+      nombreController.clear();
+      apellidoController.clear();
+      numeroDocumentoController.clear();
+      numeroCelularController.clear();
+      correoController.clear();
+
+      selectedFileSolicitudList = [];
+      selectedFileFotocopiaAutenticadaList = [];
+      selectedFileFotocopiaSimpleCedulaSolicitanteList = [];
+      selectedFileCopiaSimpleCarnetElectricistaList = [];
+      selectedFileOtrosDocumentosList = [];
+
+      ubicacion = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -214,6 +235,9 @@ class _SolicitudAbastecimientoScreenState
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Ingrese Correo del Titular';
+                    }
+                    if (!emailRegex.hasMatch(value)) {
+                      return "Ingrese formato de correo válido.";
                     }
                     return null;
                   },
@@ -322,7 +346,7 @@ class _SolicitudAbastecimientoScreenState
                         ayuda:
                             "Seleccionar archivo desde la Galería o la Cámara",
                         type: MediaType.foto,
-                       files: selectedFileSolicitudList ?? [],
+                        files: selectedFileSolicitudList ?? [],
                         onChanged: (archivo) {
                           setState(() {
                             selectedFileSolicitudList = archivo;
@@ -376,14 +400,16 @@ class _SolicitudAbastecimientoScreenState
                         color: theme.colorScheme.primary,
                       ),
                       const SizedBox(height: 8),
-                      MediaSelector(
+                      MediaSelectorList(
                         ayuda:
                             "Seleccionar archivo desde la Galería o la Cámara.",
                         type: MediaType.foto,
-                        file: selectedFileSolicitud,
+                        files:
+                            selectedFileFotocopiaSimpleCedulaSolicitanteList ??
+                            [],
                         onChanged: (archivo) {
                           setState(() {
-                            selectedFileFotocopiaSimpleCedulaSolicitante =
+                            selectedFileFotocopiaSimpleCedulaSolicitanteList =
                                 archivo;
                           });
                         },
@@ -405,14 +431,16 @@ class _SolicitudAbastecimientoScreenState
                         color: theme.colorScheme.primary,
                       ),
                       const SizedBox(height: 8),
-                      MediaSelector(
+                      MediaSelectorList(
                         ayuda:
                             "Seleccionar archivo desde la Galería o la Cámara.",
                         type: MediaType.foto,
-                        file: selectedFileSolicitud,
+                        files:
+                            selectedFileCopiaSimpleCarnetElectricistaList ?? [],
                         onChanged: (archivo) {
                           setState(() {
-                            selectedFileCopiaSimpleCarnetElectricista = archivo;
+                            selectedFileCopiaSimpleCarnetElectricistaList =
+                                archivo;
                           });
                         },
                       ),
@@ -433,14 +461,14 @@ class _SolicitudAbastecimientoScreenState
                         color: theme.colorScheme.primary,
                       ),
                       const SizedBox(height: 8),
-                      MediaSelector(
+                      MediaSelectorList(
                         ayuda:
                             "Seleccionar archivo desde la Galería o la Cámara.",
                         type: MediaType.foto,
-                        file: selectedFileSolicitud,
+                        files: selectedFileOtrosDocumentosList ?? [],
                         onChanged: (archivo) {
                           setState(() {
-                            selectedFileOtrosDocumentos = archivo;
+                            selectedFileOtrosDocumentosList = archivo;
                           });
                         },
                       ),
@@ -505,10 +533,17 @@ class _SolicitudAbastecimientoScreenState
       return;
     }
 
-    if (selectedFileSolicitud == null) {
+    if (selectedFileSolicitudList == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Debe adjuntar archivo.')));
+      return;
+    }
+
+    if (ubicacion == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Agregue ubicación en el Mapa.')),
+      );
       return;
     }
 
@@ -528,7 +563,7 @@ class _SolicitudAbastecimientoScreenState
       return;
     }
 
-    //limpiarTodo();
+    limpiarTodo();
 
     showCustomDialog(
       context: context,
@@ -558,11 +593,11 @@ class _SolicitudAbastecimientoScreenState
             numeroCelularController.text,
             correoController.text,
             '1',
-            selectedFileSolicitud,
-            selectedFileFotocopiaAutenticada,
-            selectedFileFotocopiaSimpleCedulaSolicitante,
-            selectedFileCopiaSimpleCarnetElectricista,
-            selectedFileOtrosDocumentos,
+            selectedFileSolicitudList,
+            selectedFileFotocopiaAutenticadaList,
+            selectedFileFotocopiaSimpleCedulaSolicitanteList,
+            selectedFileCopiaSimpleCarnetElectricistaList,
+            selectedFileOtrosDocumentosList,
           );
 
       return solicitudAbastecimientoResponse;

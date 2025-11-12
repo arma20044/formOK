@@ -22,11 +22,11 @@ class SolicitudAbastecimientoDatasourceImp
     String titularNumeroTelefono,
     String titularCorreo,
     String idTipoReclamo,
-    ArchivoAdjunto? selectedFileSolicitud,
-    ArchivoAdjunto? selectedFileFotocopiaAutenticada,
-    ArchivoAdjunto? selectedFileFotocopiaSimpleCedulaSolicitante,
-    ArchivoAdjunto? selectedFileCopiaSimpleCarnetElectricista,
-    ArchivoAdjunto? selectedFileOtrosDocumentos,
+    List<ArchivoAdjunto>? selectedFileSolicitudList,
+    List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList,
+    List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
+    List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
+    List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
   ) async {
     final Map<String, Object> formMap = {
       'titularNombres': titularNombres,
@@ -38,21 +38,21 @@ class SolicitudAbastecimientoDatasourceImp
       'clientKey': Environment.clientKey,
     };
 
-    
-    if (selectedFileSolicitud != null) {
-      formMap['saee_adjuntoSaee1'] = [
-        await MultipartFile.fromFile(
-          selectedFileSolicitud.file.path,
-          filename: selectedFileSolicitud.file.path.split('/').last,
-        ),
-      ];
-      formMap['saee_adjuntoSaee1Extra'] = jsonEncode(
-        selectedFileSolicitud.info,
-      );
+    if (selectedFileSolicitudList!.isNotEmpty) {
+      int pos = 0;
+      for (var foto in selectedFileSolicitudList) {
+        pos++;
+        formMap['saee_adjuntoSaee$pos'] = [
+          await MultipartFile.fromFile(
+            foto.file.path,
+            filename: foto.file.path.split('/').last,
+          ),
+        ];
+        formMap['saee_adjuntoSaee${pos}Extra'] = jsonEncode(foto.info);
+      }
     }
 
-
-   /* if (selectedFileFotocopiaAutenticada != null) {
+    /* if (selectedFileFotocopiaAutenticada != null) {
       formMap['saee_adjuntoSaee1'] = [
         await MultipartFile.fromFile(
           selectedFileFotocopiaAutenticada.file.path,

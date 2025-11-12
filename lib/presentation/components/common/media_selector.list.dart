@@ -125,10 +125,10 @@ class _MediaSelectorListState extends State<MediaSelectorList>
                     ),
                     Positioned(
                       right: 10,
-                      top: 0,
+                      //top: 0,
                       child: Center(
                         child: Container(
-                          width: 23,
+                          width: 22,
                           height: 23,
                           decoration: BoxDecoration(
                             border: Border.all(width: 1, color: Colors.white),
@@ -140,7 +140,7 @@ class _MediaSelectorListState extends State<MediaSelectorList>
                     ),
                     Positioned(
                       right: -3,
-                      top: -12,
+                      top: -13,
                       child: IconButton(
                         // iconSize: 150,
                         icon: const Icon(Icons.cancel, color: Colors.pink),

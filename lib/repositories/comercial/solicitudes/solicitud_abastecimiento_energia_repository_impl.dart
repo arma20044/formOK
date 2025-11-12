@@ -16,11 +16,11 @@ class SolicitudAbastecimientoRepositoryImpl
     String titularNumeroTelefono,
     String titularCorreo,
     String idTipoReclamo,
-    ArchivoAdjunto? selectedFileSolicitud,
-    ArchivoAdjunto? selectedFileFotocopiaAutenticada,
-    ArchivoAdjunto? selectedFileFotocopiaSimpleCedulaSolicitante,
-    ArchivoAdjunto? selectedFileCopiaSimpleCarnetElectricista,
-    ArchivoAdjunto? selectedFileOtrosDocumentos,
+    List<ArchivoAdjunto>? selectedFileSolicitudList,
+    List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList,
+    List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
+    List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
+    List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
   ) {
     return datasource.getSolicitudAbastecimiento(
       titularNombres,
@@ -29,11 +29,11 @@ class SolicitudAbastecimientoRepositoryImpl
       titularNumeroTelefono,
       titularCorreo,
       idTipoReclamo,
-      selectedFileSolicitud,
-      selectedFileFotocopiaAutenticada,
-      selectedFileFotocopiaSimpleCedulaSolicitante,
-      selectedFileCopiaSimpleCarnetElectricista,
-      selectedFileOtrosDocumentos,
+      selectedFileSolicitudList,
+      selectedFileFotocopiaAutenticadaList,
+      selectedFileFotocopiaSimpleCedulaSolicitanteList,
+      selectedFileCopiaSimpleCarnetElectricistaList,
+      selectedFileOtrosDocumentosList,
     );
   }
 }
