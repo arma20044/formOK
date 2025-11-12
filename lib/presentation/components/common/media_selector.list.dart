@@ -5,6 +5,7 @@ import 'package:form/presentation/components/common/custom_text.dart';
 import 'package:form/presentation/components/widgets/media/MediaPickerButton.dart';
 import 'package:form/presentation/components/widgets/media/MediaPreview.dart';
 import 'package:form/utils/utils.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:mime/mime.dart';
@@ -123,10 +124,29 @@ class _MediaSelectorListState extends State<MediaSelectorList>
                           widget.files[i].info['thumbnail'] as Uint8List?,
                     ),
                     Positioned(
-                      right: 0,
+                      right: 10,
+                      top: 0,
+                      child: Center(
+                        child: Container(
+                          width: 23,
+                          height: 23,
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1, color: Colors.white),
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: -3,
+                      top: -12,
                       child: IconButton(
-                        icon: const Icon(Icons.cancel, color: Colors.red),
-                        onPressed: () => _removeFile(i),
+                        // iconSize: 150,
+                        icon: const Icon(Icons.cancel, color: Colors.pink),
+                        onPressed: () {
+                          _removeFile(i);
+                        },
                       ),
                     ),
                   ],

@@ -127,7 +127,7 @@ class _SolicitudAbastecimientoScreenState
   ArchivoAdjunto? selectedFileOtrosDocumentos;
 
   List<ArchivoAdjunto>? selectedFileSolicitudList;
-List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList;
+  List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList;
 
   String fileCaption = 'asdas';
 
@@ -317,14 +317,15 @@ List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList;
                       ),
                       const SizedBox(height: 8),
 
-                      MediaSelector(
+                      MediaSelectorList(
+                        maxAdjuntos: 2,
                         ayuda:
                             "Seleccionar archivo desde la Galería o la Cámara",
                         type: MediaType.foto,
-                        file: selectedFileSolicitud,
+                       files: selectedFileSolicitudList ?? [],
                         onChanged: (archivo) {
                           setState(() {
-                            selectedFileSolicitud = archivo;
+                            selectedFileSolicitudList = archivo;
                           });
                         },
                       ),
@@ -351,7 +352,7 @@ List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList;
                         ayuda:
                             "(Contrato Privado de Compra /Venta con certificación de firma, Sentencia Declaratoria de adjudicación del inmueble) o Constancia de la Inmobiliaria (original) o Constancia Municipal (original).",
                         type: MediaType.foto,
-                        
+
                         onChanged: (archivo) {
                           setState(() {
                             selectedFileFotocopiaAutenticadaList = archivo;
