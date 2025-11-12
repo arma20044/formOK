@@ -2,13 +2,20 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:form/core/api/mi_ande_api.dart';
+import 'package:form/datasources/datasources.dart';
+import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/model/archivo_adjunto_model.dart';
+import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/custom_map_modal.dart';
+import 'package:form/presentation/components/common/media_selector.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/widgets/media/FileWithCaptionPicker.dart';
+import 'package:form/presentation/components/widgets/media/MediaPickerButton.dart';
+import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -48,6 +55,8 @@ class _SolicitudAbastecimientoScreenState
   late final ValueChanged<ArchivoAdjunto?> onChanged;
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+
+  
 
   final nombreController = TextEditingController();
   final apellidoController = TextEditingController();
@@ -116,7 +125,7 @@ class _SolicitudAbastecimientoScreenState
     }
   }
 
-  File? selectedFileSolicitud;
+  ArchivoAdjunto? selectedFileSolicitud;
   File? selectedFileFotocopiaAutenticada;
   File? selectedFileFotocopiaSimpleCedulaSolicitante;
   File? selectedFileCopiaSimpleCarnetElectricista;
@@ -124,8 +133,13 @@ class _SolicitudAbastecimientoScreenState
 
   String fileCaption = 'asdas';
 
+  bool _isLoadingSolicitud = false;
+
   @override
   Widget build(BuildContext context) {
+
+     final theme = Theme.of(context);
+
     return Scaffold(
       endDrawer: CustomDrawer(),
       appBar: AppBar(title: Text("Solicitud de Abastecimiento de Energía")),
@@ -294,8 +308,32 @@ class _SolicitudAbastecimientoScreenState
                   ),
                 ),
                 const SizedBox(height: 24),
+                CustomCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(
+                        "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.clip,
+                       color: theme.colorScheme.primary,
+                        
+                      ),
+                      const SizedBox(height: 8),
+                      MediaSelector(
+                        type: MediaType.foto,
+                        file: selectedFileSolicitud,
+                        onChanged: (archivo) {
+                          setState(() {
+                            selectedFileSolicitud = archivo;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
 
-                FileWithCaptionPicker(
+                /*  FileWithCaptionPicker(
                   label:
                       "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
                   allowedTypes: AllowedFileType.photo,
@@ -304,8 +342,7 @@ class _SolicitudAbastecimientoScreenState
                       selectedFileSolicitud = file;
                     });
                   },
-                ),
-
+                ),*/
                 const SizedBox(height: 24),
 
                 FileWithCaptionPicker(
@@ -400,6 +437,40 @@ class _SolicitudAbastecimientoScreenState
         context,
       ).showSnackBar(const SnackBar(content: Text('Ingrese todos los campos')));
       return;
+    }
+
+    if (selectedFileSolicitud != null) {
+      print(selectedFileSolicitud!.info.toString());
+    }
+  }
+
+  Future<SolicitudAbastecimientoResponse>
+  _fecthSolicitudAbastecimiento() async {
+    try {
+      final repoSolicitudAbastecimiento = SolicitudAbastecimientoRepositoryImpl(
+        SolicitudAbastecimientoDatasourceImp(MiAndeApi()),
+      );
+
+      setState(() {
+        _isLoadingSolicitud = true;
+      });
+
+      final solicitudAbastecimientoResponse = await repoSolicitudAbastecimiento
+          .getSolicitudAbastecimiento(
+            nombreController.text,
+            apellidoController.text,
+            numeroDocumentoController.text,
+            numeroCelularController.text,
+            correoController.text,
+            '1',
+            selectedFileSolicitud,
+          );
+
+      return solicitudAbastecimientoResponse;
+    } catch (e) {
+      throw Exception();
+    } finally {
+      _isLoadingSolicitud = false;
     }
   }
 }

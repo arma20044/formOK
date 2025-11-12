@@ -13,3 +13,4 @@ export './mi_cuenta/mi_cuenta_ultimas_facturas_datasource.dart';
 export './mi_cuenta/mi_cuenta_situacion_actual_datasource.dart';
 export 'comercial/historico_consumo_monto_datasource.dart';
 export 'comercial/recuperar_historico_by_id_datasource.dart';
+export 'comercial/solicitudes/solicitud_abastecimiento_energia_datasource.dart';

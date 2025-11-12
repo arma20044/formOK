@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:form/utils/utils.dart';
 
 class MediaPickerButton extends StatelessWidget {
   final VoidCallback onPickImage;
   final VoidCallback onPickVideo;
   final VoidCallback onPickGallery;
+  final MediaType? type=MediaType.foto;
 
   const MediaPickerButton({
     super.key,
@@ -26,7 +28,8 @@ class MediaPickerButton extends StatelessWidget {
                 onPickImage();
               },
             ),
-            ListTile(
+          if(type==MediaType.video)
+             ListTile(
               leading: const Icon(Icons.videocam),
               title: const Text("Grabar Video"),
               onTap: () {

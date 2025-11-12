@@ -8,7 +8,6 @@ import 'package:form/model/model.dart';
 
 import '../core/api/mi_ande_api.dart';
 import '../datasources/reclamo_datasource.dart';
-import '../model/archivo_adjunto_model.dart';
 
 
 class ReclamoDatasourceImpl extends ReclamoDatasource {
