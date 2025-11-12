@@ -385,6 +385,7 @@ class _SolicitudAbastecimientoScreenState
                     ],
                   ),
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
