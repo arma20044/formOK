@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:form/presentation/components/common/custom_text.dart';
 import 'package:form/presentation/components/widgets/media/MediaPickerButton.dart';
 import 'package:form/presentation/components/widgets/media/MediaPreview.dart';
 import 'package:form/utils/utils.dart';
@@ -9,18 +10,13 @@ import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:mime/mime.dart';
 import '../../../model/archivo_adjunto_model.dart';
 
-
 class MediaSelector extends StatefulWidget {
   final ArchivoAdjunto? file;
   final ValueChanged<ArchivoAdjunto?> onChanged;
   final MediaType? type;
+  final String? ayuda;
 
-  const MediaSelector({
-    Key? key,    
-    this.type,
-    this.file,
-    required this.onChanged,
-  }) : super(key: key);
+  const MediaSelector({super.key, this.type, this.file, required this.onChanged, this.ayuda});
 
   @override
   State<MediaSelector> createState() => _MediaSelectorState();
@@ -86,7 +82,15 @@ class _MediaSelectorState extends State<MediaSelector>
     return Column(
       children: [
         const SizedBox(height: 16),
-        MediaPreview(file: widget.file?.file, videoThumbnail: _videoThumbnail),
+        if (widget.file != null)
+          MediaPreview(
+            file: widget.file?.file,
+            videoThumbnail: _videoThumbnail,
+          ),
+
+          if(widget.file == null && widget.ayuda != null)
+          CustomText(widget.ayuda!,overflow: TextOverflow.clip,),
+
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

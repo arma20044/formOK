@@ -6,7 +6,8 @@ import 'package:form/core/enviromens/Enrivoment.dart';
 import 'package:form/datasources/datasources.dart';
 import 'package:form/model/model.dart';
 
-class SolicitudAbastecimientoDatasourceImp extends SolicitudAbastecimientoDatasource {
+class SolicitudAbastecimientoDatasourceImp
+    extends SolicitudAbastecimientoDatasource {
   late final Dio dio;
 
   //   OlicitudAbastecimiento(MiAndeApi api) : dio = api.dio;
@@ -21,7 +22,11 @@ class SolicitudAbastecimientoDatasourceImp extends SolicitudAbastecimientoDataso
     String titularNumeroTelefono,
     String titularCorreo,
     String idTipoReclamo,
-    ArchivoAdjunto? archivo,
+    ArchivoAdjunto? selectedFileSolicitud,
+    ArchivoAdjunto? selectedFileFotocopiaAutenticada,
+    ArchivoAdjunto? selectedFileFotocopiaSimpleCedulaSolicitante,
+    ArchivoAdjunto? selectedFileCopiaSimpleCarnetElectricista,
+    ArchivoAdjunto? selectedFileOtrosDocumentos,
   ) async {
     final Map<String, Object> formMap = {
       'titularNombres': titularNombres,
@@ -33,16 +38,31 @@ class SolicitudAbastecimientoDatasourceImp extends SolicitudAbastecimientoDataso
       'clientKey': Environment.clientKey,
     };
 
-    // Solo agregar archivo si existe
-    if (archivo != null) {
+    
+    if (selectedFileSolicitud != null) {
       formMap['saee_adjuntoSaee1'] = [
         await MultipartFile.fromFile(
-          archivo.file.path,
-          filename: archivo.file.path.split('/').last,
+          selectedFileSolicitud.file.path,
+          filename: selectedFileSolicitud.file.path.split('/').last,
         ),
       ];
-      formMap['saee_adjuntoSaee1Extra'] = jsonEncode(archivo.info);
+      formMap['saee_adjuntoSaee1Extra'] = jsonEncode(
+        selectedFileSolicitud.info,
+      );
     }
+
+
+   /* if (selectedFileFotocopiaAutenticada != null) {
+      formMap['saee_adjuntoSaee1'] = [
+        await MultipartFile.fromFile(
+          selectedFileFotocopiaAutenticada.file.path,
+          filename: selectedFileFotocopiaAutenticada.file.path.split('/').last,
+        ),
+      ];
+      formMap['saee_adjuntoSaee1Extra'] = jsonEncode(
+        selectedFileFotocopiaAutenticada.info,
+      );
+    }*/
 
     // Crear FormData
     final data = FormData.fromMap(formMap);

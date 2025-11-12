@@ -1,5 +1,3 @@
-
-
 import 'package:form/model/model.dart';
 
 abstract class SolicitudAbastecimientoDatasource {
@@ -10,6 +8,10 @@ abstract class SolicitudAbastecimientoDatasource {
     String titularNumeroTelefono,
     String titularCorreo,
     String idTipoReclamo,
-    ArchivoAdjunto? archivo,
+    ArchivoAdjunto? selectedFileSolicitud,
+    ArchivoAdjunto? selectedFileFotocopiaAutenticada,
+    ArchivoAdjunto? selectedFileFotocopiaSimpleCedulaSolicitante,
+    ArchivoAdjunto? selectedFileCopiaSimpleCarnetElectricista,
+    ArchivoAdjunto? selectedFileOtrosDocumentos,
   );
 }

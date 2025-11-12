@@ -5,23 +5,30 @@ import 'package:flutter/material.dart';
 class MediaPreview extends StatelessWidget {
   final File? file;
   final Uint8List? videoThumbnail;
+  final String? ayuda;
 
   const MediaPreview({
     super.key,
     this.file,
+
     this.videoThumbnail,
+    this.ayuda="Seleccionar archivo desde la Galería o la Cámara",
   });
 
   @override
   Widget build(BuildContext context) {
-    if (file == null) {
-      return const Text("Seleccionar archivo desde la Galería o la Cámara");
+    if (file == null && ayuda == null) {
+      return Text("Seleccionar archivo desde la Galería o la Cámara");
+    }
+
+    if (ayuda != null) {
+      return Text(ayuda!);
     }
 
     // Widget base que renderiza imagen o video thumbnail
     Widget previewContent;
 
-    if (file!.path.endsWith(".mp4")) {
+    if (file != null && file!.path.endsWith(".mp4")) {
       previewContent = videoThumbnail != null
           ? Image.memory(
               videoThumbnail!,
@@ -40,6 +47,7 @@ class MediaPreview extends StatelessWidget {
     }
 
     // Contenedor con bordes redondeados y sombra opcional
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(20), // más redondeado = valor mayor
       child: Container(

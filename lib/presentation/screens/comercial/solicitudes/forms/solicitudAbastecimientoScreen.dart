@@ -1,11 +1,8 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:form/core/api/mi_ande_api.dart';
-import 'package:form/datasources/datasources.dart';
 import 'package:form/infrastructure/infrastructure.dart';
-import 'package:form/model/archivo_adjunto_model.dart';
 import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
@@ -14,8 +11,6 @@ import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/custom_map_modal.dart';
 import 'package:form/presentation/components/common/media_selector.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
-import 'package:form/presentation/components/widgets/media/FileWithCaptionPicker.dart';
-import 'package:form/presentation/components/widgets/media/MediaPickerButton.dart';
 import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
 import 'package:geolocator/geolocator.dart';
@@ -125,10 +120,10 @@ class _SolicitudAbastecimientoScreenState
   }
 
   ArchivoAdjunto? selectedFileSolicitud;
-  File? selectedFileFotocopiaAutenticada;
-  File? selectedFileFotocopiaSimpleCedulaSolicitante;
-  File? selectedFileCopiaSimpleCarnetElectricista;
-  File? selectedFileOtrosDocumentos;
+  ArchivoAdjunto? selectedFileFotocopiaAutenticada;
+  ArchivoAdjunto? selectedFileFotocopiaSimpleCedulaSolicitante;
+  ArchivoAdjunto? selectedFileCopiaSimpleCarnetElectricista;
+  ArchivoAdjunto? selectedFileOtrosDocumentos;
 
   String fileCaption = 'asdas';
 
@@ -317,7 +312,10 @@ class _SolicitudAbastecimientoScreenState
                         color: theme.colorScheme.primary,
                       ),
                       const SizedBox(height: 8),
+
                       MediaSelector(
+                        ayuda:
+                            "Seleccionar archivo desde la Galería o la Cámara",
                         type: MediaType.foto,
                         file: selectedFileSolicitud,
                         onChanged: (archivo) {
@@ -330,61 +328,117 @@ class _SolicitudAbastecimientoScreenState
                   ),
                 ),
 
-                /*  FileWithCaptionPicker(
-                  label:
-                      "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
-                  allowedTypes: AllowedFileType.photo,
-                  onFileSelected: (file) {
-                    setState(() {
-                      selectedFileSolicitud = file;
-                    });
-                  },
-                ),*/
                 const SizedBox(height: 24),
 
-                FileWithCaptionPicker(
-                  label:
-                      "b) Fotocopia Autenticada por Escribanía del título de Propiedad o equivalente",
-                  ayuda:
-                      "(Contrato Privado de Compra /Venta con certificación de firma, Sentencia Declaratoria de adjudicación del inmueble) o Constancia de la Inmobiliaria (original) o Constancia Municipal (original).",
-                  allowedTypes: AllowedFileType.photo,
-                  onFileSelected: (file) {
-                    setState(() {
-                      selectedFileFotocopiaAutenticada = file;
-                    });
-                  },
+                CustomCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(
+                        "b) Fotocopia Autenticada por Escribanía del título de Propiedad o equivalente",
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.clip,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 8),
+                      MediaSelector(
+                        ayuda:
+                            "(Contrato Privado de Compra /Venta con certificación de firma, Sentencia Declaratoria de adjudicación del inmueble) o Constancia de la Inmobiliaria (original) o Constancia Municipal (original).",
+                        type: MediaType.foto,
+                        file: selectedFileSolicitud,
+                        onChanged: (archivo) {
+                          setState(() {
+                            selectedFileFotocopiaAutenticada = archivo;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
+
                 const SizedBox(height: 24),
 
-                FileWithCaptionPicker(
-                  label: "c) Copia simple de Cédula Identidad del Solicitante",
-                  allowedTypes: AllowedFileType.photo,
-                  onFileSelected: (file) {
-                    setState(() {
-                      selectedFileFotocopiaSimpleCedulaSolicitante = file;
-                    });
-                  },
+                CustomCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(
+                        "c) Copia simple de Cédula Identidad del Solicitante",
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.clip,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 8),
+                      MediaSelector(
+                        ayuda:
+                            "Seleccionar archivo desde la Galería o la Cámara.",
+                        type: MediaType.foto,
+                        file: selectedFileSolicitud,
+                        onChanged: (archivo) {
+                          setState(() {
+                            selectedFileFotocopiaSimpleCedulaSolicitante =
+                                archivo;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
+
                 const SizedBox(height: 24),
-                FileWithCaptionPicker(
-                  label:
-                      "d) Copia simple de Carnet del Electricista Matriculado en ANDE",
-                  allowedTypes: AllowedFileType.photo,
-                  onFileSelected: (file) {
-                    setState(() {
-                      selectedFileCopiaSimpleCarnetElectricista = file;
-                    });
-                  },
+
+                CustomCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(
+                        "d) Copia simple de Carnet del Electricista Matriculado en ANDE",
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.clip,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 8),
+                      MediaSelector(
+                        ayuda:
+                            "Seleccionar archivo desde la Galería o la Cámara.",
+                        type: MediaType.foto,
+                        file: selectedFileSolicitud,
+                        onChanged: (archivo) {
+                          setState(() {
+                            selectedFileCopiaSimpleCarnetElectricista = archivo;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
+
                 const SizedBox(height: 24),
-                FileWithCaptionPicker(
-                  label: "e) Otros documentose",
-                  allowedTypes: AllowedFileType.photo,
-                  onFileSelected: (file) {
-                    setState(() {
-                      selectedFileOtrosDocumentos = file;
-                    });
-                  },
+
+                CustomCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomText(
+                        "e) Otros documentose",
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.clip,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 8),
+                      MediaSelector(
+                        ayuda:
+                            "Seleccionar archivo desde la Galería o la Cámara.",
+                        type: MediaType.foto,
+                        file: selectedFileSolicitud,
+                        onChanged: (archivo) {
+                          setState(() {
+                            selectedFileOtrosDocumentos = archivo;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 8),
@@ -469,13 +523,13 @@ class _SolicitudAbastecimientoScreenState
 
     //limpiarTodo();
 
-  showCustomDialog(
-    context: context,
-    message: result.mensaje!,
-    showCopyButton: false,
-    title: "Éxito.",
-    type: DialogType.success
-  );
+    showCustomDialog(
+      context: context,
+      message: result.mensaje!,
+      showCopyButton: false,
+      title: "Éxito.",
+      type: DialogType.success,
+    );
   }
 
   Future<SolicitudAbastecimientoResponse>
@@ -498,6 +552,10 @@ class _SolicitudAbastecimientoScreenState
             correoController.text,
             '1',
             selectedFileSolicitud,
+            selectedFileFotocopiaAutenticada,
+            selectedFileFotocopiaSimpleCedulaSolicitante,
+            selectedFileCopiaSimpleCarnetElectricista,
+            selectedFileOtrosDocumentos,
           );
 
       return solicitudAbastecimientoResponse;

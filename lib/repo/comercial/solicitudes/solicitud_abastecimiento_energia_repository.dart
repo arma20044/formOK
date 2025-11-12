@@ -8,6 +8,10 @@ abstract class SolicitudAbastecimientoRepository {
     String titularNumeroTelefono,
     String titularCorreo,
     String idTipoReclamo,
-     ArchivoAdjunto? archivo,
+    ArchivoAdjunto? selectedFileSolicitud,
+    ArchivoAdjunto? selectedFileFotocopiaAutenticada,
+    ArchivoAdjunto? selectedFileFotocopiaSimpleCedulaSolicitante,
+    ArchivoAdjunto? selectedFileCopiaSimpleCarnetElectricista,
+    ArchivoAdjunto? selectedFileOtrosDocumentos,
   );
 }
