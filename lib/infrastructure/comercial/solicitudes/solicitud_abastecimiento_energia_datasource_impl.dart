@@ -27,6 +27,7 @@ class SolicitudAbastecimientoDatasourceImp extends SolicitudAbastecimientoDataso
       'titularNombres': titularNombres,
       'titularApellidos': titularApellidos,
       'titularDocumentoNumero': titularDocumentoNumero,
+      'titularNumeroTelefono': titularNumeroTelefono,
       'titularCorreo': titularCorreo,
       'idTipoReclamo': idTipoReclamo,
       'clientKey': Environment.clientKey,
@@ -40,7 +41,7 @@ class SolicitudAbastecimientoDatasourceImp extends SolicitudAbastecimientoDataso
           filename: archivo.file.path.split('/').last,
         ),
       ];
-      formMap['reclamo_adjunto1Extra'] = jsonEncode(archivo.info);
+      formMap['saee_adjuntoSaee1Extra'] = jsonEncode(archivo.info);
     }
 
     // Crear FormData

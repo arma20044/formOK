@@ -10,6 +10,7 @@ import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
+import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/custom_map_modal.dart';
 import 'package:form/presentation/components/common/media_selector.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
@@ -55,8 +56,6 @@ class _SolicitudAbastecimientoScreenState
   late final ValueChanged<ArchivoAdjunto?> onChanged;
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
-
-  
 
   final nombreController = TextEditingController();
   final apellidoController = TextEditingController();
@@ -137,8 +136,7 @@ class _SolicitudAbastecimientoScreenState
 
   @override
   Widget build(BuildContext context) {
-
-     final theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
       endDrawer: CustomDrawer(),
@@ -316,8 +314,7 @@ class _SolicitudAbastecimientoScreenState
                         "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
                         fontWeight: FontWeight.bold,
                         overflow: TextOverflow.clip,
-                       color: theme.colorScheme.primary,
-                        
+                        color: theme.colorScheme.primary,
                       ),
                       const SizedBox(height: 8),
                       MediaSelector(
@@ -403,14 +400,13 @@ class _SolicitudAbastecimientoScreenState
                   ),
                 ),
 
-                SizedBox(
+                /*                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: isLoading ? null : () => _enviarFormulario(),
                     child: Text("Enviar Solicitud"),
                   ),
-                ),
-
+                ), */
                 const SizedBox(height: 8),
                 CustomCard(
                   child: Column(
@@ -422,10 +418,19 @@ class _SolicitudAbastecimientoScreenState
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                //const SizedBox(height: 24),
               ],
             ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+          onPressed: _isLoadingSolicitud ? null : _enviarFormulario,
+          child: _isLoadingSolicitud
+              ? const SizedBox(child: CircularProgressIndicator())
+              : Text("Enviar Solicitud"),
         ),
       ),
     );
@@ -439,9 +444,38 @@ class _SolicitudAbastecimientoScreenState
       return;
     }
 
-    if (selectedFileSolicitud != null) {
-      print(selectedFileSolicitud!.info.toString());
+    if (selectedFileSolicitud == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Debe adjuntar archivo.')));
+      return;
     }
+
+    SolicitudAbastecimientoResponse result =
+        await _fecthSolicitudAbastecimiento();
+    if (!mounted) return;
+    if (!result.mensaje!.contains("Se ha creado exitosamente")) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result.errorValList == null
+                ? result.errorValList![0]
+                : result.mensaje,
+          ),
+        ),
+      );
+      return;
+    }
+
+    //limpiarTodo();
+
+  showCustomDialog(
+    context: context,
+    message: result.mensaje!,
+    showCopyButton: false,
+    title: "Éxito.",
+    type: DialogType.success
+  );
   }
 
   Future<SolicitudAbastecimientoResponse>
@@ -470,7 +504,9 @@ class _SolicitudAbastecimientoScreenState
     } catch (e) {
       throw Exception();
     } finally {
-      _isLoadingSolicitud = false;
+      setState(() {
+        _isLoadingSolicitud = false;
+      });
     }
   }
 }

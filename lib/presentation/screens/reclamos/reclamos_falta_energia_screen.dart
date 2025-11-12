@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/tab3.dart';
+import 'package:form/utils/utils.dart';
 
 import '../../../core/api/mi_ande_api.dart';
 import '../../../infrastructure/reclamo_datasource_impl.dart';
@@ -114,7 +115,7 @@ class _ParentScreenState extends State<ReclamosScreen>
             ),
             TextButton(
               onPressed: () {
-                _copyTextToClipboard(mensajeExitoso);
+                copyTextToClipboard(mensajeExitoso,context);
               },
               child: const Text('Copiar'),
             ),
@@ -126,13 +127,6 @@ class _ParentScreenState extends State<ReclamosScreen>
 
   // Envía los datos
 
-  void _copyTextToClipboard(String textToCopy) async {
-    await Clipboard.setData(ClipboardData(text: textToCopy));
-    // Optionally, show a confirmation message to the user, like a SnackBar
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Texto copiado exitosamente!')),
-    );
-  }
 
   Future<ReclamoResponse> _fetchReclamo() async {
     try {

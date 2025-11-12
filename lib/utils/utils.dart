@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:form/model/archivo_adjunto_model.dart';
 import 'package:form/model/constans/mensajes_servicios.dart';
@@ -201,3 +202,12 @@ Future<void> lanzarUrl(String key) async {
 }
 
 enum MediaType { foto, video, mixto }
+
+
+  void copyTextToClipboard(String textToCopy, BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: textToCopy));
+    // Optionally, show a confirmation message to the user, like a SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Texto copiado exitosamente!')),
+    );
+  }
