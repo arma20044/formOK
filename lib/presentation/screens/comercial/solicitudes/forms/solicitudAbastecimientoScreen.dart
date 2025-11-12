@@ -10,6 +10,7 @@ import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/custom_map_modal.dart';
 import 'package:form/presentation/components/common/media_selector.dart';
+import 'package:form/presentation/components/common/media_selector.list.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
@@ -124,6 +125,9 @@ class _SolicitudAbastecimientoScreenState
   ArchivoAdjunto? selectedFileFotocopiaSimpleCedulaSolicitante;
   ArchivoAdjunto? selectedFileCopiaSimpleCarnetElectricista;
   ArchivoAdjunto? selectedFileOtrosDocumentos;
+
+  List<ArchivoAdjunto>? selectedFileSolicitudList;
+List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList;
 
   String fileCaption = 'asdas';
 
@@ -341,14 +345,16 @@ class _SolicitudAbastecimientoScreenState
                         color: theme.colorScheme.primary,
                       ),
                       const SizedBox(height: 8),
-                      MediaSelector(
+                      MediaSelectorList(
+                        maxAdjuntos: 2,
+                        files: selectedFileFotocopiaAutenticadaList ?? [],
                         ayuda:
                             "(Contrato Privado de Compra /Venta con certificación de firma, Sentencia Declaratoria de adjudicación del inmueble) o Constancia de la Inmobiliaria (original) o Constancia Municipal (original).",
                         type: MediaType.foto,
-                        file: selectedFileSolicitud,
+                        
                         onChanged: (archivo) {
                           setState(() {
-                            selectedFileFotocopiaAutenticada = archivo;
+                            selectedFileFotocopiaAutenticadaList = archivo;
                           });
                         },
                       ),

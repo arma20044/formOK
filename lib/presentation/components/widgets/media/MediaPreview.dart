@@ -12,7 +12,7 @@ class MediaPreview extends StatelessWidget {
     this.file,
 
     this.videoThumbnail,
-    this.ayuda="Seleccionar archivo desde la Galería o la Cámara",
+    this.ayuda,
   });
 
   @override
