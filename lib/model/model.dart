@@ -14,3 +14,4 @@ export './mi_cuenta/mi_cuenta_situacion_actual_model.dart';
 export './comercial/historico_consumo_monto.dart';
 export './comercial/historico_recuperar.dart';
 export 'comercial/solicitudes/solicitud_abastecimiento_model.dart';
+export 'comercial/solicitudes/registro_numero_celular_model.dart';

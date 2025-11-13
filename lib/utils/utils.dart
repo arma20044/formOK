@@ -203,11 +203,22 @@ Future<void> lanzarUrl(String key) async {
 
 enum MediaType { foto, video, mixto }
 
+void copyTextToClipboard(String textToCopy, BuildContext context) async {
+  await Clipboard.setData(ClipboardData(text: textToCopy));
+  // Optionally, show a confirmation message to the user, like a SnackBar
+  ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(const SnackBar(content: Text('Texto copiado exitosamente!')));
+}
 
-  void copyTextToClipboard(String textToCopy, BuildContext context) async {
-    await Clipboard.setData(ClipboardData(text: textToCopy));
-    // Optionally, show a confirmation message to the user, like a SnackBar
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Texto copiado exitosamente!')),
-    );
-  }
+String obtenerFechaActual() {
+  DateTime ahora = DateTime.now();
+
+  final formateador = DateFormat('dd/MM/yyyy HH:mm:ss');
+
+  String fechaFormateada = formateador.format(ahora);
+
+  print(fechaFormateada); // Ejemplo: 13/11/2025 10:30:00
+
+  return fechaFormateada;
+}
