@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/model/model.dart';
@@ -152,6 +153,8 @@ class _SolicitudAbastecimientoScreenState
       selectedFileOtrosDocumentosList = [];
 
       ubicacion = null;
+
+      _formKey.currentState?.reset();
     });
   }
 
@@ -175,6 +178,7 @@ class _SolicitudAbastecimientoScreenState
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   controller: nombreController,
                   decoration: InputDecoration(
                     labelText: 'Nombre(s) del Titular',
@@ -189,6 +193,7 @@ class _SolicitudAbastecimientoScreenState
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   controller: apellidoController,
                   decoration: InputDecoration(
                     labelText: 'Apellido(s) del Titular',
@@ -201,7 +206,6 @@ class _SolicitudAbastecimientoScreenState
                   },
                   //enabled: !isLoading,
                 ),
-               
 
                 const SizedBox(height: 24),
                 TextFormField(
@@ -218,13 +222,13 @@ class _SolicitudAbastecimientoScreenState
                   //enabled: !isLoading,
                 ),
                 const SizedBox(height: 24),
-                 
+
                 CustomPhoneField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   controller: numeroCelularController,
                   label: 'Número de Celular del Titular',
                   onChanged: (value) {
                     print("Número completo: $value");
-                   
                   },
                   required: true,
                 ),
@@ -244,7 +248,9 @@ class _SolicitudAbastecimientoScreenState
                 ),
                 const SizedBox(height: 24),*/
                 TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   controller: correoController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(labelText: 'Correo del Titular'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -560,8 +566,6 @@ class _SolicitudAbastecimientoScreenState
       );
       return;
     }
-
-   
 
     SolicitudAbastecimientoResponse result =
         await _fecthSolicitudAbastecimiento();

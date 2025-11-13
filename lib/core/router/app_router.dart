@@ -12,7 +12,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../presentation/screens/screens.dart';
 
-final publicRoutes = ['/login', '/register', '/splash', '/','/solicitudes','/solicitudAbastecimiento'];
+final publicRoutes = ['/login', '/register', '/splash', '/','/solicitudes','/solicitudAbastecimiento','/reclamosFaltaEnergia'];
 final privateRoutes = [
   '/miCuenta',
   '/misDatos',
