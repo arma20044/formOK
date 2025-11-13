@@ -139,13 +139,15 @@ class _SolicitudAbastecimientoScreenState
   bool _isLoadingSolicitud = false;
 
   void limpiarTodo() {
-    setState(() {
-      nombreController.clear();
-      apellidoController.clear();
-      numeroDocumentoController.clear();
-      numeroCelularController.clear();
-      correoController.clear();
+    // Limpia controladores ANTES del rebuild
+    nombreController.clear();
+    apellidoController.clear();
+    numeroDocumentoController.clear();
+    numeroCelularController.clear();
+    correoController.clear();
 
+    // Limpia estado visual
+    setState(() {
       selectedFileSolicitudList = [];
       selectedFileFotocopiaAutenticadaList = [];
       selectedFileFotocopiaSimpleCedulaSolicitanteList = [];
@@ -153,9 +155,10 @@ class _SolicitudAbastecimientoScreenState
       selectedFileOtrosDocumentosList = [];
 
       ubicacion = null;
-
       _formKey.currentState?.reset();
     });
+
+    FocusScope.of(context).unfocus(); // cierra el teclado
   }
 
   @override
@@ -178,6 +181,7 @@ class _SolicitudAbastecimientoScreenState
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
+                  key: ValueKey(nombreController.text),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   controller: nombreController,
                   decoration: InputDecoration(
@@ -362,6 +366,7 @@ class _SolicitudAbastecimientoScreenState
                       const SizedBox(height: 8),
 
                       MediaSelectorList(
+                        key: ValueKey(selectedFileSolicitudList),
                         maxAdjuntos: 2,
                         ayuda:
                             "Seleccionar archivo desde la Galería o la Cámara",
@@ -547,9 +552,9 @@ class _SolicitudAbastecimientoScreenState
 
   void _enviarFormulario() async {
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Ingrese todos los campos')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ingrese los campos obligatorios')),
+      );
       return;
     }
 
@@ -583,7 +588,7 @@ class _SolicitudAbastecimientoScreenState
       return;
     }
 
-    limpiarTodo();
+    //limpiarTodo();
 
     showCustomDialog(
       context: context,
@@ -591,7 +596,9 @@ class _SolicitudAbastecimientoScreenState
       showCopyButton: false,
       title: "Éxito.",
       type: DialogType.success,
-    );
+    ).then((_) {
+      Navigator.of(context).pop();
+    });
   }
 
   Future<SolicitudAbastecimientoResponse>

@@ -52,18 +52,65 @@ class SolicitudAbastecimientoDatasourceImp
       }
     }
 
-    /* if (selectedFileFotocopiaAutenticada != null) {
-      formMap['saee_adjuntoSaee1'] = [
-        await MultipartFile.fromFile(
-          selectedFileFotocopiaAutenticada.file.path,
-          filename: selectedFileFotocopiaAutenticada.file.path.split('/').last,
-        ),
-      ];
-      formMap['saee_adjuntoSaee1Extra'] = jsonEncode(
-        selectedFileFotocopiaAutenticada.info,
-      );
-    }*/
+    if (selectedFileFotocopiaAutenticadaList!.isNotEmpty) {
+      int pos = 0;
+      for (var foto in selectedFileFotocopiaAutenticadaList) {
+        pos++;
+        formMap['saee_adjuntoTituloPropiedad$pos'] = [
+          await MultipartFile.fromFile(
+            foto.file.path,
+            filename: foto.file.path.split('/').last,
+          ),
+        ];
+        formMap['saee_adjuntoTituloPropiedad${pos}Extra'] = jsonEncode(
+          foto.info,
+        );
+      }
+    }
 
+    if (selectedFileFotocopiaSimpleCedulaSolicitanteList!.isNotEmpty) {
+      int pos = 0;
+      for (var foto in selectedFileFotocopiaSimpleCedulaSolicitanteList) {
+        pos++;
+        formMap['saee_adjuntoCiSolicitante$pos'] = [
+          await MultipartFile.fromFile(
+            foto.file.path,
+            filename: foto.file.path.split('/').last,
+          ),
+        ];
+        formMap['saee_adjuntoCiSolicitante${pos}Extra'] = jsonEncode(foto.info);
+      }
+    }
+
+    if (selectedFileCopiaSimpleCarnetElectricistaList!.isNotEmpty) {
+      int pos = 0;
+      for (var foto in selectedFileCopiaSimpleCarnetElectricistaList) {
+        pos++;
+        formMap['saee_adjuntoCarnetElectricista$pos'] = [
+          await MultipartFile.fromFile(
+            foto.file.path,
+            filename: foto.file.path.split('/').last,
+          ),
+        ];
+        formMap['saee_adjuntoCarnetElectricista${pos}Extra'] = jsonEncode(
+          foto.info,
+        );
+      }
+    }
+
+    if (selectedFileOtrosDocumentosList!.isNotEmpty) {
+      int pos = 0;
+      for (var foto in selectedFileOtrosDocumentosList) {
+        pos++;
+        formMap['saee_adjuntoOtro$pos'] = [
+          await MultipartFile.fromFile(
+            foto.file.path,
+            filename: foto.file.path.split('/').last,
+          ),
+        ];
+        formMap['saee_adjuntoOtro${pos}Extra'] = jsonEncode(foto.info);
+      }
+    }
     // Crear FormData
     final data = FormData.fromMap(formMap);
 
