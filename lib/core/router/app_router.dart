@@ -12,7 +12,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../presentation/screens/screens.dart';
 
-final publicRoutes = ['/login', '/register', '/splash', '/','/solicitudes','/solicitudAbastecimiento','/reclamosFaltaEnergia'];
+final publicRoutes = ['/login', '/register', '/splash', '/','/solicitudes','/solicitudAbastecimiento','/reclamosFaltaEnergia','/solicitudesPublico'];
 final privateRoutes = [
   '/miCuenta',
   '/misDatos',
@@ -86,8 +86,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SuministrosScreen(),
       ),
       GoRoute(
+        path: '/solicitudesPublico',
+        builder: (context, state) => const SolicitudesScreen(true),
+      ),
+      GoRoute(
         path: '/solicitudes',
-        builder: (context, state) => const SolicitudesScreen(),
+        builder: (context, state) => const SolicitudesScreen(false),
       ),
       GoRoute(
         path: '/solicitudAbastecimiento',

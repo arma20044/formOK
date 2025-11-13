@@ -8,7 +8,8 @@ import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:go_router/go_router.dart';
 
 class SolicitudesScreen extends ConsumerStatefulWidget {
-  const SolicitudesScreen({super.key});
+  const SolicitudesScreen(this.publico, {super.key});
+  final bool publico;
 
   @override
   ConsumerState<SolicitudesScreen> createState() => _SolicitudesScreenState();
@@ -26,11 +27,11 @@ class _SolicitudesScreenState extends ConsumerState<SolicitudesScreen> {
     // ✅ Filtramos la lista según autenticación y campo necesitaAuth
     final filteredItems = itemsSolicitudesComerciales.where((item) {
       // Si está autenticado → mostrar solo los que necesitan auth
-      if (isAuthenticated) {
+      if (isAuthenticated && widget.publico == false) {
         return item.necesitaAuth == true;
       }
       // Si NO está autenticado → mostrar solo los que NO necesitan auth
-      return item.necesitaAuth != true;
+      return item.necesitaAuth != true && widget.publico;
     }).toList();
 
     return Scaffold(

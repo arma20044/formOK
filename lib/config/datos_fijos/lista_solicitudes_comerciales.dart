@@ -13,16 +13,19 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     description:
         "Registre su número de Teléfono Celular y NIS para recibir notificaciones por SMS.",
     buttonText: "Registrar",
+    necesitaAuth: false
   ),
   InfoItem(
     title: "Solicitud de Factura Fija",
     description: "Abone un importe fijo mensual durante todo un año.",
     buttonText: "Solicitar",
+    necesitaAuth: false
   ),
   InfoItem(
     title: "Solicitud de Abastecimiento",
     description:
         "Solicitud para nueva conexión en Baja Tensión (hasta 40 kW). Solicitud para modificación de contrato para clientes con potencia reservada.",
     buttonText: "Solicitar",
+    necesitaAuth: false
   ),
 ];
