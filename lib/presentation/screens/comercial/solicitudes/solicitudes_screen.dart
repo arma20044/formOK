@@ -48,7 +48,7 @@ class _SolicitudesScreenState extends ConsumerState<SolicitudesScreen> {
             description: item.description,
             buttonText: item.buttonText,
             onPressed: () {
-              context.push('/solicitudAbastecimiento');
+              context.push(item.path);
 
          
         
