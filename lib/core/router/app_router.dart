@@ -6,6 +6,7 @@ import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/main.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/forms/registro_numero_celular.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitudAbastecimientoScreen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/solicitudes_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -96,6 +97,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/solicitudAbastecimiento',
         builder: (context, state) => const SolicitudAbastecimientoScreen(),
+      ),
+      GoRoute(
+        path: '/registroNumeroCelular',
+        builder: (context, state) => const RegistroNumeroCelularScreen(),
       ),
     ],
 

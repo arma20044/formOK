@@ -11,7 +11,6 @@ import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/custom_map_modal.dart';
-import 'package:form/presentation/components/common/media_selector.dart';
 import 'package:form/presentation/components/common/media_selector.list.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/repositories/repositories.dart';
