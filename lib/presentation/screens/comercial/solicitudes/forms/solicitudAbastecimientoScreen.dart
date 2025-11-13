@@ -8,6 +8,7 @@ import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
+import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/custom_map_modal.dart';
 import 'package:form/presentation/components/common/media_selector.dart';
 import 'package:form/presentation/components/common/media_selector.list.dart';
@@ -200,6 +201,8 @@ class _SolicitudAbastecimientoScreenState
                   },
                   //enabled: !isLoading,
                 ),
+               
+
                 const SizedBox(height: 24),
                 TextFormField(
                   controller: numeroDocumentoController,
@@ -215,7 +218,18 @@ class _SolicitudAbastecimientoScreenState
                   //enabled: !isLoading,
                 ),
                 const SizedBox(height: 24),
-                TextFormField(
+                 
+                CustomPhoneField(
+                  controller: numeroCelularController,
+                  label: 'Número de Celular del Titular',
+                  onChanged: (value) {
+                    print("Número completo: $value");
+                   
+                  },
+                  required: true,
+                ),
+                const SizedBox(height: 24),
+                /*TextFormField(
                   controller: numeroCelularController,
                   decoration: InputDecoration(
                     labelText: 'Número de Celular del Titular',
@@ -228,7 +242,7 @@ class _SolicitudAbastecimientoScreenState
                   },
                   //enabled: !isLoading,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 24),*/
                 TextFormField(
                   controller: correoController,
                   decoration: InputDecoration(labelText: 'Correo del Titular'),
@@ -546,6 +560,8 @@ class _SolicitudAbastecimientoScreenState
       );
       return;
     }
+
+   
 
     SolicitudAbastecimientoResponse result =
         await _fecthSolicitudAbastecimiento();
