@@ -222,3 +222,66 @@ String obtenerFechaActual() {
 
   return fechaFormateada;
 }
+
+
+
+
+String formatMiles(num number) {
+  final formatter = NumberFormat("#,##0", "es_PY"); // Español - Paraguay
+  return formatter.format(number);
+}
+
+
+
+
+
+
+
+String formatNumero(dynamic valor) {
+  if (valor == null) return "";
+
+  String strValor = valor.toString().trim();
+  if (strValor.isEmpty) return "";
+
+  String normalized = strValor;
+
+  // Detectar formato
+  if (strValor.contains('.') && strValor.contains(',')) {
+    // Caso típico: '1.234,56' -> punto miles, coma decimal
+    normalized = strValor.replaceAll('.', '').replaceAll(',', '.');
+  } else if (strValor.contains(',')) {
+    // Solo coma decimal
+    normalized = strValor.replaceAll(',', '.');
+  } else {
+    // Solo punto o nada
+    normalized = strValor;
+  }
+
+  num numero;
+  try {
+    numero = num.parse(normalized);
+  } catch (e) {
+    return strValor; // fallback
+  }
+
+  // Decidimos la cantidad de decimales según el número original
+  int decimales = 0;
+  if (strValor.contains(',') || strValor.contains('.')) {
+    // Si tiene decimal en entrada, contamos dígitos
+    List<String> partes = strValor.contains(',')
+        ? strValor.split(',')
+        : strValor.split('.');
+    if (partes.length > 1) {
+      decimales = partes[1].length;
+    }
+  }
+
+  // Formateamos con separador de miles y decimal
+  final formatter = NumberFormat.currency(
+    locale: 'es_PY',
+    symbol: '',
+    decimalDigits: decimales,
+  );
+
+  return formatter.format(numero).trim();
+}

@@ -6,25 +6,26 @@ class CustomCard extends StatelessWidget {
   final String titleSize;
   final Color? titleColor;
   final double borderWidth;
+  final Color? borderColor;
   final Widget child;
   final BoxDecoration? styleAdd;
 
   const CustomCard({
-    Key? key,
+    super.key,
     this.title,
     this.titleSize = 'large',
     this.titleColor,
     this.borderWidth = 1.0,
     required this.child,
-    this.styleAdd,
-  }) : super(key: key);
+    this.styleAdd, this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    final borderColor = colors.outlineVariant; // equivalente a colors.tertiary
+    //final borderColor = colors.outlineVariant; // equivalente a colors.tertiary
     final dividerColor = colors.surfaceContainerHighest; // equivalente a colors.neutral1
 
     return Container(
@@ -33,7 +34,7 @@ class CustomCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               width: borderWidth,
-              color: borderColor,
+              color: borderColor != null ? borderColor! :colors.outlineVariant,
             ),
           ),
       padding: const EdgeInsets.all(10),

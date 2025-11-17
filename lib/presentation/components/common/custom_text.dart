@@ -11,6 +11,7 @@ class CustomText extends StatelessWidget {
   final double? letterSpacing;
   final double? height;
   final bool? adaptToTheme;
+  final bool? underline;
 
   const CustomText(
     this.text, {
@@ -24,6 +25,7 @@ class CustomText extends StatelessWidget {
     this.letterSpacing,
     this.height,
     this.adaptToTheme = true,
+    this.underline = false
   });
 
   @override
@@ -43,6 +45,7 @@ class CustomText extends StatelessWidget {
           fontWeight: fontWeight ?? FontWeight.normal,
           letterSpacing: letterSpacing,
           height: height,
+          decoration: underline! ? TextDecoration.underline : TextDecoration.none
         ),
       ),
     );

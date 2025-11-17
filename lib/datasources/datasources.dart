@@ -15,3 +15,4 @@ export 'comercial/historico_consumo_monto_datasource.dart';
 export 'comercial/recuperar_historico_by_id_datasource.dart';
 export 'comercial/solicitudes/solicitud_abastecimiento_energia_datasource.dart';
 export 'comercial/solicitudes/registro_numero_celular_datasource.dart';
+export 'comercial/solicitudes/factura_fija_datasource.dart';
