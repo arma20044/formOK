@@ -21,7 +21,7 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     description: "Abone un importe fijo mensual durante todo un año.",
     buttonText: "Solicitar",
     necesitaAuth: false,
-    path: "/",
+    path: "/solicitudFacturaFija",
   ),
   InfoItem(
     title: "Solicitud de Abastecimiento",

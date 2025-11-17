@@ -8,12 +8,13 @@ import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/main.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/registro_numero_celular_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitudAbastecimientoScreen.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_factura_fija_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/solicitudes_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../presentation/screens/screens.dart';
 
-final publicRoutes = ['/login', '/register', '/splash', '/','/solicitudes','/solicitudAbastecimiento','/reclamosFaltaEnergia','/solicitudesPublico'];
+final publicRoutes = ['/login', '/register', '/splash', '/','/solicitudes','/solicitudAbastecimiento','/reclamosFaltaEnergia','/solicitudesPublico','/solicitudFacturaFija'];
 final privateRoutes = [
   '/miCuenta',
   '/misDatos',
@@ -101,6 +102,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/registroNumeroCelular',
         builder: (context, state) => const RegistroNumeroCelularScreen(),
+      ),
+      GoRoute(
+        path: '/solicitudFacturaFija',
+        builder: (context, state) => const SolicitudFacturaFijaScreen(),
       ),
     ],
 
