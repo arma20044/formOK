@@ -3,6 +3,7 @@ import 'package:form/config/constantes.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/common/custom_text.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
@@ -73,12 +74,14 @@ class _SolicitudFacturaFijaScreenState
         resultadoFacturaFija = result.resultado;
       });
 
-      DialogHelper.showMessage(
+      /*DialogHelper.showMessage(
         context,
         MessageType.success,
         'Éxito',
         result.resultado!.consumoPromedio.toString(),
-      );
+      );*/
+      CustomSnackbar.show(context, message: "Simulacion Correcta.",type: MessageType.success);
+
     } catch (e) {
       DialogHelper.showMessage(
         context,
@@ -153,9 +156,9 @@ class _SolicitudFacturaFijaScreenState
       case 0:
         return _simularContent();
       case 1:
-        return const Center(child: Text("Ventajas"));
+        return _ventajasContent();
       case 2:
-        return const Center(child: Text("Condiciones"));
+        return _condicionesContent();
       default:
         return const SizedBox();
     }
@@ -230,6 +233,115 @@ class _SolicitudFacturaFijaScreenState
     );
   }
 
+  Widget _ventajasContent() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          CustomText(
+            "VENTAJAS",
+            textAlign: TextAlign.start,
+            fontWeight: FontWeight.bold,
+          ),
+          const SizedBox(height: 6),
+          CustomText(
+            "1. Es un servicio optativo y sin costo con el que el Cliente conocerá el importe que estará pagando cada uno de los meses durante un año.",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.justify,
+          ),
+
+          CustomText(
+            "2. La adhesión al servicio podrá ser realizada a través de la página web de la ANDE, la aplicación Mi ANDE para teléfonos inteligentes o en cualquier Oficina de Atención al Cliente en todo el país.",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.justify,
+          ),
+          CustomText(
+            "3. La renovación será automática, en cuyo caso se realizará un nuevo cálculo del importe a pagar, en base al nuevo promedio de consumos.",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.justify,
+          ),
+          CustomText(
+            "4. La diferencia de importes resultante entre lo abonado a través de las facturas fijas y lo realmente consumido, será distribuida proporcionalmente mediante créditos o débitos, según corresponda, en los siguientes 12 meses.",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.justify,
+          ),
+          CustomText(
+            "5. La cancelación podrá ser realizada cuando el Cliente lo desee, en cuyo caso la diferencia de importes entre lo abonado a través de las facturas fijas y lo realmente consumido hasta ese mes, será ingresado en la siguiente factura.",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.justify,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _condicionesContent() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          CustomText(
+            "CONDICIONES PARA LA SUSCRIPCION AL SERVICIO DE FACTURA FIJA",
+            textAlign: TextAlign.start,
+            fontWeight: FontWeight.bold,
+            overflow: TextOverflow.clip,
+          ),
+          const SizedBox(height: 6),
+          CustomText(
+            "1. El suministro debe estar con Contrato activo, en Baja Tensión y no pertenecer a la Tarifa Social.\n2. No debe poseer facturas pendientes de pago.\n3. Debe tener como mínimo de 3 (tres) meses de facturación con lectura de medidor valida.",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.justify,
+          ),
+          const SizedBox(height: 6),
+
+          CustomText(
+            "LA ANDE PODRA CANCELAR EL SERVICIO EN LOS SIGUIENTES CASOS:",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.justify,
+          ),
+          CustomText(
+            "1. Falta de pago de 3 (tres) facturas fijas.\n2. Consumos de energía muy superiores al establecido para el cálculo de la Factura Fija.\n3. Irregularidad constatada en las instalaciones eléctricas del suministro.\n4. Incorrección de datos consignados en la Solicitud de Servicio.\n5. El cambio de las condiciones en el contrato de suministro: variación de la potencia o de la tarifa contratada.\n6. El cambio de Titularidad del Contrato\n7. La baja del Contrato.",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.justify,
+          ),
+          const SizedBox(height: 6),
+
+          CustomText(
+            "En todos los casos, la diferencia de importes entre lo abonado a través de las facturas fijas y lo realmente consumido hasta ese mes, será ingresado en la siguiente factura",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.justify,
+          ),
+          const SizedBox(height: 6),
+
+          RichText(
+            text: TextSpan(
+              style: TextStyle(
+                // color: Colors.black,
+              ), // Estilo por defecto para todo el texto
+              children: <TextSpan>[
+                // TextSpan(text: 'Este es texto normal, '),
+                TextSpan(
+                  text: 'Observación:\n',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: CustomText(
+                    'La Factura, además del importe fijo por consumo de energía, podrá incluir cuotas e intereses de acuerdos a plazos, alumbrado público u otros cargos eventuales.',
+                    textAlign: TextAlign.justify,
+                  ).text,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _resultadoBox() {
     final theme = Theme.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -243,9 +355,7 @@ class _SolicitudFacturaFijaScreenState
           decoration: BoxDecoration(
             // color: theme.colorScheme.surfaceVariant,
             borderRadius: BorderRadius.circular(8),
-            border: BoxBorder.all(
-              color: isDark ? Colors.green : Colors.black,
-            ),
+            border: BoxBorder.all(color: isDark ? Colors.green : Colors.black),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
