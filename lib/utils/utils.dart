@@ -1,20 +1,18 @@
+import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:form/model/archivo_adjunto_model.dart';
 import 'package:form/model/constans/mensajes_servicios.dart';
 import 'package:form/model/servicios_nis_telefono.dart';
 import 'package:form/presentation/components/common/custom_pdf_modal.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:intl/intl.dart';
-import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
+
 
 final RegExp emailRegex = RegExp(
   r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
@@ -285,3 +283,15 @@ String formatNumero(dynamic valor) {
 
   return formatter.format(numero).trim();
 }
+
+ List<Favorito> favFacturas = [];
+  Future<void> toggleFavoritoFactura(Favorito fav) async {
+    if (favFacturas.any((e) => e.id == fav.id)) {
+      favFacturas.removeWhere((e) => e.id == fav.id);
+    } else {
+      favFacturas.add(fav);
+    }
+    await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
+    //setState(() {});
+    log("guadradamos$fav");
+  }

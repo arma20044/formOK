@@ -9,11 +9,15 @@ import 'package:form/presentation/components/common/datos_card.dart';
 import 'package:form/presentation/components/common/factura_scroll_horizontal.dart';
 import 'package:form/presentation/components/common/info_card.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
+import 'package:form/utils/utils.dart';
 import '../../../infrastructure/infrastructure.dart';
 import '../../../repositories/repositories.dart';
+import 'package:uuid/uuid.dart';
 
 class ConsultaFacturasScreen extends ConsumerStatefulWidget {
-  const ConsultaFacturasScreen({super.key});
+  final String? nis;
+  const ConsultaFacturasScreen({this.nis, super.key});
 
   @override
   ConsumerState<ConsultaFacturasScreen> createState() =>
@@ -24,6 +28,24 @@ class _ConsultaFacturasScreenState
     extends ConsumerState<ConsultaFacturasScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nisController = TextEditingController();
+
+@override
+void initState() {
+  super.initState();
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final nis = widget.nis;
+
+    // Si viene desde favoritos y es válido
+    if (nis != null && nis.isNotEmpty && int.tryParse(nis) != null) {
+      _nisController.text = nis;
+
+      // Hacer la consulta después del primer frame
+      _consultar();
+    }
+  });
+}
+
 
   List<Lista?>? facturas; // <-- aquí guardamos los resultados
   DatosCliente? datosCliente;
@@ -153,7 +175,7 @@ class _ConsultaFacturasScreenState
                           if (!RegExp(r'^\d+$').hasMatch(value)) {
                             return 'Solo números permitidos';
                           }
-                          if(value.length != 7){
+                          if (value.length != 7) {
                             return 'NIS debe ser de 7 dígitos.';
                           }
                           return null;
@@ -171,7 +193,13 @@ class _ConsultaFacturasScreenState
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            var uuid = Uuid();
+                            String nis = _nisController.text;
+                            toggleFavoritoFactura(
+                              Favorito(id: uuid.v4(), title: nis),
+                            );
+                          },
                           icon: const Icon(
                             Icons.star_border_sharp,
                             color: Colors.green,
@@ -197,10 +225,16 @@ class _ConsultaFacturasScreenState
                     nis: _nisController.text,
                   ),
                   const SizedBox(height: 16),
-                  Text("Historico de Comprobantes", style: TextStyle(
-                    color: Colors.green, fontWeight: FontWeight.bold
-                  ),),
-                  Text("Deslice hacia la izquierda o derecha para ver más comprobantes"),
+                  Text(
+                    "Historico de Comprobantes",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "Deslice hacia la izquierda o derecha para ver más comprobantes",
+                  ),
                   FacturaScrollHorizontal(
                     facturas: facturas,
                     nis: _nisController,

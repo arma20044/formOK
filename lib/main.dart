@@ -7,6 +7,7 @@ import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/menu/main_menu.dart';
 import 'package:form/presentation/screens/splash_screen.dart';
 import 'package:form/provider/theme_provider.dart';
+import 'package:go_router/go_router.dart';
 
 import 'presentation/components/menu/menu_data.dart';
 
@@ -30,25 +31,31 @@ class MyApp extends ConsumerWidget {
     final themeStateAsync = ref.watch(themeNotifierProvider);
     final router = ref.watch(goRouterProvider);
 
-    return themeStateAsync.when(
-      data: (themeState) {
-        return MaterialApp.router(
-          scaffoldMessengerKey: rootScaffoldMessengerKey,
-          theme: AppTheme(
-            selectedColor: themeState.selectedColor,
-            isDarkMode: false,
-          ).getTheme(),
-          darkTheme: AppTheme(
-            selectedColor: themeState.selectedColor,
-            isDarkMode: true,
-          ).getTheme(),
-          themeMode: themeState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          //home: const HomeScreen(),
-          routerConfig: router,
+    // ⚡ MaterialApp.router SIEMPRE arriba
+    return MaterialApp.router(
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
+      theme: ThemeData.light(), // fallback temporal
+      darkTheme: ThemeData.dark(),
+      themeMode: ThemeMode.light,
+      routerConfig: router,
+      builder: (context, child) {
+        return themeStateAsync.when(
+          data: (themeState) {
+            return Theme(
+              data: AppTheme(
+                selectedColor: themeState.selectedColor,
+                isDarkMode: themeState.isDarkMode,
+              ).getTheme(),
+              child: child!,
+            );
+          },
+          loading: () {
+            // ⚡ Aquí mostramos SplashScreen con Scaffold y Directionality
+            return const SplashScreen();
+          },
+          error: (e, st) => Center(child: Text('Error cargando tema: $e')),
         );
       },
-      loading: () => const SplashScreen(), // O un splash screen
-      error: (e, st) => const Center(child: Text('Error cargando tema')),
     );
   }
 }
@@ -67,7 +74,10 @@ class HomeScreen extends StatelessWidget {
 
         leading: Padding(
           padding: const EdgeInsets.only(left: 12),
-          child: Icon(Icons.star, color: Colors.yellow[600], size: 50),
+          child: IconButton(
+            icon:Icon(Icons.star, color: Colors.yellow[600], size: 50),
+            onPressed: () => GoRouter.of(context).push('/favoritos'),
+            ),
         ),
       ),
       body: SingleChildScrollView(

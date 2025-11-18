@@ -10,11 +10,23 @@ import 'package:form/presentation/screens/comercial/solicitudes/forms/registro_n
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitudAbastecimientoScreen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_factura_fija_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/solicitudes_screen.dart';
+import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../presentation/screens/screens.dart';
 
-final publicRoutes = ['/login', '/register', '/splash', '/','/solicitudes','/solicitudAbastecimiento','/reclamosFaltaEnergia','/solicitudesPublico','/solicitudFacturaFija'];
+final publicRoutes = [
+  '/login',
+  '/register',
+  '/splash',
+  '/',
+  '/solicitudes',
+  '/solicitudAbastecimiento',
+  '/reclamosFaltaEnergia',
+  '/solicitudesPublico',
+  '/solicitudFacturaFija',
+  '/favoritos',
+];
 final privateRoutes = [
   '/miCuenta',
   '/misDatos',
@@ -33,22 +45,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   });
   ref.onDispose(refreshListenable.dispose);
 
-  
-
   final router = GoRouter(
     debugLogDiagnostics: true,
     observers: [MyNavigatorObserver()],
     initialLocation: '/splash',
     refreshListenable: refreshListenable,
     routes: [
-       GoRoute(
-          path: '/login',
-          builder: (context, state) {
-            // Recupera la ruta destino si existe
-            final from = state.uri.queryParameters['from'] ?? '/';
-            return LoginScreen(from: from);
-          },
-        ),
+      GoRoute(
+        path: '/login',
+        builder: (context, state) {
+          // Recupera la ruta destino si existe
+          final from = state.uri.queryParameters['from'] ?? '/';
+          return LoginScreen(from: from);
+        },
+      ),
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
       GoRoute(path: '/misDatos', builder: (context, state) => const MisDatos()),
       GoRoute(
@@ -74,7 +84,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/consultaFacturas',
         builder: (context, state) => const ConsultaFacturasScreen(),
+        routes: [
+          GoRoute(
+            path: ':nis',
+            builder: (context, state) {
+              final nis = state.pathParameters['nis'];
+              return ConsultaFacturasScreen(nis: nis);
+            },
+          ),
+        ],
       ),
+
       GoRoute(
         path: '/olvidoContrasenha',
         builder: (context, state) => const OlvidoContrasenhaScreen(),
@@ -107,6 +127,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/solicitudFacturaFija',
         builder: (context, state) => const SolicitudFacturaFijaScreen(),
       ),
+      GoRoute(
+        path: '/favoritos',
+        builder: (context, state) => const FavoritosScreen(),
+      ),
     ],
 
     redirect: (context, state) {
@@ -115,18 +139,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final loggingIn = state.uri.path == '/login';
       //final currentPath = state.matchedLocation;
 
-       final currentPath = state.uri.path;
+      final currentPath = state.uri.path;
 
-       // Si no está logueado e intenta ir a una privada:
-        if (!isLoggedIn && !publicRoutes.contains(currentPath)) {
-          // Redirige a login con query param 'from'
-          return '/login?from=${Uri.encodeComponent(currentPath)}';
-        }
+      // Si no está logueado e intenta ir a una privada:
+      if (!isLoggedIn && !publicRoutes.contains(currentPath)) {
+        // Redirige a login con query param 'from'
+        return '/login?from=${Uri.encodeComponent(currentPath)}';
+      }
 
-        // Si está logueado e intenta ir a login, lo mandamos al home
-        if (isLoggedIn && currentPath == '/login') {
-          return '/';
-        }
+      // Si está logueado e intenta ir a login, lo mandamos al home
+      if (isLoggedIn && currentPath == '/login') {
+        return '/';
+      }
 
       // Forzar cambio de contraseña
       final forzarCambioContrasenha = authState.value?.user?.modificarPassword;
@@ -159,7 +183,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       if (isLoggedIn && state.uri.path == '/splash') return '/';
 
       // Splash solo redirige a home si el usuario ya está logueado
-      if (state.uri.path == '/splash') return '/';
+      //if (state.uri.path == '/splash') return '/';
 
       return null; // no redirigir
     },
@@ -173,20 +197,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // No guardar login ni splash como previous
       if (currentUri.path != '/login' && currentUri.path != '/splash') {
-       // routeHistory.update(currentUri);
+        // routeHistory.update(currentUri);
         debugPrint('➡️ Ruta actual guardada: ${currentUri.path}');
       }
     }
   });
 
-
-
-  
-
   return router;
 });
-
-
 
 class MyNavigatorObserver extends NavigatorObserver {
   @override
