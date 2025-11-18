@@ -25,7 +25,10 @@ class FacturaScrollHorizontal extends ConsumerStatefulWidget {
 class _FacturaScrollHorizontalState
     extends ConsumerState<FacturaScrollHorizontal> {
   
-  bool _isDownloading = false;
+
+
+  // Guardamos los índices de los cards que están descargando
+  final Set<int> _cardsDescargando = {};
 
   // Función helper para calcular la "cifra"
   num calcularCifra(String nis, String fechaVencimiento) {
@@ -55,7 +58,7 @@ class _FacturaScrollHorizontalState
     }
 
     return SizedBox(
-      height: 200, // un poquito más alto para que el botón no se corte
+      height: 200,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: widget.facturas!.length,
@@ -77,6 +80,8 @@ class _FacturaScrollHorizontalState
               "&clientKey=${Environment.clientKey}"
               "&value=$cifra"
               "&fecha=${factura.fechaVencimiento}";
+
+          final estaDescargando = _cardsDescargando.contains(index);
 
           return Container(
             width: 300,
@@ -128,12 +133,12 @@ class _FacturaScrollHorizontalState
                     const Spacer(),
                     SizedBox(
                       width: double.infinity,
-                      child: _isDownloading
+                      child: estaDescargando
                           ? const Center(child: CircularProgressIndicator())
                           : ElevatedButton(
                               onPressed: () async {
                                 setState(() {
-                                  _isDownloading = true;
+                                  _cardsDescargando.add(index);
                                 });
                                 try {
                                   final File archivoDescargado =
@@ -148,7 +153,7 @@ class _FacturaScrollHorizontalState
                                   );
                                 } finally {
                                   setState(() {
-                                    _isDownloading = false;
+                                    _cardsDescargando.remove(index);
                                   });
                                 }
                               },

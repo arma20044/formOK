@@ -44,10 +44,9 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
         Expanded(
           child: asyncSituacionActual.when(
             data: (situacionActual) {
-              /*if (situacionActual.facturaDatos) {
-                return const Center(child: Text("No hay factuas sin pagar."));
-              }*/
-              final fechaVencimiento =
+
+              
+final fechaVencimiento =
                   situacionActual.facturaDatos!.recibo!.fechaVencimiento;
 
               final factura = situacionActual.facturaDatos;
@@ -65,6 +64,12 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                   widget.selectedNIS!.nisRad!));
               num res = oper * mejunje;
               String cifra = res.toString();
+            
+
+              /*if (situacionActual.facturaDatos) {
+                return const Center(child: Text("No hay factuas sin pagar."));
+              }*/
+              
 
               //logica para mostrar cards
               return Column(
