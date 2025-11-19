@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/core/auth/model/user_model.dart';
+import 'package:form/presentation/components/common/UI/custom_card.dart';
+import 'package:form/presentation/components/common/custom_text.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:go_router/go_router.dart';
 
@@ -50,7 +52,19 @@ class MisDatos extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 10),
+              if (datosJson!.tipoCliente == '1' && datosJson.verificado != 'S')
+                CustomCard(
+                  borderColor: Colors.red,
+                  child: CustomText(
+                    fontWeight: FontWeight.bold,
+                    textAlign: TextAlign.justify,
+                    "Estimado cliente, su solicitud de registro está pendiente de validación, una vez que reciba el SMS de validación podrá solicitar el fraccionamiento. La validación será procesada en un periodo de 24 hs.",
+                    overflow: TextOverflow.clip,
+                    color: Colors.red,
+                  ),
+                ),
+              const SizedBox(height: 10),
 
               Container(
                 width: double.infinity,

@@ -139,6 +139,8 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         tipoCliente: response.resultado!.tipoCliente!,
         modificarPassword: response.resultado!.modificarPassword!,
         userDatosAnexos: response.resultado?.suministrosList,
+        verificado: response.resultado!.verificado!,
+
       );
 
       final List<SuministrosList?>? datosAnexos =

@@ -17,6 +17,7 @@ class UserModel {
   final String telefonoCelular;
   final String tipoCliente;
   final String modificarPassword;
+  final String verificado;
   List<SuministrosList?>? userDatosAnexos;
 
   factory UserModel.empty() => UserModel(
@@ -36,6 +37,7 @@ class UserModel {
     tipoCliente: '',
     ciudad: '',
     modificarPassword: '',
+    verificado: '',
   );
 
   UserModel({
@@ -56,6 +58,7 @@ class UserModel {
     required this.token,
     required this.modificarPassword,
     this.userDatosAnexos,
+    required this.verificado
   });
 
   Map<String, dynamic> toMap() => {
@@ -76,6 +79,7 @@ class UserModel {
     'tipoCliente': tipoCliente,
     'modificarPassword': modificarPassword,
     'userDatosAnexos': userDatosAnexos,
+    'verificado':verificado
   };
 
   factory UserModel.fromMap(Map<String, dynamic> map) => UserModel(
@@ -96,6 +100,7 @@ class UserModel {
     tipoCliente: map['tipoCliente'],
     modificarPassword: map['modificarPassword'],
     userDatosAnexos: map['userDatosAnexos'],
+    verificado: map['verificado']
   );
 
   UserModel copyWith({
@@ -122,6 +127,7 @@ class UserModel {
       tipoCliente: tipoCliente,
       modificarPassword: modificarPassword ?? this.modificarPassword,
       userDatosAnexos: userDatosAnexos,
+      verificado: verificado
     );
   }
 }
