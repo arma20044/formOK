@@ -44,9 +44,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
         Expanded(
           child: asyncSituacionActual.when(
             data: (situacionActual) {
-
-              
-final fechaVencimiento =
+              final fechaVencimiento =
                   situacionActual.facturaDatos!.recibo!.fechaVencimiento;
 
               final factura = situacionActual.facturaDatos;
@@ -64,12 +62,10 @@ final fechaVencimiento =
                   widget.selectedNIS!.nisRad!));
               num res = oper * mejunje;
               String cifra = res.toString();
-            
 
               /*if (situacionActual.facturaDatos) {
                 return const Center(child: Text("No hay factuas sin pagar."));
               }*/
-              
 
               //logica para mostrar cards
               return Column(
@@ -80,18 +76,29 @@ final fechaVencimiento =
                               _isLoadingFacturaDeudaTotal,
                           title: "Deuda Total",
                           monto: situacionActual
-                              .facturaDatos!.recibo!.importeRecibo
+                              .facturaDatos!
+                              .recibo!
+                              .importeRecibo
                               .toString(),
                           fechaLectura: situacionActual
-                              .facturaDatos!.recibo!.fechaVencimiento!,
-                          lectura: (situacionActual.facturaDatos!.lectura)!.first!.lecturaActual!,
-                          consumo: "${situacionActual.facturaDatos!.lectura!.first!.consumo} KWh",
+                              .facturaDatos!
+                              .recibo!
+                              .fechaVencimiento!,
+                          lectura: (situacionActual.facturaDatos!.lectura)!
+                              .first!
+                              .lecturaActual!,
+                          consumo:
+                              "${situacionActual.facturaDatos!.lectura!.first!.consumo} KWh",
                           fechaVencimiento:
                               situacionActual
-                                  .facturaDatos!.recibo!.fechaVencimiento ??
+                                  .facturaDatos!
+                                  .recibo!
+                                  .fechaVencimiento ??
                               'Sin dato',
                           totalConComision: situacionActual
-                              .facturaDatos!.otrosImportes!.totalconComision
+                              .facturaDatos!
+                              .otrosImportes!
+                              .totalconComision
                               .toString(),
                           onPrimaryPressed: () {
                             print("Ver Ultima Factura");
@@ -103,7 +110,8 @@ final fechaVencimiento =
 
                             final String urlFinal =
                                 situacionActual
-                                    .facturaDatos!.facturaElectronica!
+                                    .facturaDatos!
+                                    .facturaElectronica!
                                 //? '${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?nro_nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fecha&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}&f_fact=$fecha_fac'
                                 ? "${Environment.hostCtxOpen}/v5/suministro/ultimaFacturaElectronicaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento"
                                 : "${Environment.hostCtxOpen}/v4/suministro/ultimaFacturaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento";
