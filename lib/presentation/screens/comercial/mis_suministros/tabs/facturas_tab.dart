@@ -111,7 +111,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                           monto:
                               facturaDatos.recibo?.importeRecibo?.toString() ??
                               "0",
-                          fechaLectura: fechaVencimiento,
+                          fechaLectura: situacionActual.facturaDatos!.lectura![0]!.fechaLectura ?? "",
                           lectura:
                               facturaDatos.lectura?.first?.lecturaActual
                                   ?.toString() ??
@@ -209,6 +209,22 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
         ),
 
         const SizedBox(height: 16),
+
+        // Agregamos título antes del segundo scroll
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Últimas Facturas",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+        ),
 
         Expanded(
           child: asyncFacturas.when(

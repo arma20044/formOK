@@ -379,6 +379,7 @@ class Lectura {
   final num? constanteAparato;
   final num? csmoMin;
   final num? lecturaActual;
+  final String? fechaLectura;
 
   Lectura({
     this.tipoConsumo,
@@ -388,6 +389,7 @@ class Lectura {
     this.constanteAparato,
     this.csmoMin,
     this.lecturaActual,
+    this.fechaLectura
   });
 
   factory Lectura.fromJson(Map<String, dynamic>? json) {

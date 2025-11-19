@@ -183,6 +183,9 @@ String formatearNumeroString(
   int decimales = 0,
   String locale = 'es_PY',
 }) {
+  if(valor.contains("/")){ //es fecha
+    return valor;
+  }
   final numero = num.tryParse(valor.replaceAll(',', '.')) ?? 0;
   return formatearNumero(numero, decimales: decimales, locale: locale);
 }
