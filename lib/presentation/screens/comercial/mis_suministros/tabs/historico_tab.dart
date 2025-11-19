@@ -93,12 +93,22 @@ class _HistoricoTabState extends ConsumerState<HistoricoTab> {
 
         if (snapshot.hasError) {
           // 🔹 Mostramos directamente el mensaje limpio que venga del provider/interceptor
-          return Center(
+          /*return Center(
             child: Text(
               snapshot.error.toString(),
               style: const TextStyle(color: Colors.red, fontSize: 16),
             ),
-          );
+          );*/
+
+            return Text(
+              snapshot.error.toString(),
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            );
         }
 
         final data = snapshot.data!;

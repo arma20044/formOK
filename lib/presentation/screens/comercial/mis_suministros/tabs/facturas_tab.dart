@@ -11,6 +11,7 @@ import 'package:form/presentation/components/common/card_item_second.dart';
 import 'package:form/provider/situacion_actual_provider.dart';
 import 'package:form/provider/ultimas_facturas_provider.dart';
 import 'package:form/utils/utils.dart';
+import 'package:intl/intl.dart';
 import '../../../../../model/login_model.dart';
 
 class FacturasTab extends ConsumerStatefulWidget {
@@ -30,139 +31,180 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
   @override
   Widget build(BuildContext context) {
     final asyncFacturas = ref.watch(facturasProvider);
-
     final asyncSituacionActual = ref.watch(situacionActualProvider);
-
-    print(asyncSituacionActual);
-
-    final horizontalTitles = ['Deuda Total', 'Deuda Anterior'];
 
     return Column(
       children: [
         const SizedBox(height: 10),
-        //HorizontalCards(titles: horizontalTitles),
+
         Expanded(
           child: asyncSituacionActual.when(
             data: (situacionActual) {
-              final fechaVencimiento =
-                  situacionActual.facturaDatos!.recibo!.fechaVencimiento;
-
+              // Validación de nulos críticos
+              final facturaDatos = situacionActual.facturaDatos;
               final factura = situacionActual.facturaDatos;
+              final tieneDeuda = situacionActual.tieneDeuda ?? false;
 
-              num nisParcial = int.parse(
-                widget.selectedNIS!.nisRad.toString().substring(0, 3),
-              );
-              List<String> fechaObtenida = fechaVencimiento!.split('/');
-              num dia = int.parse(fechaObtenida[0]);
-              num mes = int.parse(fechaObtenida[1]);
-              num anho = int.parse(fechaObtenida[2]);
-              num mejunje = (anho - (dia * mes));
-              num oper =
-                  (((widget.selectedNIS!.nisRad! * nisParcial) +
-                  widget.selectedNIS!.nisRad!));
-              num res = oper * mejunje;
-              String cifra = res.toString();
+              if (facturaDatos == null ||
+                  facturaDatos.recibo == null ||
+                  facturaDatos.recibo!.fechaVencimiento == null ||
+                  widget.selectedNIS?.nisRad == null) {
+                return Center(
+                  child: Text(
+                    "Error de datos para el suministro NIS: ${widget.selectedNIS?.nisRad ?? 'Desconocido'}",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }
 
-              /*if (situacionActual.facturaDatos) {
-                return const Center(child: Text("No hay factuas sin pagar."));
-              }*/
+              String fechaVencimiento = '';
+              String cifra = '';
+              if (situacionActual.facturaDatos != null) {
+                fechaVencimiento =
+                    situacionActual.facturaDatos!.recibo.fechaVencimiento!;
 
-              //logica para mostrar cards
+                num nisParcial = int.parse(
+                  widget.selectedNIS!.nisRad.toString().substring(0, 3),
+                );
+                List<String> fechaObtenida = fechaVencimiento!.split('/');
+                num dia = int.parse(fechaObtenida[0]);
+                num mes = int.parse(fechaObtenida[1]);
+                num anho = int.parse(fechaObtenida[2]);
+                num mejunje = (anho - (dia * mes));
+                num oper =
+                    (((widget.selectedNIS!.nisRad! * nisParcial) +
+                    widget.selectedNIS!.nisRad!));
+                num res = oper * mejunje;
+                cifra = res.toString();
+              }
+              if (situacionActual.facturaPagada != null) {
+                fechaVencimiento =
+                    situacionActual.facturaPagada!.fechaVencimiento!;
+
+                num nisParcial = int.parse(
+                  widget.selectedNIS!.nisRad.toString().substring(0, 3),
+                );
+                List<String> fechaObtenida = fechaVencimiento.split('-');
+                num dia = int.parse(fechaObtenida[2]);
+                num mes = int.parse(fechaObtenida[1]);
+                num anho = int.parse(fechaObtenida[0]);
+                num mejunje = (anho - (dia * mes));
+                num oper =
+                    (((widget.selectedNIS!.nisRad! * nisParcial) +
+                    widget.selectedNIS!.nisRad!));
+                num res = oper * mejunje;
+                cifra = res.toString();
+              }
+
               return Column(
                 children: [
-                  situacionActual.tieneDeuda!
+                  tieneDeuda
                       ? CardItemFirst(
                           isLoadingFacturaDeudaTotal:
                               _isLoadingFacturaDeudaTotal,
                           title: "Deuda Total",
-                          monto: situacionActual
-                              .facturaDatos!
-                              .recibo!
-                              .importeRecibo
-                              .toString(),
-                          fechaLectura: situacionActual
-                              .facturaDatos!
-                              .recibo!
-                              .fechaVencimiento!,
-                          lectura: (situacionActual.facturaDatos!.lectura)!
-                              .first!
-                              .lecturaActual!,
+                          monto:
+                              facturaDatos.recibo?.importeRecibo?.toString() ??
+                              "0",
+                          fechaLectura: fechaVencimiento,
+                          lectura:
+                              facturaDatos.lectura?.first?.lecturaActual
+                                  ?.toString() ??
+                              "-",
                           consumo:
-                              "${situacionActual.facturaDatos!.lectura!.first!.consumo} KWh",
-                          fechaVencimiento:
-                              situacionActual
-                                  .facturaDatos!
-                                  .recibo!
-                                  .fechaVencimiento ??
-                              'Sin dato',
-                          totalConComision: situacionActual
-                              .facturaDatos!
-                              .otrosImportes!
-                              .totalconComision
-                              .toString(),
-                          onPrimaryPressed: () {
-                            print("Ver Ultima Factura");
-                          },
+                              "${facturaDatos.lectura?.first?.consumo ?? 0} KWh",
+                          fechaVencimiento: fechaVencimiento,
+                          totalConComision:
+                              facturaDatos.otrosImportes?.totalconComision
+                                  ?.toString() ??
+                              "0",
+                          onPrimaryPressed: () => print("Ver Ultima Factura"),
                           onSecondaryPressed: () async {
                             setState(() {
                               _isLoadingFacturaDeudaTotal = true;
                             });
 
-                            final String urlFinal =
-                                situacionActual
-                                    .facturaDatos!
-                                    .facturaElectronica!
-                                //? '${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?nro_nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fecha&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}&f_fact=$fecha_fac'
-                                ? "${Environment.hostCtxOpen}/v5/suministro/ultimaFacturaElectronicaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento"
-                                : "${Environment.hostCtxOpen}/v4/suministro/ultimaFacturaPendientePdfMobile?nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento";
+                            try {
+                              final String urlFinal =
+                                  facturaDatos.facturaElectronica == true
+                                  ? "${Environment.hostCtxOpen}/v5/suministro/ultimaFacturaElectronicaPendientePdfMobile?nis=${widget.selectedNIS?.nisRad}&clientKey=${Environment.clientKey}&fecha=$fechaVencimiento&value=$cifra&fecha=$fechaVencimiento"
+                                  : "${Environment.hostCtxOpen}/v4/suministro/ultimaFacturaPendientePdfMobile?nis=${widget.selectedNIS?.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento";
 
-                            final File
-                            archivoDescargado = await descargarPdfConPipe(
-                              urlFinal, // URL del PDF
-                              'factura_${factura!.recibo.nirSecuencial}.pdf',
-                            );
+                              final File
+                              archivoDescargado = await descargarPdfConPipe(
+                                urlFinal,
+                                'factura_${facturaDatos.recibo?.nirSecuencial ?? '0'}.pdf',
+                              );
 
-                            setState(() {
-                              _isLoadingFacturaDeudaTotal = false;
-                            });
-
-                            mostrarCustomModal(context, archivoDescargado);
+                              mostrarCustomModal(context, archivoDescargado);
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error al abrir PDF: $e'),
+                                ),
+                              );
+                            } finally {
+                              setState(() {
+                                _isLoadingFacturaDeudaTotal = false;
+                              });
+                            }
                           },
                         )
-                      : Text(""),
+                      : const Text("Sin deudas"),
 
-                  situacionActual.tieneDeuda! &&
-                          situacionActual.facturaDatos!.recibo!.cantidad! > 1
+                  // Deuda anterior solo si hay más de una
+                  (tieneDeuda && (facturaDatos.recibo?.cantidad ?? 0) > 1)
                       ? CardItemFirst(
                           isLoadingFacturaDeudaTotal:
                               _isLoadingFacturaDeudaTotal,
                           title: "Deuda Anterior",
-                          monto: situacionActual
-                              .facturaPenultima['recibo']['importeRecibo']
-                              .toString(),
-                          fechaLectura: situacionActual
-                              .facturaPenultima['recibo']['fechaVencimiento'],
-                          lectura: situacionActual.calculoConsumo['consumo']
-                              .toString(),
+                          monto:
+                              situacionActual
+                                  .facturaPenultima?['recibo']?['importeRecibo']
+                                  ?.toString() ??
+                              "0",
+                          fechaLectura:
+                              situacionActual
+                                  .facturaPenultima?['recibo']?['fechaVencimiento'] ??
+                              "Sin dato",
+                          lectura:
+                              situacionActual.calculoConsumo?['consumo']
+                                  ?.toString() ??
+                              "-",
                           consumo: "",
                           fechaVencimiento:
                               situacionActual
-                                  .facturaPenultima['recibo']['fechaVencimiento'] ??
-                              'Sin dato',
-                          totalConComision: situacionActual
-                              .facturaPenultima['otrosImportes']['totalconComision']
-                              .toString(),
+                                  .facturaPenultima?['recibo']?['fechaVencimiento'] ??
+                              "Sin dato",
+                          totalConComision:
+                              situacionActual
+                                  .facturaPenultima?['otrosImportes']?['totalconComision']
+                                  ?.toString() ??
+                              "0",
                           onPrimaryPressed: () async {},
-                          onSecondaryPressed: () {
-                            print("Pagar");
-                          },
+                          onSecondaryPressed: () => print("Pagar"),
                         )
-                      : Text(""),
+                      : const SizedBox(),
                 ],
               );
             },
             loading: () => const CustomLoading(text: "Cargando..."),
-            error: (error, _) => Center(child: Text('Error: $error')),
+            error: (error, _) => Center(
+              child: Text(
+                "Error al cargar datos para el suministro NIS: ${widget.selectedNIS?.nisRad ?? 'Desconocido'}",
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ),
 
@@ -175,105 +217,113 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                 return const Center(child: Text("No hay facturas disponibles"));
               }
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      "Últimos Comprobantes",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+              return ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: facturas.length,
+                itemBuilder: (context, index) {
+                  final formatoFecha = DateFormat('dd/MM/yyyy');
+
+                  final factura = facturas[index];
+
+                  final cifra = calcularCifra(
+                    widget.selectedNIS!.nisRad.toString(),
+                    factura.fechaVencimiento!,
+                  );
+
+                  final fechaFacturacion = DateTime.tryParse(
+                    factura.fechaFacturacion ?? '',
+                  );
+                  final fechaEmision = DateTime.tryParse(
+                    factura.fechaEmision ?? '',
+                  );
+                  final fechaVencimiento = DateTime.tryParse(
+                    factura.fechaVencimiento ?? '',
+                  );
+
+                  // Si datos de factura nulos, mostrar mensaje de error central
+                  if (factura.importe == null ||
+                      factura.fechaVencimiento == null) {
+                    return Center(
+                      child: Text(
+                        "Error de datos en facturas para el suministro NIS: ${widget.selectedNIS?.nisRad ?? 'Desconocido'}",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ),
-                  // Usar Flexible para el ListView
-                  Flexible(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(8),
-                      itemCount: facturas.length,
-                      itemBuilder: (context, index) {
-                        final factura = facturas[index];
+                    );
+                  }
 
-                        num nisParcial = int.parse(
-                          widget.selectedNIS!.nisRad.toString().substring(0, 3),
-                        );
-                        List<String> fechaObtenida = factura.fechaVencimiento!
-                            .split('-');
-                        num dia = int.parse(fechaObtenida[2]);
-                        num mes = int.parse(fechaObtenida[1]);
-                        num anho = int.parse(fechaObtenida[0]);
-                        num mejunje = (anho - (dia * mes));
-                        num oper =
-                            (((widget.selectedNIS!.nisRad! * nisParcial) +
-                            widget.selectedNIS!.nisRad!));
-                        num res = oper * mejunje;
-                        String cifra = res.toString();
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: CardItemSecond(
+                      isLoadingFactura: _isLoadingFactura,
+                      monto: factura.importe.toString(),
+                      estadoPago: factura.estadoFactura ?? '',
+                      estadoColor: factura.esPagado == true
+                          ? Colors.green
+                          : Colors.red,
+                      fechaEmision: factura.fechaEmision ?? 'Sin dato',
+                      fechaVencimiento: factura.fechaVencimiento ?? 'Sin dato',
+                      onVerFacturaPressed: () async {
+                        setState(() {
+                          _isLoadingFactura = true;
+                        });
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: CardItemSecond(
-                            isLoadingFactura: _isLoadingFactura,
-                            monto: factura.importe.toString(),
-                            estadoPago: factura.estadoFactura ?? '',
-                            estadoColor: factura.esPagado == true
-                                ? Colors.green
-                                : Colors.red,
-                            fechaEmision: factura.fechaEmision ?? 'Sin dato',
-                            fechaVencimiento:
-                                factura.fechaVencimiento ?? 'Sin dato',
-                            onVerFacturaPressed: () async {
-                              setState(() {
-                                _isLoadingFactura = true;
-                              });
-                              print("Ver Ultima Factura");
-                              try {
-                                final fecha = factura.fechaVencimiento;
-                                final fecha_fac = formatearFecha(
-                                  fecha: factura.fechaFacturacion!,
-                                  formatoSalida: '/',
-                                );
-                                final String urlFinal =
-                                    factura.facturaElectronica!
-                                    ? '${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile?nro_nis=${widget.selectedNIS!.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fecha&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}&f_fact=$fecha_fac'
-                                    : "";
+                        try {
+                          /*if (factura.facturaElectronica != true) {
+                            throw "Factura electrónica no disponible";
+                          }*/
 
-                                print(urlFinal);
+                          final String urlFinal = factura.facturaElectronica!
+                              ? "${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile"
+                                    "?nro_nis=${widget.selectedNIS!.nisRad}"
+                                    "&sec_nis=${factura.secNis}"
+                                    "&sec_rec=${factura.secRec}"
+                                    "&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"
+                                    "&clientKey=${Environment.clientKey}"
+                                    "&value=$cifra"
+                                    "&fecha=${factura.fechaVencimiento}"
+                              : '${Environment.hostCtxOpen}/v4/suministro/facturaPdfMobile?nro_nis=${widget.selectedNIS?.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=${factura.fechaVencimiento}&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}"&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"';
 
-                                final File archivoDescargado =
-                                    await descargarPdfConPipe(
-                                      urlFinal, // URL del PDF
-                                      'factura_${factura.nirSecuencial}.pdf',
-                                    );
+                          print(urlFinal);
 
-                                setState(() {
-                                  _isLoadingFactura = false;
-                                });
+                          final File archivoDescargado =
+                              await descargarPdfConPipe(
+                                urlFinal,
+                                'factura_${factura.nirSecuencial}.pdf',
+                              );
 
-                                mostrarCustomModal(context, archivoDescargado);
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Error al abrir PDF: $e'),
-                                  ),
-                                );
-                              } finally {
-                                setState(() {
-                                  _isLoadingFactura = false;
-                                });
-                              }
-                            },
-                          ),
-                        );
+                          mostrarCustomModal(context, archivoDescargado);
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error al abrir PDF: $e')),
+                          );
+                        } finally {
+                          setState(() {
+                            _isLoadingFactura = false;
+                          });
+                        }
                       },
                     ),
-                  ),
-                ],
+                  );
+                },
               );
             },
             loading: () => const CustomLoading(text: "Cargando..."),
-            error: (error, _) => Center(child: Text('Error: $error')),
+            error: (error, _) => Center(
+              child: Text(
+                "Error al cargar facturas para el suministro NIS: ${widget.selectedNIS?.nisRad ?? 'Desconocido'}",
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ),
       ],

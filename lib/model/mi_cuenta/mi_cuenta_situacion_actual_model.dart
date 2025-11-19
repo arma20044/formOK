@@ -373,12 +373,12 @@ class Cabecera {
 
 class Lectura {
   final String? tipoConsumo;
-  final String? consumo;
+  final num? consumo;
   final String? numeroAparato;
-  final String? lecturaAnterior;
+  final num? lecturaAnterior;
   final num? constanteAparato;
-  final String? csmoMin;
-  final String? lecturaActual;
+  final num? csmoMin;
+  final num? lecturaActual;
 
   Lectura({
     this.tipoConsumo,

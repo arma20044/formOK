@@ -24,9 +24,6 @@ class FacturaScrollHorizontal extends ConsumerStatefulWidget {
 
 class _FacturaScrollHorizontalState
     extends ConsumerState<FacturaScrollHorizontal> {
-  
-
-
   // Guardamos los índices de los cards que están descargando
   final Set<int> _cardsDescargando = {};
 
@@ -40,7 +37,8 @@ class _FacturaScrollHorizontalState
     final mes = int.tryParse(parts[1]) ?? 0;
     final anho = int.tryParse(parts[0]) ?? 0;
     final mejunje = anho - (dia * mes);
-    final oper = (int.tryParse(nis) ?? 0) * nisParcial + (int.tryParse(nis) ?? 0);
+    final oper =
+        (int.tryParse(nis) ?? 0) * nisParcial + (int.tryParse(nis) ?? 0);
     return oper * mejunje;
   }
 
@@ -66,20 +64,29 @@ class _FacturaScrollHorizontalState
           final factura = widget.facturas![index];
           if (factura == null) return const SizedBox();
 
-          final cifra = calcularCifra(widget.nis.text, factura.fechaVencimiento);
+          final cifra = calcularCifra(
+            widget.nis.text,
+            factura.fechaVencimiento,
+          );
 
-          final fechaFacturacion = DateTime.tryParse(factura.fechaFacturacion ?? '');
+          final fechaFacturacion = DateTime.tryParse(
+            factura.fechaFacturacion ?? '',
+          );
           final fechaEmision = DateTime.tryParse(factura.fechaEmision ?? '');
-          final fechaVencimiento = DateTime.tryParse(factura.fechaVencimiento ?? '');
+          final fechaVencimiento = DateTime.tryParse(
+            factura.fechaVencimiento ?? '',
+          );
 
-          final urlFinal = "${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile"
-              "?nro_nis=${widget.nis.text}"
-              "&sec_nis=${factura.secNis}"
-              "&sec_rec=${factura.secRec}"
-              "&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"
-              "&clientKey=${Environment.clientKey}"
-              "&value=$cifra"
-              "&fecha=${factura.fechaVencimiento}";
+          final String urlFinal = factura.facturaElectronica!
+              ? "${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile"
+                    "?nro_nis=${widget.nis.text}"
+                    "&sec_nis=${factura.secNis}"
+                    "&sec_rec=${factura.secRec}"
+                    "&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"
+                    "&clientKey=${Environment.clientKey}"
+                    "&value=$cifra"
+                    "&fecha=${factura.fechaVencimiento}"
+              : '${Environment.hostCtxOpen}/v4/suministro/facturaPdfMobile?nro_nis=${widget.nis.text}&clientKey=${Environment.clientKey}&value=$cifra&fecha=${factura.fechaVencimiento}&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}"&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"';
 
           final estaDescargando = _cardsDescargando.contains(index);
 
@@ -90,7 +97,9 @@ class _FacturaScrollHorizontalState
               elevation: 4,
               shape: RoundedRectangleBorder(
                 side: BorderSide(
-                  color: themeState.value!.isDarkMode ? Colors.white : Colors.black,
+                  color: themeState.value!.isDarkMode
+                      ? Colors.white
+                      : Colors.black,
                   width: 0.5,
                 ),
                 borderRadius: BorderRadius.circular(16),
@@ -114,10 +123,14 @@ class _FacturaScrollHorizontalState
                         Chip(
                           label: Text(
                             factura.esPagado! ? 'Pagado' : 'Pendiente de Pago',
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
                           ),
-                          backgroundColor:
-                              factura.esPagado! ? Colors.green : Colors.orange,
+                          backgroundColor: factura.esPagado!
+                              ? Colors.green
+                              : Colors.orange,
                         ),
                       ],
                     ),
@@ -143,13 +156,18 @@ class _FacturaScrollHorizontalState
                                 try {
                                   final File archivoDescargado =
                                       await descargarPdfConPipe(
-                                    urlFinal,
-                                    'factura_${factura.nirSecuencial}.pdf',
+                                        urlFinal,
+                                        'factura_${factura.nirSecuencial}.pdf',
+                                      );
+                                  mostrarCustomModal(
+                                    context,
+                                    archivoDescargado,
                                   );
-                                  mostrarCustomModal(context, archivoDescargado);
                                 } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Error al abrir PDF: $e')),
+                                    SnackBar(
+                                      content: Text('Error al abrir PDF: $e'),
+                                    ),
                                   );
                                 } finally {
                                   setState(() {
@@ -157,7 +175,10 @@ class _FacturaScrollHorizontalState
                                   });
                                 }
                               },
-                              child: const Text("Ver Factura", style: TextStyle(fontSize: 14)),
+                              child: const Text(
+                                "Ver Factura",
+                                style: TextStyle(fontSize: 14),
+                              ),
                             ),
                     ),
                   ],

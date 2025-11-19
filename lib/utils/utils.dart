@@ -295,3 +295,17 @@ String formatNumero(dynamic valor) {
     //setState(() {});
     log("guadradamos$fav");
   }
+
+
+    num calcularCifra(String nis, String fechaVencimiento) {
+    if (nis.length < 3) return 0;
+    final nisParcial = int.tryParse(nis.substring(0, 3)) ?? 0;
+    final parts = fechaVencimiento.split('-');
+    if (parts.length != 3) return 0;
+    final dia = int.tryParse(parts[2]) ?? 0;
+    final mes = int.tryParse(parts[1]) ?? 0;
+    final anho = int.tryParse(parts[0]) ?? 0;
+    final mejunje = anho - (dia * mes);
+    final oper = (int.tryParse(nis) ?? 0) * nisParcial + (int.tryParse(nis) ?? 0);
+    return oper * mejunje;
+  }
