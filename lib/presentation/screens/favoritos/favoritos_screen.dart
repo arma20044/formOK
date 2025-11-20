@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:form/config/constantes.dart';
+import 'package:form/presentation/components/common/UI/custom_dialog.dart';
+import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:go_router/go_router.dart';
@@ -94,7 +96,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
       message: isFav
           ? "${fav.title} agregado a favoritos"
           : "${fav.title} eliminado de favoritos",
-      type: isFav ? MessageType.success: MessageType.error,
+      type: isFav ? MessageType.success : MessageType.error,
     );
   }
 
@@ -137,8 +139,16 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                   onTap: () => irA(item), // 👈 Navega con el NIS
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () =>
-                        onTap(item), // 👈 Esta función borra el favorito
+                    onPressed: () => showConfirmDialog(
+                      context: context,
+                      title: "¿Eliminar factura?",
+                      message: "Esta acción no se puede deshacer.",
+                      type: DialogType.error,
+                      onConfirm: () {
+                        onTap(item);
+                      },
+                    ),
+                    //onTap(item), // 👈 Esta función borra el favorito
                   ),
                 );
               }).toList(),

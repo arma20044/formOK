@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 
-enum DialogType { success, error, warning, info }
-
-/// Color de fondo según tipo
 Color _dialogBgColor(BuildContext context, DialogType type) {
   final cs = Theme.of(context).colorScheme;
 
@@ -13,13 +10,11 @@ Color _dialogBgColor(BuildContext context, DialogType type) {
     case DialogType.error:
       return cs.errorContainer;
     case DialogType.warning:
-      return Colors.amber.shade200;
+      return Colors.amber.shade200; // Warning no tiene container estándar
     case DialogType.info:
       return cs.secondaryContainer;
   }
 }
-
-/// Color del texto/ícono según tipo
 Color _dialogOnColor(BuildContext context, DialogType type) {
   final cs = Theme.of(context).colorScheme;
 
@@ -29,13 +24,12 @@ Color _dialogOnColor(BuildContext context, DialogType type) {
     case DialogType.error:
       return cs.onErrorContainer;
     case DialogType.warning:
-      return Colors.black87;
+      return Colors.black87; // mejor contraste con el amberContainer
     case DialogType.info:
       return cs.onSecondaryContainer;
   }
 }
 
-/// Icono según tipo
 IconData _dialogIcon(DialogType type) {
   switch (type) {
     case DialogType.success:
@@ -49,7 +43,6 @@ IconData _dialogIcon(DialogType type) {
   }
 }
 
-/// Texto por defecto según tipo
 String _defaultTitle(DialogType type) {
   switch (type) {
     case DialogType.success:
@@ -63,22 +56,20 @@ String _defaultTitle(DialogType type) {
   }
 }
 
-/// Diálogo personalizado, seguro, moderno y reutilizable
-Future<void> showCustomDialog({
+
+
+Future<void> showConfirmDialog({
   required BuildContext context,
   required String message,
+  required Function() onConfirm,  // callback al Aceptar
   String? title,
-  DialogType type = DialogType.success,
-  bool showCopyButton = true,
+  DialogType type = DialogType.warning,
 }) async {
   final theme = Theme.of(context);
   final cs = theme.colorScheme;
 
   final bgColor = _dialogBgColor(context, type);
   final onColor = _dialogOnColor(context, type);
-
-  // Contexto raíz para mostrar SnackBar correctamente
-  final rootContext = Navigator.of(context).context;
 
   await showDialog(
     context: context,
@@ -114,35 +105,28 @@ Future<void> showCustomDialog({
         ),
 
         actions: [
-          if (showCopyButton)
-            TextButton(
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: message));
-                Navigator.of(dialogContext).pop();
-
-                ScaffoldMessenger.of(rootContext).showSnackBar(
-                  SnackBar(
-                    content: const Text("Texto copiado al portapapeles"),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: cs.surfaceVariant,
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-              child: Text(
-                "Copiar",
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: cs.primary,
-                ),
-              ),
-            ),
-
+          // CANCELAR
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(
+              "Cancelar",
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: cs.primary,
+              ),
+            ),
+          ),
+
+          // ACEPTAR (EJECUTA CALLBACK)
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop(); // cerrar diálogo
+              onConfirm(); // ejecutar acción
+            },
             child: Text(
               "Aceptar",
               style: theme.textTheme.labelLarge?.copyWith(
                 color: cs.primary,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
