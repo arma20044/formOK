@@ -338,3 +338,34 @@ num calcularCifra(String nis, String fechaVencimiento) {
    // favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
     return favFacturas;
   }
+
+
+  String formatTelefono(String telefono) {
+  // Quitar el prefijo +595
+  final cleaned = telefono.replaceAll('+595', '');
+
+  // Si tiene 8 dígitos, formatear como 0XX XXX XXX
+  if (cleaned.length == 8) {
+    final match = RegExp(r'^(\d{2})(\d{3})(\d{3})$').firstMatch(cleaned);
+    if (match != null) {
+      return '0${match[1]} ${match[2]} ${match[3]}';
+    }
+  }
+
+  // Si tiene 9 dígitos y empieza con "21", formatear como 0XX XXX XXXX
+  if (cleaned.length == 9 && cleaned.startsWith('21')) {
+    final match = RegExp(r'^(\d{2})(\d{3})(\d{4})$').firstMatch(cleaned);
+    if (match != null) {
+      return '0${match[1]} ${match[2]} ${match[3]}';
+    }
+  }
+
+  // Intentar formatear como 0XXX XXX XXX
+  final match = RegExp(r'^(\d{3})(\d{3})(\d{3})$').firstMatch(cleaned);
+  if (match != null) {
+    return '0${match[1]} ${match[2]} ${match[3]}';
+  }
+
+  // Si no coincide ningún patrón, devolver tal cual
+  return telefono;
+}

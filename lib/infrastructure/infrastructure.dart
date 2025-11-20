@@ -16,3 +16,4 @@ export './comercial/historico_consumo_monto_datasource_impl.dart';
 export 'comercial/recuperar_historico_datasource_impl.dart';
 export 'comercial/solicitudes/solicitud_abastecimiento_energia_datasource_impl.dart';
 export 'comercial/solicitudes/factura_fija_datasource_impl.dart';
+export 'reclamo_recuperado_datasource_impl.dart';

@@ -17,3 +17,4 @@ export 'comercial/recuperar_historico_repository.dart';
 export 'comercial/solicitudes/solicitud_abastecimiento_energia_repository.dart';
 export 'comercial/solicitudes/registro_numero_celular_repository.dart';
 export 'comercial/solicitudes/factura_fija_repository.dart';
+export 'reclamo_recupeado_repository.dart';

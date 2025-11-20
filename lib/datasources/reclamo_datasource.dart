@@ -2,7 +2,6 @@
 
 
 
-import '../model/archivo_adjunto_model.dart';
 import '../model/model.dart';
 
 abstract class ReclamoDatasource {

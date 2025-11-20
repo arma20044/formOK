@@ -13,3 +13,4 @@ export './mi_cuenta/mi_cuenta_situacion_actual_repository_impl.dart';
 export 'comercial/historico_consumo_monto_repository_impl.dart';
 export 'comercial/recuperar_historico_repository_impl.dart';
 export 'comercial/solicitudes/solicitud_abastecimiento_energia_repository_impl.dart';
+export 'reclamo_recuperado_repository_impl.dart';

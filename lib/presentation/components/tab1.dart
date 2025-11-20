@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:form/presentation/components/common/UI/custom_dialog.dart';
+import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
 import 'package:form/utils/utils.dart';
 
 import '../../core/api/mi_ande_api.dart';
@@ -11,7 +13,6 @@ import 'widgets/dropdown_custom.dart';
 
 class Tab1 extends StatefulWidget {
   //final GlobalKey<FormState> formKey;
-  
 
   final String tipoReclamo; // FE, CO, AP
 
@@ -45,6 +46,9 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
   final repoTipoReclamo = TipoReclamoRepositoryImpl(
     TipoReclamoDatasourceImpl(MiAndeApi()),
   );
+  final repoUltimosReclamos = ReclamoRecuperadoRepositoryImpl(
+    ReclamoRecuperadoDatasourceImpl(MiAndeApi()),
+  );
 
   List<Departamento> departamentos = [];
   List<Ciudad> ciudades = [];
@@ -55,10 +59,14 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
   bool isLoadingBarrios = false;
   bool isLoadingTipoReclamo = false;
 
+  bool isLoadingUltimosReclamos = false;
+
   List<Departamento> listaDepartamentos = [];
   List<Ciudad> listaCiudades = [];
   List<Barrio> listaBarrios = [];
   List<TipoReclamo> listaTipoReclamo = [];
+
+  late ReclamoRecuperadoResponse listaUltimosReclamos;
 
   late Map<String, String? Function(String?)> validators;
 
@@ -185,172 +193,257 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     ]);
   }
 
+  Future<void> recuperarUltimoReclamo(String telefono) async {
+    if (telefono.length != 10) return;
+    setState(() => isLoadingUltimosReclamos = true);
+    try {
+      listaUltimosReclamos = await repoUltimosReclamos.getReclamoRecuperado(
+        telefonoController.text,
+      );
+final datos = listaUltimosReclamos.respuesta?.datos?[0];
+
+if (datos != null) {
+      showConfirmDialog(
+        type: DialogType.info,
+        context: context,
+        message:
+            "Con el teléfono ingresado se encontró:" +
+            "\n"
+            "\n✓ Teléfono:${listaUltimosReclamos.respuesta!.datos![0]!.telefono.toString()}" +
+            "\n✓ Nombre y Apellido:${listaUltimosReclamos.respuesta!.datos![0]!.nombreApellido.toString()}" +
+            "\n✓ NIS:${listaUltimosReclamos.respuesta!.datos![0]!.nis.toString()}" +
+            "\n✓ Departamento:${listaUltimosReclamos.respuesta!.datos![0]!.departamentoNombre.toString()}" +
+            "\n✓ Ciudad:${listaUltimosReclamos.respuesta!.datos![0]!.ciudadNombre.toString()}" +
+            "\n✓ Barrio:${listaUltimosReclamos.respuesta!.datos![0]!.barrioNombre.toString()}" +
+            "\n✓ Correo:${listaUltimosReclamos.respuesta!.datos![0]!.correo.toString()}" +
+            "\n✓ Dirección:${listaUltimosReclamos.respuesta!.datos![0]!.direccion.toString()}" +
+            "\n✓ Referencia:${listaUltimosReclamos.respuesta!.datos![0]!.referencia.toString()}" +
+            "\n" +
+            "" +
+            "" +
+            "\nCargar reclamo con los datos obtenidos?",
+      onConfirm: () async {
+  final datos = listaUltimosReclamos.respuesta?.datos?[0];
+  if (datos == null) return;
+
+  setState(() {
+    telefonoController.text = formatTelefono(datos.telefono!) ?? '';
+    nombreApellidoController.text = datos.nombreApellido ?? '';
+    nisController.text = datos.nis.toString() ?? '';
+    correoController.text = datos.correo ?? '';
+    direccionController.text = datos.direccion ?? '';
+    referenciaController.text = datos.referencia ?? '';
+  });
+
+  // Seleccionar departamento
+  selectedDept = listaDepartamentos.firstWhere(
+    (d) => d.idDepartamento == datos.departamentoIdDepartamento,
+   // orElse: () => null,
+  );
+
+  if (selectedDept != null) {
+    // Cargar ciudades del departamento seleccionado
+    await _fetchCiudades(selectedDept!.idDepartamento);
+
+    // Seleccionar ciudad
+    selectedCiudad = listaCiudades.firstWhere(
+      (c) => c.idCiudad == datos.ciudadIdCiudad,
+      //orElse: () => null,
+    );
+
+    if (selectedCiudad != null) {
+      // Cargar barrios de la ciudad seleccionada
+      await _fetchBarrios(selectedCiudad!.idCiudad);
+
+      // Seleccionar barrio
+      selectedBarrio = listaBarrios.firstWhere(
+        (b) => b.idBarrio == datos.barrioIdBarrio,
+       // orElse: () => null,
+      );
+    }
+  }
+
+  setState(() {}); // Actualiza la UI con los valores cargados
+},
+
+      );
+}
+    } catch (e) {
+      print("Error al cargar UltimosReclamos: $e");
+    } finally {
+      setState(() => isLoadingUltimosReclamos = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child:Column(
-          children: [
-            //TELEFONO
-            TextFormField(
-              controller: telefonoController,
-              keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                labelText: "Teléfono",
-                border: OutlineInputBorder(),
-              ),
-              validator: (val) {
-                if (selectedTipoReclamo?.nisObligatorio == 'S') {
-                  if (val == null || val.isEmpty) return "Ingrese un teléfono";
-                  if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
-                  return null;
-                }
+      child: Column(
+        children: [
+          //TELEFONO
+          TextFormField(
+            onChanged: (value) {
+              print("Hola $value");
+              recuperarUltimoReclamo(value);
+            },
+            controller: telefonoController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              labelText: "Teléfono",
+              border: OutlineInputBorder(),
+            ),
+            validator: (val) {
+              if (selectedTipoReclamo?.nisObligatorio == 'S') {
+                if (val == null || val.isEmpty) return "Ingrese un teléfono";
+                if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
                 return null;
-              },
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
+          DropdownCustom<TipoReclamo>(
+            label: "Tipo Reclamo",
+            items: listaTipoReclamo,
+            value: selectedTipoReclamo,
+            displayBuilder: (b) => b.nombre!,
+            validator: (val) =>
+                val == null ? "Seleccione un tipo Reclamo" : null,
+            onChanged: (val) => setState(() => selectedTipoReclamo = val),
+          ),
+          const SizedBox(height: 20),
+          //NIS
+          TextFormField(
+            controller: nisController,
+            keyboardType: TextInputType.number,
+            maxLength: 7,
+            decoration: const InputDecoration(
+              labelText: "NIS",
+              border: OutlineInputBorder(),
             ),
-            const SizedBox(height: 20),
-            DropdownCustom<TipoReclamo>(
-              label: "Tipo Reclamo",
-              items: listaTipoReclamo,
-              value: selectedTipoReclamo,
-              displayBuilder: (b) => b.nombre!,
-              validator: (val) =>
-                  val == null ? "Seleccione un tipo Reclamo" : null,
-              onChanged: (val) => setState(() => selectedTipoReclamo = val),
-            ),
-            const SizedBox(height: 20),
-            //NIS
-            TextFormField(
-              controller: nisController,
-              keyboardType: TextInputType.number,
-              maxLength: 7,
-              decoration: const InputDecoration(
-                labelText: "NIS",
-                border: OutlineInputBorder(),
-              ),
-              validator: (val) {
-                if (selectedTipoReclamo?.nisObligatorio == 'S') {
-                  if (val == null || val.isEmpty) return "Ingrese NIS";
-                  if (val.length != 7) return "NIS debe ser de 7 dígitos";
-                  if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
-                  return null;
-                }
+            validator: (val) {
+              if (selectedTipoReclamo?.nisObligatorio == 'S') {
+                if (val == null || val.isEmpty) return "Ingrese NIS";
+                if (val.length != 7) return "NIS debe ser de 7 dígitos";
+                if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
                 return null;
-              },
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
+          //NOMBRE Y APELLIDO
+          TextFormField(
+            controller: nombreApellidoController,
+            keyboardType: TextInputType.text,
+            decoration: const InputDecoration(
+              labelText: "Nombre y Apellido",
+              border: OutlineInputBorder(),
             ),
-            const SizedBox(height: 20),
-            //NOMBRE Y APELLIDO
-            TextFormField(
-              controller: nombreApellidoController,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                labelText: "Nombre y Apellido",
-                border: OutlineInputBorder(),
-              ),
-              // validator: (val) {
-              //   if (val == null || val.isEmpty)
-              //     return "Ingrese Nombre y Apellido";
-        
-              //   return null;
-              // },
-              validator: validators['nombreApellido'],
+            // validator: (val) {
+            //   if (val == null || val.isEmpty)
+            //     return "Ingrese Nombre y Apellido";
+
+            //   return null;
+            // },
+            validator: validators['nombreApellido'],
+          ),
+          const SizedBox(height: 20),
+          DropdownCustom<Departamento>(
+            label: "Departamento",
+            items: listaDepartamentos,
+            value: selectedDept,
+            displayBuilder: (d) => d.nombre!,
+            validator: (val) =>
+                val == null ? "Seleccione un Departamento" : null,
+            onChanged: (val) {
+              setState(() {
+                selectedDept = val;
+                selectedCiudad = null;
+                selectedBarrio = null;
+                ciudades = [];
+                barrios = [];
+              });
+              if (val != null) _fetchCiudades(val.idDepartamento);
+            },
+          ),
+          const SizedBox(height: 20),
+          DropdownCustom<Ciudad>(
+            label: "Ciudad",
+            items: listaCiudades,
+            value: selectedCiudad,
+            displayBuilder: (c) => c.nombre!,
+            validator: (val) => val == null ? "Seleccione una ciudad" : null,
+            onChanged: (val) {
+              setState(() {
+                selectedCiudad = val;
+                selectedBarrio = null;
+                barrios = [];
+              });
+              if (val != null) _fetchBarrios(val.idCiudad);
+            },
+          ),
+          const SizedBox(height: 20),
+          DropdownCustom<Barrio>(
+            label: "Barrio",
+            items: listaBarrios,
+            value: selectedBarrio,
+            displayBuilder: (b) => b.nombre!,
+            validator: (val) => val == null ? "Seleccione un barrio" : null,
+            onChanged: (val) => setState(() => selectedBarrio = val),
+          ),
+          const SizedBox(height: 20),
+          //DIRECCION
+          TextFormField(
+            controller: direccionController,
+            keyboardType: TextInputType.text,
+            decoration: const InputDecoration(
+              labelText: "Direccion",
+              border: OutlineInputBorder(),
             ),
-            const SizedBox(height: 20),
-            DropdownCustom<Departamento>(
-              label: "Departamento",
-              items: listaDepartamentos,
-              value: selectedDept,
-              displayBuilder: (d) => d.nombre!,
-              validator: (val) =>
-                  val == null ? "Seleccione un Departamento" : null,
-              onChanged: (val) {
-                setState(() {
-                  selectedDept = val;
-                  selectedCiudad = null;
-                  selectedBarrio = null;
-                  ciudades = [];
-                  barrios = [];
-                });
-                if (val != null) _fetchCiudades(val.idDepartamento);
-              },
+            validator: (val) {
+              if (val == null || val.isEmpty) return "Ingrese Dirección";
+              //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
+          //CORREO
+          TextFormField(
+            controller: correoController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              labelText: "Correo Electrónico",
+              border: OutlineInputBorder(),
             ),
-            const SizedBox(height: 20),
-            DropdownCustom<Ciudad>(
-              label: "Ciudad",
-              items: listaCiudades,
-              value: selectedCiudad,
-              displayBuilder: (c) => c.nombre!,
-              validator: (val) => val == null ? "Seleccione una ciudad" : null,
-              onChanged: (val) {
-                setState(() {
-                  selectedCiudad = val;
-                  selectedBarrio = null;
-                  barrios = [];
-                });
-                if (val != null) _fetchBarrios(val.idCiudad);
-              },
-            ),
-            const SizedBox(height: 20),
-            DropdownCustom<Barrio>(
-              label: "Barrio",
-              items: listaBarrios,
-              value: selectedBarrio,
-              displayBuilder: (b) => b.nombre!,
-              validator: (val) => val == null ? "Seleccione un barrio" : null,
-              onChanged: (val) => setState(() => selectedBarrio = val),
-            ),
-            const SizedBox(height: 20),
-            //DIRECCION
-            TextFormField(
-              controller: direccionController,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                labelText: "Direccion",
-                border: OutlineInputBorder(),
-              ),
-              validator: (val) {
-                if (val == null || val.isEmpty) return "Ingrese Dirección";
-                //if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
+            validator: (val) {
+              if (selectedTipoReclamo?.correoObligatorio == 'S') {
+                if (val == null || val.isEmpty)
+                  return "Ingrese Correo Electrónico";
+                if (!emailRegex.hasMatch(val))
+                  return "Ingrese formato de correo válido.";
+
                 return null;
-              },
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
+          //REFERENCIA
+          TextFormField(
+            controller: referenciaController,
+            keyboardType: TextInputType.text,
+            decoration: const InputDecoration(
+              labelText: "Referencia",
+              border: OutlineInputBorder(),
             ),
-            const SizedBox(height: 20),
-            //CORREO
-            TextFormField(
-              controller: correoController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: "Correo Electrónico",
-                border: OutlineInputBorder(),
-              ),
-              validator: (val) {
-                if (selectedTipoReclamo?.correoObligatorio == 'S') {
-                  if (val == null || val.isEmpty)
-                    return "Ingrese Correo Electrónico";
-                   if (!emailRegex.hasMatch(val))
-                    return "Ingrese formato de correo válido.";
-        
-                  return null;
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-            //REFERENCIA
-            TextFormField(
-              controller: referenciaController,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                labelText: "Referencia",
-                border: OutlineInputBorder(),
-              ),
-              validator: validators['referencia'],
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      
+            validator: validators['referencia'],
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }

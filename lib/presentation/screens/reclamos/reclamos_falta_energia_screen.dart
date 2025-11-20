@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/tab3.dart';
 import 'package:form/utils/utils.dart';
 
 import '../../../core/api/mi_ande_api.dart';
 import '../../../infrastructure/reclamo_datasource_impl.dart';
-import '../../../model/archivo_adjunto_model.dart';
 import '../../../model/model.dart';
 import '../../../repositories/reclamo_repository_impl.dart';
 import '../../components/components.dart';
-import '../../forms/FormWrapper.dart';
 
 class ReclamosScreen extends StatefulWidget {
   const ReclamosScreen({
