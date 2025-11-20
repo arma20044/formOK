@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:form/config/constantes.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/utils/utils.dart';
 
 import '../../core/api/mi_ande_api.dart';
@@ -70,11 +72,22 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
 
   late Map<String, String? Function(String?)> validators;
 
+  final FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
     _fetchDepartamentos();
     _fetchTipoReclamo();
+
+    // Listener para detectar cambios de foco
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        // Se perdió el foco
+        print("El campo perdió el foco");
+        recuperarUltimoReclamo(telefonoController.text);
+      }
+    });
 
     validators = {
       //VALIDA PARA TODOS
@@ -114,6 +127,12 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
 
       // más campos condicionales según tipoReclamo...
     };
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose(); // Muy importante liberar recursos
+    super.dispose();
   }
 
   Future<void> _fetchDepartamentos() async {
@@ -196,78 +215,83 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
   Future<void> recuperarUltimoReclamo(String telefono) async {
     if (telefono.length != 10) return;
     setState(() => isLoadingUltimosReclamos = true);
+    CustomSnackbar.show(
+      context,
+      message: "Obteniendo último reclamo...",
+      type: MessageType.info,
+      duration: Durations.long4
+    );
     try {
       listaUltimosReclamos = await repoUltimosReclamos.getReclamoRecuperado(
         telefonoController.text,
       );
-final datos = listaUltimosReclamos.respuesta?.datos?[0];
+      final datos = listaUltimosReclamos.respuesta?.datos?[0];
 
-if (datos != null) {
-      showConfirmDialog(
-        type: DialogType.info,
-        context: context,
-        message:
-            "Con el teléfono ingresado se encontró:" +
-            "\n"
-            "\n✓ Teléfono:${listaUltimosReclamos.respuesta!.datos![0]!.telefono.toString()}" +
-            "\n✓ Nombre y Apellido:${listaUltimosReclamos.respuesta!.datos![0]!.nombreApellido.toString()}" +
-            "\n✓ NIS:${listaUltimosReclamos.respuesta!.datos![0]!.nis.toString()}" +
-            "\n✓ Departamento:${listaUltimosReclamos.respuesta!.datos![0]!.departamentoNombre.toString()}" +
-            "\n✓ Ciudad:${listaUltimosReclamos.respuesta!.datos![0]!.ciudadNombre.toString()}" +
-            "\n✓ Barrio:${listaUltimosReclamos.respuesta!.datos![0]!.barrioNombre.toString()}" +
-            "\n✓ Correo:${listaUltimosReclamos.respuesta!.datos![0]!.correo.toString()}" +
-            "\n✓ Dirección:${listaUltimosReclamos.respuesta!.datos![0]!.direccion.toString()}" +
-            "\n✓ Referencia:${listaUltimosReclamos.respuesta!.datos![0]!.referencia.toString()}" +
-            "\n" +
-            "" +
-            "" +
-            "\nCargar reclamo con los datos obtenidos?",
-      onConfirm: () async {
-  final datos = listaUltimosReclamos.respuesta?.datos?[0];
-  if (datos == null) return;
+      if (datos != null) {
+        showConfirmDialog(
+          type: DialogType.info,
+          context: context,
+          message:
+              "Con el teléfono ingresado se encontró:" +
+              "\n"
+                  "\n✓ Teléfono:${listaUltimosReclamos.respuesta!.datos![0]!.telefono.toString()}" +
+              "\n✓ Nombre y Apellido:${listaUltimosReclamos.respuesta!.datos![0]!.nombreApellido.toString()}" +
+              "\n✓ NIS:${listaUltimosReclamos.respuesta!.datos![0]!.nis.toString()}" +
+              "\n✓ Departamento:${listaUltimosReclamos.respuesta!.datos![0]!.departamentoNombre.toString()}" +
+              "\n✓ Ciudad:${listaUltimosReclamos.respuesta!.datos![0]!.ciudadNombre.toString()}" +
+              "\n✓ Barrio:${listaUltimosReclamos.respuesta!.datos![0]!.barrioNombre.toString()}" +
+              "\n✓ Correo:${listaUltimosReclamos.respuesta!.datos![0]!.correo.toString()}" +
+              "\n✓ Dirección:${listaUltimosReclamos.respuesta!.datos![0]!.direccion.toString()}" +
+              "\n✓ Referencia:${listaUltimosReclamos.respuesta!.datos![0]!.referencia.toString()}" +
+              "\n" +
+              "" +
+              "" +
+              "\nCargar reclamo con los datos obtenidos?",
+          onConfirm: () async {
+            final datos = listaUltimosReclamos.respuesta?.datos?[0];
+            if (datos == null) return;
 
-  setState(() {
-    telefonoController.text = formatTelefono(datos.telefono!) ?? '';
-    nombreApellidoController.text = datos.nombreApellido ?? '';
-    nisController.text = datos.nis.toString() ?? '';
-    correoController.text = datos.correo ?? '';
-    direccionController.text = datos.direccion ?? '';
-    referenciaController.text = datos.referencia ?? '';
-  });
+            setState(() {
+              telefonoController.text = formatTelefono(datos.telefono!) ?? '';
+              nombreApellidoController.text = datos.nombreApellido ?? '';
+              nisController.text = datos.nis.toString() ?? '';
+              correoController.text = datos.correo ?? '';
+              direccionController.text = datos.direccion ?? '';
+              referenciaController.text = datos.referencia ?? '';
+            });
 
-  // Seleccionar departamento
-  selectedDept = listaDepartamentos.firstWhere(
-    (d) => d.idDepartamento == datos.departamentoIdDepartamento,
-   // orElse: () => null,
-  );
+            // Seleccionar departamento
+            selectedDept = listaDepartamentos.firstWhere(
+              (d) => d.idDepartamento == datos.departamentoIdDepartamento,
+              // orElse: () => null,
+            );
 
-  if (selectedDept != null) {
-    // Cargar ciudades del departamento seleccionado
-    await _fetchCiudades(selectedDept!.idDepartamento);
+            if (selectedDept != null) {
+              // Cargar ciudades del departamento seleccionado
+              await _fetchCiudades(selectedDept!.idDepartamento);
 
-    // Seleccionar ciudad
-    selectedCiudad = listaCiudades.firstWhere(
-      (c) => c.idCiudad == datos.ciudadIdCiudad,
-      //orElse: () => null,
-    );
+              // Seleccionar ciudad
+              selectedCiudad = listaCiudades.firstWhere(
+                (c) => c.idCiudad == datos.ciudadIdCiudad,
+                //orElse: () => null,
+              );
 
-    if (selectedCiudad != null) {
-      // Cargar barrios de la ciudad seleccionada
-      await _fetchBarrios(selectedCiudad!.idCiudad);
+              if (selectedCiudad != null) {
+                // Cargar barrios de la ciudad seleccionada
+                await _fetchBarrios(selectedCiudad!.idCiudad);
 
-      // Seleccionar barrio
-      selectedBarrio = listaBarrios.firstWhere(
-        (b) => b.idBarrio == datos.barrioIdBarrio,
-       // orElse: () => null,
-      );
-    }
-  }
+                // Seleccionar barrio
+                selectedBarrio = listaBarrios.firstWhere(
+                  (b) => b.idBarrio == datos.barrioIdBarrio,
+                  // orElse: () => null,
+                );
+              }
+            }
 
-  setState(() {}); // Actualiza la UI con los valores cargados
-},
-
-      );
-}
+            setState(() {}); // Actualiza la UI con los valores cargados
+          },
+        );
+      }
     } catch (e) {
       print("Error al cargar UltimosReclamos: $e");
     } finally {
@@ -284,9 +308,14 @@ if (datos != null) {
         children: [
           //TELEFONO
           TextFormField(
+            focusNode: _focusNode,
+
+            onEditingComplete: () {
+              Text("fin edicion");
+            },
             onChanged: (value) {
               print("Hola $value");
-              recuperarUltimoReclamo(value);
+              // recuperarUltimoReclamo(value);
             },
             controller: telefonoController,
             keyboardType: TextInputType.phone,
