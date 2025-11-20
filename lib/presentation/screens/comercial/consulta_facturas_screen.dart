@@ -4,6 +4,7 @@ import 'package:form/config/constantes.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/model/model.dart';
+import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/common/datos_card.dart';
 import 'package:form/presentation/components/common/factura_scroll_horizontal.dart';
@@ -13,7 +14,6 @@ import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:form/utils/utils.dart';
 import '../../../infrastructure/infrastructure.dart';
 import '../../../repositories/repositories.dart';
-import 'package:uuid/uuid.dart';
 
 class ConsultaFacturasScreen extends ConsumerStatefulWidget {
   final String? nis;
@@ -29,9 +29,13 @@ class _ConsultaFacturasScreenState
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nisController = TextEditingController();
 
+  List<Favorito> favFacturas = [];
+
   @override
   void initState() {
     super.initState();
+
+    obtenerFavoritos();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final nis = widget.nis;
@@ -44,6 +48,15 @@ class _ConsultaFacturasScreenState
         _consultar();
       }
     });
+  }
+
+  Future<void> obtenerFavoritos() async {
+    final favoritosFac = await cargarDatos();
+    setState(() {
+      favFacturas = favoritosFac;
+    });
+
+    if (_nisController.text.isNotEmpty) verificarFavorito(_nisController.text);
   }
 
   List<Lista?>? facturas; // <-- aquí guardamos los resultados
@@ -101,6 +114,7 @@ class _ConsultaFacturasScreenState
       setState(() {
         facturas = consultaFacturasResponse.resultado?.lista;
         datosCliente = consultaFacturasResponse.resultado?.datosCliente;
+        print(datosCliente);
         isLoading = false;
       });
 
@@ -115,6 +129,26 @@ class _ConsultaFacturasScreenState
         context,
       ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
+  }
+
+  bool esFavorito = false;
+  Favorito verificarFavorito(String nisBuscado) {
+    Favorito? encontrado = favFacturas.firstWhere(
+      (fav) => fav.title == nisBuscado,
+      orElse: () => Favorito(id: "nada", title: "nada"),
+    );
+
+    if (encontrado.title.contains("nada")) {
+      setState(() {
+        esFavorito = false;
+      });
+    } else {
+      setState(() {
+        esFavorito = true;
+      });
+    }
+
+    return encontrado;
   }
 
   @override
@@ -155,11 +189,17 @@ class _ConsultaFacturasScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                //Text(favFacturas[0].title.toString()),
                 Row(
                   children: [
                     Expanded(
                       flex: 8, // 80% del espacio
                       child: TextFormField(
+                        onChanged: (newValue) {
+                          // Do something with newValue
+                          print('Text changed to: $newValue');
+                          verificarFavorito(newValue);
+                        },
                         maxLength: 7,
                         controller: _nisController,
                         keyboardType: TextInputType.number,
@@ -193,8 +233,18 @@ class _ConsultaFacturasScreenState
                       : const Text('Consultar'),
                 ),
                 const SizedBox(height: 20),
+                if (facturas != null && facturas!.isEmpty) ...[
+                  CustomCard(
+                    borderColor: Colors.red,
+                    child: Center(
+                      child: Text(
+                        "No se recibieron datos con el NIS ingresado.",
+                      ),
+                    ),
+                  ),
+                ],
                 if (facturas != null && facturas!.isNotEmpty) ...[
-                  Row(
+                  Column(
                     children: [
                       DatosCard(
                         datosCliente: datosCliente,
@@ -209,15 +259,16 @@ class _ConsultaFacturasScreenState
                         ),
                         child: IconButton(
                           onPressed: () {
-                            var uuid = Uuid();
                             String nis = _nisController.text;
                             toggleFavoritoFactura(
-                              Favorito(id: uuid.v4(), title: nis),context
+                              Favorito(id: nis, title: nis),
+                              context,
                             );
+                           obtenerFavoritos();
                           },
-                          icon: const Icon(
-                            Icons.star_border_sharp,
-                            color: Colors.green,
+                          icon: Icon(
+                            esFavorito ? Icons.star : Icons.star_border_sharp,
+                            color: esFavorito ? Colors.amber : Colors.green,
                             size: 30,
                           ),
                         ),

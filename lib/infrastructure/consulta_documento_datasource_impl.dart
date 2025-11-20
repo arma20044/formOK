@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:form/core/enviromens/Enrivoment.dart';
 import 'package:form/model/model.dart';
-import 'package:form/presentation/components/common/custom_show_dialog.dart';
 
 import '../core/api/mi_ande_api.dart';
 
@@ -43,7 +42,6 @@ class ConsultaDocumentoDatasourceImpl extends ConsultaDocumentoDatasource {
       ),
     );
 
-    print('URL llamada: ${response.requestOptions.uri}');
 
     if (response.statusCode == 200) {
       final result = response.data;

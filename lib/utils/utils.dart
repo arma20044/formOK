@@ -281,39 +281,43 @@ String formatNumero(dynamic valor) {
 }
 
 List<Favorito> favFacturas = [];
-Future<void> toggleFavoritoFactura(Favorito fav, BuildContext context) async {
-  print("guardamos toggleFavoritoFactura");
-  bool isFav;
+Future<void> toggleFavoritoFactura(Favorito fav,BuildContext context) async {
+    final index = favFacturas.indexWhere((e) => e.id == fav.id);
+    bool isFav;
 
-  if (favFacturas.any((e) => e.id == fav.id)) {
-    favFacturas.removeWhere((e) => e.id == fav.id);
-    isFav = false;
-  } else {
-    favFacturas.add(fav);
-    isFav = true;
+    if (index != -1) {
+      // Ya existe -> eliminar
+      favFacturas.removeAt(index);
+      isFav = false;
+    } else {
+      // Solo agregar si no existe
+      favFacturas.add(fav);
+      isFav = true;
+    }
+
+    // Guardar y eliminar duplicados antes de almacenar
+    final ids = <String>{};
+    final uniqueList = <Favorito>[];
+    for (var f in favFacturas) {
+      if (!ids.contains(f.id)) {
+        ids.add(f.id);
+        uniqueList.add(f);
+      }
+    }
+
+    favFacturas = uniqueList;
+    await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
+    
+
+    CustomSnackbar.show(
+      context,
+      message: isFav
+          ? "${fav.title} agregado a favoritos"
+          : "${fav.title} eliminado de favoritos",
+      type: isFav ? MessageType.success : MessageType.error,
+    );
+    
   }
-  await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
-  //setState(() {});
-  log("guadradamos$favFacturas.title");
-  /*ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      
-      content: Text(
-        isFav
-            ? "${fav.title} agregado a favoritos"
-            : "${fav.title} eliminado de favoritos",
-      ),
-      duration: Duration(seconds: 2),
-    ),
-  );*/
-  CustomSnackbar.show(
-    context,
-    message: isFav
-        ? "NIS: ${fav.title} agregado a favoritos"
-        : "NIS: ${fav.title} eliminado de favoritos",
-    type: isFav ? MessageType.success: MessageType.error,
-  );
-}
 
 num calcularCifra(String nis, String fechaVencimiento) {
   if (nis.length < 3) return 0;
@@ -327,3 +331,10 @@ num calcularCifra(String nis, String fechaVencimiento) {
   final oper = (int.tryParse(nis) ?? 0) * nisParcial + (int.tryParse(nis) ?? 0);
   return oper * mejunje;
 }
+
+
+  Future<List<Favorito>> cargarDatos() async {
+    favFacturas = await FavoritosStorage.getLista(FavoritosStorage.keyFacturas);
+   // favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
+    return favFacturas;
+  }

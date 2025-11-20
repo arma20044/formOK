@@ -7,6 +7,7 @@ import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:form/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 
 class Favorito {
@@ -37,7 +38,21 @@ class FavoritosStorage {
 
     try {
       final List decoded = json.decode(data);
-      return decoded.map((e) => Favorito.fromJson(e)).toList();
+      // Convertir a Favorito y eliminar duplicados por id
+      final List<Favorito> lista = decoded
+          .map((e) => Favorito.fromJson(e))
+          .toList();
+
+      // Eliminar duplicados
+      final ids = <String>{};
+      final uniqueList = <Favorito>[];
+      for (var f in lista) {
+        if (!ids.contains(f.id)) {
+          ids.add(f.id);
+          uniqueList.add(f);
+        }
+      }
+      return uniqueList;
     } catch (_) {
       return [];
     }
@@ -70,27 +85,45 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   @override
   void initState() {
     super.initState();
-    cargarDatos();
+
+    obtenerFavoritos();
   }
 
-  Future<void> cargarDatos() async {
-    favFacturas = await FavoritosStorage.getLista(FavoritosStorage.keyFacturas);
-    favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
-    setState(() {});
+  Future<void> obtenerFavoritos() async {
+    final favoritosFac = await cargarDatos();
+    setState(() {
+      favFacturas = favoritosFac;
+    });
   }
 
   Future<void> toggleFavoritoFactura(Favorito fav) async {
+    final index = favFacturas.indexWhere((e) => e.id == fav.id);
     bool isFav;
 
-    if (favFacturas.any((e) => e.id == fav.id)) {
-      favFacturas.removeWhere((e) => e.id == fav.id);
+    if (index != -1) {
+      // Ya existe -> eliminar
+      favFacturas.removeAt(index);
       isFav = false;
     } else {
+      // Solo agregar si no existe
       favFacturas.add(fav);
       isFav = true;
     }
+
+    // Guardar y eliminar duplicados antes de almacenar
+    final ids = <String>{};
+    final uniqueList = <Favorito>[];
+    for (var f in favFacturas) {
+      if (!ids.contains(f.id)) {
+        ids.add(f.id);
+        uniqueList.add(f);
+      }
+    }
+
+    favFacturas = uniqueList;
     await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
     setState(() {});
+
     CustomSnackbar.show(
       context,
       message: isFav
@@ -101,11 +134,14 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   }
 
   Future<void> toggleFavoritoReclamo(Favorito fav) async {
-    if (favReclamos.any((e) => e.id == fav.id)) {
-      favReclamos.removeWhere((e) => e.id == fav.id);
-    } else {
+    if (!favReclamos.any((e) => e.id == fav.id)) {
+      // Solo agregar si NO existe
       favReclamos.add(fav);
+    } else {
+      // Si ya existe, lo eliminamos
+      favReclamos.removeWhere((e) => e.id == fav.id);
     }
+
     await FavoritosStorage.saveLista(FavoritosStorage.keyReclamos, favReclamos);
     setState(() {});
   }
