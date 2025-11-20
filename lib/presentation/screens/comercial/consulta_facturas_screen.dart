@@ -29,23 +29,22 @@ class _ConsultaFacturasScreenState
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nisController = TextEditingController();
 
-@override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    final nis = widget.nis;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final nis = widget.nis;
 
-    // Si viene desde favoritos y es válido
-    if (nis != null && nis.isNotEmpty && int.tryParse(nis) != null) {
-      _nisController.text = nis;
+      // Si viene desde favoritos y es válido
+      if (nis != null && nis.isNotEmpty && int.tryParse(nis) != null) {
+        _nisController.text = nis;
 
-      // Hacer la consulta después del primer frame
-      _consultar();
-    }
-  });
-}
-
+        // Hacer la consulta después del primer frame
+        _consultar();
+      }
+    });
+  }
 
   List<Lista?>? facturas; // <-- aquí guardamos los resultados
   DatosCliente? datosCliente;
@@ -183,31 +182,6 @@ void initState() {
                       ),
                     ),
                     const SizedBox(width: 8), // separación entre input y botón
-                    Expanded(
-                      flex: 2, // 20% del espacio
-                      child: Container(
-                        height:
-                            60, // opcional: para igualar altura del TextFormField
-                        decoration: BoxDecoration(
-                          //color: Colors.blue,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: IconButton(
-                          onPressed: () {
-                            var uuid = Uuid();
-                            String nis = _nisController.text;
-                            toggleFavoritoFactura(
-                              Favorito(id: uuid.v4(), title: nis),
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.star_border_sharp,
-                            color: Colors.green,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
 
@@ -220,10 +194,37 @@ void initState() {
                 ),
                 const SizedBox(height: 20),
                 if (facturas != null && facturas!.isNotEmpty) ...[
-                  DatosCard(
-                    datosCliente: datosCliente,
-                    nis: _nisController.text,
+                  Row(
+                    children: [
+                      DatosCard(
+                        datosCliente: datosCliente,
+                        nis: _nisController.text,
+                      ),
+                      Container(
+                        height:
+                            60, // opcional: para igualar altura del TextFormField
+                        decoration: BoxDecoration(
+                          //color: Colors.blue,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            var uuid = Uuid();
+                            String nis = _nisController.text;
+                            toggleFavoritoFactura(
+                              Favorito(id: uuid.v4(), title: nis),context
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.star_border_sharp,
+                            color: Colors.green,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+
                   const SizedBox(height: 16),
                   Text(
                     "Historico de Comprobantes",

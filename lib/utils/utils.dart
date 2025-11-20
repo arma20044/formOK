@@ -5,14 +5,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:form/config/constantes.dart';
 import 'package:form/model/constans/mensajes_servicios.dart';
 import 'package:form/model/servicios_nis_telefono.dart';
 import 'package:form/presentation/components/common/custom_pdf_modal.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 
 final RegExp emailRegex = RegExp(
   r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
@@ -183,7 +184,8 @@ String formatearNumeroString(
   int decimales = 0,
   String locale = 'es_PY',
 }) {
-  if(valor.contains("/")){ //es fecha
+  if (valor.contains("/")) {
+    //es fecha
     return valor;
   }
   final numero = num.tryParse(valor.replaceAll(',', '.')) ?? 0;
@@ -224,19 +226,10 @@ String obtenerFechaActual() {
   return fechaFormateada;
 }
 
-
-
-
 String formatMiles(num number) {
   final formatter = NumberFormat("#,##0", "es_PY"); // Español - Paraguay
   return formatter.format(number);
 }
-
-
-
-
-
-
 
 String formatNumero(dynamic valor) {
   if (valor == null) return "";
@@ -287,28 +280,50 @@ String formatNumero(dynamic valor) {
   return formatter.format(numero).trim();
 }
 
- List<Favorito> favFacturas = [];
-  Future<void> toggleFavoritoFactura(Favorito fav) async {
-    if (favFacturas.any((e) => e.id == fav.id)) {
-      favFacturas.removeWhere((e) => e.id == fav.id);
-    } else {
-      favFacturas.add(fav);
-    }
-    await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
-    //setState(() {});
-    log("guadradamos$fav");
-  }
+List<Favorito> favFacturas = [];
+Future<void> toggleFavoritoFactura(Favorito fav, BuildContext context) async {
+  print("guardamos toggleFavoritoFactura");
+  bool isFav;
 
-
-    num calcularCifra(String nis, String fechaVencimiento) {
-    if (nis.length < 3) return 0;
-    final nisParcial = int.tryParse(nis.substring(0, 3)) ?? 0;
-    final parts = fechaVencimiento.split('-');
-    if (parts.length != 3) return 0;
-    final dia = int.tryParse(parts[2]) ?? 0;
-    final mes = int.tryParse(parts[1]) ?? 0;
-    final anho = int.tryParse(parts[0]) ?? 0;
-    final mejunje = anho - (dia * mes);
-    final oper = (int.tryParse(nis) ?? 0) * nisParcial + (int.tryParse(nis) ?? 0);
-    return oper * mejunje;
+  if (favFacturas.any((e) => e.id == fav.id)) {
+    favFacturas.removeWhere((e) => e.id == fav.id);
+    isFav = false;
+  } else {
+    favFacturas.add(fav);
+    isFav = true;
   }
+  await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
+  //setState(() {});
+  log("guadradamos$favFacturas.title");
+  /*ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      
+      content: Text(
+        isFav
+            ? "${fav.title} agregado a favoritos"
+            : "${fav.title} eliminado de favoritos",
+      ),
+      duration: Duration(seconds: 2),
+    ),
+  );*/
+  CustomSnackbar.show(
+    context,
+    message: isFav
+        ? "NIS: ${fav.title} agregado a favoritos"
+        : "NIS: ${fav.title} eliminado de favoritos",
+    type: isFav ? MessageType.success: MessageType.error,
+  );
+}
+
+num calcularCifra(String nis, String fechaVencimiento) {
+  if (nis.length < 3) return 0;
+  final nisParcial = int.tryParse(nis.substring(0, 3)) ?? 0;
+  final parts = fechaVencimiento.split('-');
+  if (parts.length != 3) return 0;
+  final dia = int.tryParse(parts[2]) ?? 0;
+  final mes = int.tryParse(parts[1]) ?? 0;
+  final anho = int.tryParse(parts[0]) ?? 0;
+  final mejunje = anho - (dia * mes);
+  final oper = (int.tryParse(nis) ?? 0) * nisParcial + (int.tryParse(nis) ?? 0);
+  return oper * mejunje;
+}

@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:form/config/constantes.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
+import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:go_router/go_router.dart';
 
 class Favorito {
@@ -75,13 +78,24 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   }
 
   Future<void> toggleFavoritoFactura(Favorito fav) async {
+    bool isFav;
+
     if (favFacturas.any((e) => e.id == fav.id)) {
       favFacturas.removeWhere((e) => e.id == fav.id);
+      isFav = false;
     } else {
       favFacturas.add(fav);
+      isFav = true;
     }
     await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
     setState(() {});
+    CustomSnackbar.show(
+      context,
+      message: isFav
+          ? "${fav.title} agregado a favoritos"
+          : "${fav.title} eliminado de favoritos",
+      type: isFav ? MessageType.success: MessageType.error,
+    );
   }
 
   Future<void> toggleFavoritoReclamo(Favorito fav) async {
@@ -136,6 +150,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Favoritos")),
+      endDrawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Column(
           children: [
