@@ -35,6 +35,8 @@ class _ParentScreenState extends State<ReclamosScreen>
   final repoReclamo = ReclamoRepositoryImpl(ReclamoDatasourceImpl(MiAndeApi()));
   bool _isLoadingReclamo = false;
 
+  
+
   @override
   void initState() {
     super.initState();

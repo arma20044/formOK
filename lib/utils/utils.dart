@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/model/constans/mensajes_servicios.dart';
+import 'package:form/model/favoritos/favoritos_model.dart';
+import 'package:form/model/favoritos/favoritos_tipo_model.dart';
 import 'package:form/model/servicios_nis_telefono.dart';
 import 'package:form/presentation/components/common/custom_pdf_modal.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';

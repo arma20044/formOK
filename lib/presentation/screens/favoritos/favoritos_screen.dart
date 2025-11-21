@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:form/config/constantes.dart';
+import 'package:form/model/favoritos/favoritos_model.dart';
+import 'package:form/model/favoritos/favoritos_tipo_model.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
@@ -10,57 +12,20 @@ import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
-import 'package:form/presentation/components/common/custom_snackbar.dart';
-import 'package:form/presentation/components/drawer/custom_drawer.dart';
-import 'package:go_router/go_router.dart';
 
 //
 // ==================================================
 // ENUM – Tipo de favorito
 // ==================================================
 //
-enum FavoritoTipo {
-  consultaFactura,
-  datosReclamo,
-  vacio,
-}
+
 
 //
 // ==================================================
 // MODELO – Favorito
 // ==================================================
 //
-class Favorito {
-  final String id;
-  final String title;
-  final FavoritoTipo tipo;
 
-  Favorito({
-    required this.id,
-    required this.title,
-    this.tipo = FavoritoTipo.vacio,
-  });
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "title": title,
-        "tipo": tipo.name,
-      };
-
-  factory Favorito.fromJson(Map<String, dynamic> json) => Favorito(
-        id: json["id"],
-        title: json["title"],
-        tipo: FavoritoTipo.values.firstWhere(
-          (e) => e.name == json["tipo"],
-          orElse: () => FavoritoTipo.vacio,
-        ),
-      );
-}
 
 //
 // ==================================================
@@ -213,6 +178,29 @@ Future<void> irA(Favorito fav) async {
   }
 }
 
+Future<void> borrar(Favorito fav) async {
+  switch (fav.tipo) {
+    case FavoritoTipo.consultaFactura:
+      toggleFavoritoFactura(fav);
+      obtenerFavoritos();
+      break;
+
+    case FavoritoTipo.datosReclamo:
+      toggleFavoritoReclamo(fav);
+      obtenerFavoritos();
+      break;
+    default:
+      CustomSnackbar.show(
+        context,
+        message: "Tipo de favorito no reconocido",
+        type: MessageType.error,
+      );
+      break;
+  }
+}
+
+
+
 
   //
   // ==================================================
@@ -264,7 +252,7 @@ Future<void> irA(Favorito fav) async {
                       title: "¿Eliminar favorito?",
                       message: "Esta acción no se puede deshacer.",
                       type: DialogType.error,
-                      onConfirm: () => onTap(item),
+                      onConfirm: () => borrar(item) 
                     ),
                   ),
                 );
