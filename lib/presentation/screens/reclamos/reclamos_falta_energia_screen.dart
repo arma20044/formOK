@@ -135,13 +135,13 @@ class _ParentScreenState extends State<ReclamosScreen>
       });
       final reclamoResponse = await repoReclamo.getReclamo(
         tab1Key.currentState!.telefonoController.text,
-        tab1Key.currentState!.selectedTipoReclamo!.idTipoReclamoCliente,
+        tab1Key.currentState!.selectedTipoReclamo!,
         tab1Key.currentState!.nisController.text,
         tab1Key.currentState!.nombreApellidoController.text,
 
-        tab1Key.currentState!.selectedDept!.idDepartamento,
-        tab1Key.currentState!.selectedCiudad!.idCiudad,
-        tab1Key.currentState!.selectedBarrio!.idBarrio,
+        tab1Key.currentState!.selectedDept!,
+        tab1Key.currentState!.selectedCiudad!,
+        tab1Key.currentState!.selectedBarrio!,
 
         tab1Key.currentState!.direccionController.text,
         tab1Key.currentState!.correoController.text,

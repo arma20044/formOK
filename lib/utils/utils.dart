@@ -344,7 +344,7 @@ num calcularCifra(String nis, String fechaVencimiento) {
 
   List<Favorito> favReclamos = [];
    Future<void> toggleFavoritoReclamo(Favorito fav) async {
-    fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.datosReclamo);
+    //fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.datosReclamo,);
 
     final exists = favReclamos.any((e) => e.id == fav.id);
 

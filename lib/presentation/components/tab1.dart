@@ -199,7 +199,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
       telefono: telefonoController.text,
       nombreApellido: nombreApellidoController.text,
       direccion: direccionController.text,
-      correoElectronico: correoController.text,
+      correo: correoController.text,
       nis: nisController.text,
       adjuntoObligatorio: "N",
       referencia: referenciaController.text,
@@ -209,22 +209,30 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     );
   }
 
-  Future<void> toggleFavoritoReclamo(Favorito fav) async {
-    final favoritos = await cargarDatosFacturas(); // tu función de carga
-    final index = favoritos.indexWhere((f) => f.id == fav.id);
+Future<void> toggleFavoritoReclamo(Favorito fav) async {
+  // Crear favorito con tipo reclamo y datos completos
+  final nuevoFavorito = Favorito(
+    id: fav.id,
+    title: fav.title,
+    tipo: FavoritoTipo.datosReclamo,
+    datos: obtenerDatosReclamo(), // <-- aquí agregás todos los datos del formulario
+  );
 
-    if (index >= 0) {
-      favoritos.removeAt(index); // elimina si ya existe
-    } else {
-      favoritos.add(fav); // agrega si no existe
-    }
+  final exists = favReclamos.any((e) => e.id == nuevoFavorito.id);
 
-    await FavoritosStorage.saveLista(FavoritosStorage.keyReclamos, favoritos);
-
-    setState(() {
-      esFavorito = index < 0;
-    });
+  if (exists) {
+    favReclamos.removeWhere((e) => e.id == nuevoFavorito.id);
+  } else {
+    favReclamos.add(nuevoFavorito);
   }
+
+  await FavoritosStorage.saveLista(FavoritosStorage.keyReclamos, favReclamos);
+
+  setState(() {
+    esFavorito = !exists;
+  });
+}
+
 
   Future<void> obtenerFavoritos() async {
     final favoritos = await cargarDatosFacturas();

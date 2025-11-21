@@ -12,7 +12,7 @@ class DatosReclamo {
   final String telefono;
   final String nombreApellido;
   final String direccion;
-  final String correoElectronico;
+  final String correo;
   final String nis;
   final String adjuntoObligatorio;
   final String referencia;
@@ -34,7 +34,7 @@ class DatosReclamo {
     required this.telefono,
     required this.nombreApellido,
     required this.direccion,
-    required this.correoElectronico,
+    required this.correo,
     required this.nis,
     required this.adjuntoObligatorio,
     required this.referencia,
@@ -60,7 +60,7 @@ class DatosReclamo {
       telefono: json["telefono"],
       nombreApellido: json["nombreApellido"],
       direccion: json["direccion"],
-      correoElectronico: json["correoElectronico"],
+      correo: json["correo"],
       nis: json["nis"],
       adjuntoObligatorio: json["adjuntoObligatorio"],
       referencia: json["referencia"],
@@ -84,7 +84,7 @@ class DatosReclamo {
         "telefono": telefono,
         "nombreApellido": nombreApellido,
         "direccion": direccion,
-        "correoElectronico": correoElectronico,
+        "correo": correo,
         "nis": nis,
         "adjuntoObligatorio": adjuntoObligatorio,
         "referencia": referencia,

@@ -5,13 +5,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/model/favoritos/favoritos_model.dart';
 import 'package:form/model/favoritos/favoritos_tipo_model.dart';
+import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
+import 'package:form/presentation/components/common/custom_text.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/utils/utils.dart';
 import 'package:go_router/go_router.dart';
-
 
 //
 // ==================================================
@@ -19,13 +20,11 @@ import 'package:go_router/go_router.dart';
 // ==================================================
 //
 
-
 //
 // ==================================================
 // MODELO – Favorito
 // ==================================================
 //
-
 
 //
 // ==================================================
@@ -50,7 +49,7 @@ class FavoritosStorage {
 
       final map = <String, Favorito>{
         for (var item in decoded)
-          Favorito.fromJson(item).id: Favorito.fromJson(item)
+          Favorito.fromJson(item).id: Favorito.fromJson(item),
       };
 
       return map.values.toList();
@@ -61,12 +60,9 @@ class FavoritosStorage {
 
   /// Guardar lista, eliminando duplicados
   static Future<void> saveLista(String key, List<Favorito> lista) async {
-    final map = <String, Favorito>{
-      for (var f in lista) f.id: f
-    };
+    final map = <String, Favorito>{for (var f in lista) f.id: f};
 
-    final encoded =
-        json.encode(map.values.map((e) => e.toJson()).toList());
+    final encoded = json.encode(map.values.map((e) => e.toJson()).toList());
 
     await _storage.write(key: key, value: encoded);
   }
@@ -95,8 +91,12 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   }
 
   Future<void> obtenerFavoritos() async {
-    final favoritosFac = await FavoritosStorage.getLista(FavoritosStorage.keyFacturas);
-    final favoritosReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
+    final favoritosFac = await FavoritosStorage.getLista(
+      FavoritosStorage.keyFacturas,
+    );
+    final favoritosReclamos = await FavoritosStorage.getLista(
+      FavoritosStorage.keyReclamos,
+    );
 
     setState(() {
       favFacturas = favoritosFac;
@@ -158,49 +158,71 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   // NAVEGACIÓN SEGÚN TIPO
   // ==================================================
   //
-Future<void> irA(Favorito fav) async {
-  switch (fav.tipo) {
-    case FavoritoTipo.consultaFactura:
-      GoRouter.of(context).push('/consultaFacturas/${fav.id}');
-      break;
+  Future<void> irA(Favorito fav) async {
+    switch (fav.tipo) {
+      case FavoritoTipo.consultaFactura:
+        GoRouter.of(context).push('/consultaFacturas/${fav.id}');
+        break;
 
-    case FavoritoTipo.datosReclamo:
-      GoRouter.of(context).push('/reclamosFaltaEnergia/${fav.id}');
-      break;
+      case FavoritoTipo.datosReclamo:
+        GoRouter.of(context).push('/reclamosFaltaEnergia/${fav.datos!.telefono}');
+        break;
 
-    default:
-      CustomSnackbar.show(
-        context,
-        message: "Tipo de favorito no reconocido",
-        type: MessageType.error,
-      );
-      break;
+      default:
+        CustomSnackbar.show(
+          context,
+          message: "Tipo de favorito no reconocido",
+          type: MessageType.error,
+        );
+        break;
+    }
   }
-}
 
-Future<void> borrar(Favorito fav) async {
-  switch (fav.tipo) {
-    case FavoritoTipo.consultaFactura:
-      toggleFavoritoFactura(fav);
-      obtenerFavoritos();
-      break;
+  Future<void> borrar(Favorito fav) async {
+    switch (fav.tipo) {
+      case FavoritoTipo.consultaFactura:
+        toggleFavoritoFactura(fav);
+        obtenerFavoritos();
+        break;
 
-    case FavoritoTipo.datosReclamo:
-      toggleFavoritoReclamo(fav);
-      obtenerFavoritos();
-      break;
-    default:
-      CustomSnackbar.show(
-        context,
-        message: "Tipo de favorito no reconocido",
-        type: MessageType.error,
-      );
-      break;
+      case FavoritoTipo.datosReclamo:
+        toggleFavoritoReclamo(fav);
+        obtenerFavoritos();
+        break;
+      default:
+        CustomSnackbar.show(
+          context,
+          message: "Tipo de favorito no reconocido",
+          type: MessageType.error,
+        );
+        break;
+    }
   }
-}
 
+  Widget queCardMuestro(Favorito fav) {
+    switch (fav.tipo) {
+      case FavoritoTipo.consultaFactura:
+        return Column(children: [Text("NIS ${fav.title}. Consulta de Factura")]);
 
+      case FavoritoTipo.datosReclamo:
+        return Column(
+          children: [
+            CustomText(
+              "Nro.: ${fav.datos?.numeroReclamo} ${fav.datos?.nombreApellido} Tel.: ${fav.datos?.telefono} ${fav.datos?.barrioDescripcion} ${fav.datos?.ciudadDescripcion}-${fav.datos?.departamentoDescripcion} ${fav.datos?.referencia} ${fav.datos?.fechaReclamo}",
+              overflow: TextOverflow.clip,
+            ),
+          ],
+        );
 
+      default:
+        CustomSnackbar.show(
+          context,
+          message: "Tipo de favorito no reconocido",
+          type: MessageType.error,
+        );
+        return Text("data");
+    }
+  }
 
   //
   // ==================================================
@@ -231,19 +253,22 @@ Future<void> borrar(Favorito fav) async {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       child: ExpansionTile(
-        title: Text(title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         children: lista.isEmpty
             ? [
                 const Padding(
                   padding: EdgeInsets.all(15),
-                  child: Text("No hay favoritos."),
+                  child: Text("No se encontraron registros."),
                 ),
               ]
             : lista.map((item) {
                 return ListTile(
                   leading: _iconoSegunTipo(item.tipo),
-                  title: Text(item.title),
+                  title: queCardMuestro(item),
+
                   onTap: () => irA(item),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
@@ -252,7 +277,7 @@ Future<void> borrar(Favorito fav) async {
                       title: "¿Eliminar favorito?",
                       message: "Esta acción no se puede deshacer.",
                       type: DialogType.error,
-                      onConfirm: () => borrar(item) 
+                      onConfirm: () => borrar(item),
                     ),
                   ),
                 );
@@ -274,13 +299,9 @@ Future<void> borrar(Favorito fav) async {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            buildList("Sevicios por NIS", favFacturas, toggleFavoritoFactura),
             buildList(
-              "Consulta de Facturas (NIS)",
-              favFacturas,
-              toggleFavoritoFactura,
-            ),
-            buildList(
-              "Reclamos",
+              "Últimos Reclamos Realizados",
               favReclamos,
               toggleFavoritoReclamo,
             ),

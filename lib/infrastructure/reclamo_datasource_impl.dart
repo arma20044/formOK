@@ -1,14 +1,15 @@
-
-
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
+import 'package:form/model/favoritos/datos_reclamo_model.dart';
+import 'package:form/model/favoritos/favoritos_model.dart';
+import 'package:form/model/favoritos/favoritos_tipo_model.dart';
 import 'package:form/model/model.dart';
+import 'package:form/utils/utils.dart';
 
 import '../core/api/mi_ande_api.dart';
 import '../datasources/reclamo_datasource.dart';
-
 
 class ReclamoDatasourceImpl extends ReclamoDatasource {
   late final Dio dio;
@@ -20,30 +21,28 @@ class ReclamoDatasourceImpl extends ReclamoDatasource {
   @override
   Future<ReclamoResponse> getReclamo(
     String telefono,
-    num tipoReclamo,
+    TipoReclamo tipoReclamo,
     String nis,
     String nombreApellido,
-    num departamento,
-    num ciudad,
-    num barrio,
+    Departamento departamento,
+    Ciudad ciudad,
+    Barrio barrio,
     String direccion,
     String correo,
     String referencia,
     ArchivoAdjunto? archivo,
     String adjuntoObligatorio,
     double? latitud,
-    double? longitud
+    double? longitud,
   ) async {
     final formMap = {
-      
-
       'telefono': telefono,
-      'idTipoReclamoCliente': tipoReclamo,
+      'idTipoReclamoCliente': tipoReclamo.idTipoReclamoCliente,
       'nis': nis,
       'nombreApellido': nombreApellido,
-      'idDepartamento': departamento,
-      'idCiudad': ciudad,
-      'idBarrio': barrio,
+      'idDepartamento': departamento.idDepartamento,
+      'idCiudad': ciudad.idCiudad,
+      'idBarrio': barrio.idBarrio,
       'direccion': direccion,
       'correo': correo,
       'referencia': referencia,
@@ -61,7 +60,7 @@ class ReclamoDatasourceImpl extends ReclamoDatasource {
       formMap['reclamo_adjunto1Extra'] = jsonEncode(archivo.info);
     }
 
-    if(latitud != null && longitud != null){
+    if (latitud != null && longitud != null) {
       formMap['latitud'] = latitud;
       formMap['longitud'] = longitud;
     }
@@ -69,13 +68,41 @@ class ReclamoDatasourceImpl extends ReclamoDatasource {
     // Crear FormData
     final data = FormData.fromMap(formMap);
 
-    final response = await dio.post("${Environment.hostCtxGra}/v1/reclamo/nuevoViaApp",
+    final response = await dio.post(
+      "${Environment.hostCtxGra}/v1/reclamo/nuevoViaApp",
       data: data,
-     // options: Options(contentType: Headers.formUrlEncodedContentType),
+      // options: Options(contentType: Headers.formUrlEncodedContentType),
     );
 
     if (response.statusCode == 200) {
       final reclamoResponse = ReclamoResponse.fromJson(response.data);
+
+      //AGREGAR A FAVORITOS PARA ULTIMOS RECLAMOS REALIZADOS
+      final nuevoFavorito = Favorito(
+        id: reclamoResponse.reclamo!.numeroReclamo!,
+        title: reclamoResponse.reclamo!.numeroReclamo!,
+        tipo: FavoritoTipo.datosReclamo,
+        datos:DatosReclamo(
+          grupoReclamo: 'FE', 
+          numeroReclamo: reclamoResponse.reclamo!.numeroReclamo!, 
+          fechaReclamo: obtenerFechaActual(), 
+          idDepartamento: departamento.idDepartamento.toInt(), 
+          departamentoDescripcion: departamento.nombre!, 
+          idCiudad: ciudad.idCiudad.toInt(), 
+          ciudadDescripcion: ciudad.nombre!, 
+          idBarrio: barrio.idBarrio.toInt(), 
+          barrioDescripcion: barrio.nombre!, 
+          idTipoReclamoCliente: tipoReclamo.idTipoReclamoCliente.toInt(), 
+          telefono: telefono, 
+          nombreApellido: nombreApellido, 
+          direccion: direccion, 
+          correo: correo, 
+          nis: nis, 
+          adjuntoObligatorio: adjuntoObligatorio, 
+          referencia: referencia)
+      );
+
+      await toggleFavoritoReclamo(nuevoFavorito);
 
       return reclamoResponse;
     } else {
