@@ -10,18 +10,63 @@ import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
+import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:go_router/go_router.dart';
+
+//
+// ==================================================
+// ENUM – Tipo de favorito
+// ==================================================
+//
+enum FavoritoTipo {
+  consultaFactura,
+  datosReclamo,
+  vacio,
+}
+
+//
+// ==================================================
+// MODELO – Favorito
+// ==================================================
+//
 class Favorito {
   final String id;
   final String title;
+  final FavoritoTipo tipo;
 
-  Favorito({required this.id, required this.title});
+  Favorito({
+    required this.id,
+    required this.title,
+    this.tipo = FavoritoTipo.vacio,
+  });
 
-  Map<String, dynamic> toJson() => {"id": id, "title": title};
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "title": title,
+        "tipo": tipo.name,
+      };
 
-  factory Favorito.fromJson(Map<String, dynamic> json) =>
-      Favorito(id: json["id"], title: json["title"]);
+  factory Favorito.fromJson(Map<String, dynamic> json) => Favorito(
+        id: json["id"],
+        title: json["title"],
+        tipo: FavoritoTipo.values.firstWhere(
+          (e) => e.name == json["tipo"],
+          orElse: () => FavoritoTipo.vacio,
+        ),
+      );
 }
 
+//
+// ==================================================
+// STORAGE – Manejo de favoritos
+// ==================================================
+//
 class FavoritosStorage {
   static const String keyFacturas = "fav_facturas";
   static const String keyReclamos = "fav_reclamos";
@@ -30,47 +75,43 @@ class FavoritosStorage {
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
   );
 
-  /// Obtener lista segura
+  /// Obtener lista limpia (sin duplicados)
   static Future<List<Favorito>> getLista(String key) async {
     final data = await _storage.read(key: key);
-
     if (data == null) return [];
 
     try {
       final List decoded = json.decode(data);
-      // Convertir a Favorito y eliminar duplicados por id
-      final List<Favorito> lista = decoded
-          .map((e) => Favorito.fromJson(e))
-          .toList();
 
-      // Eliminar duplicados
-      final ids = <String>{};
-      final uniqueList = <Favorito>[];
-      for (var f in lista) {
-        if (!ids.contains(f.id)) {
-          ids.add(f.id);
-          uniqueList.add(f);
-        }
-      }
-      return uniqueList;
+      final map = <String, Favorito>{
+        for (var item in decoded)
+          Favorito.fromJson(item).id: Favorito.fromJson(item)
+      };
+
+      return map.values.toList();
     } catch (_) {
       return [];
     }
   }
 
-  /// Guardar lista segura
+  /// Guardar lista, eliminando duplicados
   static Future<void> saveLista(String key, List<Favorito> lista) async {
-    final encoded = json.encode(lista.map((e) => e.toJson()).toList());
+    final map = <String, Favorito>{
+      for (var f in lista) f.id: f
+    };
+
+    final encoded =
+        json.encode(map.values.map((e) => e.toJson()).toList());
 
     await _storage.write(key: key, value: encoded);
   }
-
-  /// Borrar una lista completa
-  static Future<void> clearLista(String key) async {
-    await _storage.delete(key: key);
-  }
 }
 
+//
+// ==================================================
+// PANTALLA – FavoritosScreen
+// ==================================================
+//
 class FavoritosScreen extends StatefulWidget {
   const FavoritosScreen({super.key});
 
@@ -85,71 +126,115 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   @override
   void initState() {
     super.initState();
-
     obtenerFavoritos();
   }
 
   Future<void> obtenerFavoritos() async {
-    final favoritosFac = await cargarDatos();
+    final favoritosFac = await FavoritosStorage.getLista(FavoritosStorage.keyFacturas);
+    final favoritosReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
+
     setState(() {
       favFacturas = favoritosFac;
+      favReclamos = favoritosReclamos;
     });
   }
 
-  Future<void> toggleFavoritoFactura(Favorito fav) async {
-    final index = favFacturas.indexWhere((e) => e.id == fav.id);
-    bool isFav;
+  //
+  // ==================================================
+  // AGREGAR / QUITAR FAVORITO – FACTURA
+  // ==================================================
+  //
+  /*Future<void> toggleFavoritoFactura(Favorito fav) async {
+    // Forzamos el tipo correcto
+    fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.consultaFactura);
 
-    if (index != -1) {
-      // Ya existe -> eliminar
-      favFacturas.removeAt(index);
-      isFav = false;
+    final exists = favFacturas.any((e) => e.id == fav.id);
+
+    if (exists) {
+      favFacturas.removeWhere((e) => e.id == fav.id);
     } else {
-      // Solo agregar si no existe
       favFacturas.add(fav);
-      isFav = true;
     }
 
-    // Guardar y eliminar duplicados antes de almacenar
-    final ids = <String>{};
-    final uniqueList = <Favorito>[];
-    for (var f in favFacturas) {
-      if (!ids.contains(f.id)) {
-        ids.add(f.id);
-        uniqueList.add(f);
-      }
-    }
-
-    favFacturas = uniqueList;
     await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
     setState(() {});
 
     CustomSnackbar.show(
       context,
-      message: isFav
-          ? "${fav.title} agregado a favoritos"
-          : "${fav.title} eliminado de favoritos",
-      type: isFav ? MessageType.success : MessageType.error,
+      message: exists
+          ? "${fav.title} eliminado de favoritos"
+          : "${fav.title} agregado a favoritos",
+      type: exists ? MessageType.error : MessageType.success,
     );
-  }
+  }*/
 
-  Future<void> toggleFavoritoReclamo(Favorito fav) async {
-    if (!favReclamos.any((e) => e.id == fav.id)) {
-      // Solo agregar si NO existe
-      favReclamos.add(fav);
-    } else {
-      // Si ya existe, lo eliminamos
+  //
+  // ==================================================
+  // AGREGAR / QUITAR FAVORITO – RECLAMO
+  // ==================================================
+  //
+  /*Future<void> toggleFavoritoReclamo(Favorito fav) async {
+    fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.datosReclamo);
+
+    final exists = favReclamos.any((e) => e.id == fav.id);
+
+    if (exists) {
       favReclamos.removeWhere((e) => e.id == fav.id);
+    } else {
+      favReclamos.add(fav);
     }
 
     await FavoritosStorage.saveLista(FavoritosStorage.keyReclamos, favReclamos);
     setState(() {});
+  }*/
+
+  //
+  // ==================================================
+  // NAVEGACIÓN SEGÚN TIPO
+  // ==================================================
+  //
+Future<void> irA(Favorito fav) async {
+  switch (fav.tipo) {
+    case FavoritoTipo.consultaFactura:
+      GoRouter.of(context).push('/consultaFacturas/${fav.id}');
+      break;
+
+    case FavoritoTipo.datosReclamo:
+      GoRouter.of(context).push('/reclamosFaltaEnergia/${fav.id}');
+      break;
+
+    default:
+      CustomSnackbar.show(
+        context,
+        message: "Tipo de favorito no reconocido",
+        type: MessageType.error,
+      );
+      break;
+  }
+}
+
+
+  //
+  // ==================================================
+  // ÍCONO SEGÚN TIPO
+  // ==================================================
+  //
+  Icon _iconoSegunTipo(FavoritoTipo tipo) {
+    switch (tipo) {
+      case FavoritoTipo.consultaFactura:
+        return const Icon(Icons.receipt_long, color: Colors.blue);
+      case FavoritoTipo.datosReclamo:
+        return const Icon(Icons.report_problem, color: Colors.orange);
+      default:
+        return const Icon(Icons.star_border);
+    }
   }
 
-  Future<void> irA(Favorito fav) async {
-    GoRouter.of(context).push('/consultaFacturas/${fav.title}');
-  }
-
+  //
+  // ==================================================
+  // LISTA REUTILIZABLE
+  // ==================================================
+  //
   Widget buildList(
     String title,
     List<Favorito> lista,
@@ -158,10 +243,8 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       child: ExpansionTile(
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
+        title: Text(title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         children: lista.isEmpty
             ? [
                 const Padding(
@@ -171,20 +254,18 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
               ]
             : lista.map((item) {
                 return ListTile(
+                  leading: _iconoSegunTipo(item.tipo),
                   title: Text(item.title),
-                  onTap: () => irA(item), // 👈 Navega con el NIS
+                  onTap: () => irA(item),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () => showConfirmDialog(
                       context: context,
-                      title: "¿Eliminar factura?",
+                      title: "¿Eliminar favorito?",
                       message: "Esta acción no se puede deshacer.",
                       type: DialogType.error,
-                      onConfirm: () {
-                        onTap(item);
-                      },
+                      onConfirm: () => onTap(item),
                     ),
-                    //onTap(item), // 👈 Esta función borra el favorito
                   ),
                 );
               }).toList(),
@@ -192,6 +273,11 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
     );
   }
 
+  //
+  // ==================================================
+  // UI PRINCIPAL
+  // ==================================================
+  //
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,7 +291,11 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
               favFacturas,
               toggleFavoritoFactura,
             ),
-            buildList("Reclamos", favReclamos, toggleFavoritoReclamo),
+            buildList(
+              "Reclamos",
+              favReclamos,
+              toggleFavoritoReclamo,
+            ),
           ],
         ),
       ),

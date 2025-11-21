@@ -3,6 +3,7 @@ import 'package:form/config/constantes.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
+import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:form/utils/utils.dart';
 
 import '../../core/api/mi_ande_api.dart';
@@ -17,8 +18,9 @@ class Tab1 extends StatefulWidget {
   //final GlobalKey<FormState> formKey;
 
   final String tipoReclamo; // FE, CO, AP
+  final String? telefono;
 
-  const Tab1({super.key, required this.tipoReclamo});
+  const Tab1({super.key, required this.tipoReclamo,  this.telefono});
 
   @override
   Tab1State createState() => Tab1State();
@@ -80,6 +82,18 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     _fetchDepartamentos();
     _fetchTipoReclamo();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+        final telefono = widget.telefono;
+
+        // Si viene desde favoritos y es válido
+        if (telefono != null && telefono.isNotEmpty) {
+          telefonoController.text = telefono;
+
+          // Hacer la consulta después del primer frame
+          recuperarUltimoReclamo(telefono);
+        }
+      });
+
     // Listener para detectar cambios de foco
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
@@ -125,7 +139,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
         return null;
       },
 
-      // más campos condicionales según tipoReclamo...
+      
     };
   }
 
@@ -219,7 +233,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
       context,
       message: "Obteniendo último reclamo...",
       type: MessageType.info,
-      duration: Durations.long4
+      duration: Durations.long4,
     );
     try {
       listaUltimosReclamos = await repoUltimosReclamos.getReclamoRecuperado(
@@ -252,7 +266,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             if (datos == null) return;
 
             setState(() {
-              telefonoController.text = formatTelefono(datos.telefono!) ?? '';
+              //  telefonoController.text = formatTelefono(datos.telefono!) ?? '';
               nombreApellidoController.text = datos.nombreApellido ?? '';
               nisController.text = datos.nis.toString() ?? '';
               correoController.text = datos.correo ?? '';
@@ -299,6 +313,42 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     }
   }
 
+  Future<void> obtenerFavoritos() async {
+    final favoritosFac = await cargarDatosFacturas();
+    setState(() {
+      favFacturas = favoritosFac;
+    });
+
+    if (telefonoController.text.isNotEmpty) {
+      verificarFavorito(telefonoController.text);
+    }
+
+    final favoritosReclamos = await cargarDatosFacturas();
+    setState(() {
+      favReclamos = favoritosReclamos;
+    });
+  }
+
+  bool esFavorito = false;
+  Favorito verificarFavorito(String nisBuscado) {
+    Favorito? encontrado = favFacturas.firstWhere(
+      (fav) => fav.title == nisBuscado,
+      orElse: () => Favorito(id: "nada", title: "nada"),
+    );
+
+    if (encontrado.title.contains("nada")) {
+      setState(() {
+        esFavorito = false;
+      });
+    } else {
+      setState(() {
+        esFavorito = true;
+      });
+    }
+
+    return encontrado;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -306,32 +356,56 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          //TELEFONO
-          TextFormField(
-            focusNode: _focusNode,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              //TELEFONO
+              Expanded(
+                child: TextFormField(
+                  focusNode: _focusNode,
 
-            onEditingComplete: () {
-              Text("fin edicion");
-            },
-            onChanged: (value) {
-              print("Hola $value");
-              // recuperarUltimoReclamo(value);
-            },
-            controller: telefonoController,
-            keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(
-              labelText: "Teléfono",
-              border: OutlineInputBorder(),
-            ),
-            validator: (val) {
-              if (selectedTipoReclamo?.nisObligatorio == 'S') {
-                if (val == null || val.isEmpty) return "Ingrese un teléfono";
-                if (!RegExp(r'^\d+$').hasMatch(val)) return "Solo números";
-                return null;
-              }
-              return null;
-            },
+                  onEditingComplete: () {
+                    Text("fin edicion");
+                  },
+                  onChanged: (value) {
+                    print("Hola $value");
+                    // recuperarUltimoReclamo(value);
+                  },
+                  controller: telefonoController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: "Teléfono",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (val) {
+                    if (selectedTipoReclamo?.nisObligatorio == 'S') {
+                      if (val == null || val.isEmpty)
+                        return "Ingrese un teléfono";
+                      if (!RegExp(r'^\d+$').hasMatch(val))
+                        return "Solo números";
+                      return null;
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  String telefono = telefonoController.text;
+                  toggleFavoritoReclamo(
+                    Favorito(id: telefono, title: telefono),
+                  );
+                  obtenerFavoritos();
+                },
+                icon: Icon(
+                  esFavorito ? Icons.star : Icons.star_border_sharp,
+                  color: esFavorito ? Colors.amber : Colors.green,
+                  size: 30,
+                ),
+              ),
+            ],
           ),
+
           const SizedBox(height: 20),
           DropdownCustom<TipoReclamo>(
             label: "Tipo Reclamo",

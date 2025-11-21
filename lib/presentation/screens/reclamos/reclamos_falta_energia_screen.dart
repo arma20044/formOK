@@ -12,10 +12,11 @@ import '../../components/components.dart';
 class ReclamosScreen extends StatefulWidget {
   const ReclamosScreen({
     super.key,
-    required this.tipoReclamo,
+    required this.tipoReclamo,  this.telefono,
     //required String tipo
   });
   final String tipoReclamo; // FE, CO, AP
+  final String? telefono;
 
   @override
   _ParentScreenState createState() => _ParentScreenState();
@@ -198,7 +199,7 @@ class _ParentScreenState extends State<ReclamosScreen>
               physics: NeverScrollableScrollPhysics(),
               controller: _tabController,
               children: [
-                Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo),
+                Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo,telefono: widget.telefono,),
                 Tab2(
                   onSaved: (newValue) => {_archivo = newValue},
 

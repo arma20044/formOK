@@ -76,6 +76,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/reclamosFaltaEnergia',
         builder: (context, state) => const ReclamosScreen(tipoReclamo: 'FE'),
+        routes: [
+          GoRoute(
+            path: ':telefono',
+            builder: (context, state) {
+              final nis = state.pathParameters['telefono'];
+              return ReclamosScreen(telefono: nis, tipoReclamo: 'FE',);
+            },
+          ),
+        ]
       ),
       GoRoute(
         path: '/splash',

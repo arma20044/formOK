@@ -281,43 +281,7 @@ String formatNumero(dynamic valor) {
 }
 
 List<Favorito> favFacturas = [];
-Future<void> toggleFavoritoFactura(Favorito fav,BuildContext context) async {
-    final index = favFacturas.indexWhere((e) => e.id == fav.id);
-    bool isFav;
 
-    if (index != -1) {
-      // Ya existe -> eliminar
-      favFacturas.removeAt(index);
-      isFav = false;
-    } else {
-      // Solo agregar si no existe
-      favFacturas.add(fav);
-      isFav = true;
-    }
-
-    // Guardar y eliminar duplicados antes de almacenar
-    final ids = <String>{};
-    final uniqueList = <Favorito>[];
-    for (var f in favFacturas) {
-      if (!ids.contains(f.id)) {
-        ids.add(f.id);
-        uniqueList.add(f);
-      }
-    }
-
-    favFacturas = uniqueList;
-    await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
-    
-
-    CustomSnackbar.show(
-      context,
-      message: isFav
-          ? "${fav.title} agregado a favoritos"
-          : "${fav.title} eliminado de favoritos",
-      type: isFav ? MessageType.success : MessageType.error,
-    );
-    
-  }
 
 num calcularCifra(String nis, String fechaVencimiento) {
   if (nis.length < 3) return 0;
@@ -333,10 +297,16 @@ num calcularCifra(String nis, String fechaVencimiento) {
 }
 
 
-  Future<List<Favorito>> cargarDatos() async {
+  Future<List<Favorito>> cargarDatosFacturas() async {
     favFacturas = await FavoritosStorage.getLista(FavoritosStorage.keyFacturas);
    // favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
     return favFacturas;
+  }
+
+    Future<List<Favorito>> cargarDatosReclamos() async {
+    favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
+   // favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
+    return favReclamos;
   }
 
 
@@ -369,3 +339,44 @@ num calcularCifra(String nis, String fechaVencimiento) {
   // Si no coincide ningún patrón, devolver tal cual
   return telefono;
 }
+
+  List<Favorito> favReclamos = [];
+   Future<void> toggleFavoritoReclamo(Favorito fav) async {
+    fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.datosReclamo);
+
+    final exists = favReclamos.any((e) => e.id == fav.id);
+
+    if (exists) {
+      favReclamos.removeWhere((e) => e.id == fav.id);
+    } else {
+      favReclamos.add(fav);
+    }
+
+    await FavoritosStorage.saveLista(FavoritosStorage.keyReclamos, favReclamos);
+    
+  }
+
+
+  Future<void> toggleFavoritoFactura(Favorito fav) async {
+    // Forzamos el tipo correcto
+    fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.consultaFactura);
+
+    final exists = favFacturas.any((e) => e.id == fav.id);
+
+    if (exists) {
+      favFacturas.removeWhere((e) => e.id == fav.id);
+    } else {
+      favFacturas.add(fav);
+    }
+
+    await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
+    
+
+   /* CustomSnackbar.show(
+      context,
+      message: exists
+          ? "${fav.title} eliminado de favoritos"
+          : "${fav.title} agregado a favoritos",
+      type: exists ? MessageType.error : MessageType.success,
+    );*/
+  }

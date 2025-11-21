@@ -51,7 +51,7 @@ class _ConsultaFacturasScreenState
   }
 
   Future<void> obtenerFavoritos() async {
-    final favoritosFac = await cargarDatos();
+    final favoritosFac = await cargarDatosFacturas();
     setState(() {
       favFacturas = favoritosFac;
     });
@@ -262,7 +262,7 @@ class _ConsultaFacturasScreenState
                             String nis = _nisController.text;
                             toggleFavoritoFactura(
                               Favorito(id: nis, title: nis),
-                              context,
+                              
                             );
                            obtenerFavoritos();
                           },
