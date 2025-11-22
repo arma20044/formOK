@@ -165,7 +165,9 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
         break;
 
       case FavoritoTipo.datosReclamo:
-        GoRouter.of(context).push('/reclamosFaltaEnergia/${fav.datos!.telefono}');
+        GoRouter.of(
+          context,
+        ).push('/reclamosFaltaEnergia/${fav.datos!.telefono}');
         break;
 
       default:
@@ -181,7 +183,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   Future<void> borrar(Favorito fav) async {
     switch (fav.tipo) {
       case FavoritoTipo.consultaFactura:
-        toggleFavoritoFactura(fav);
+        toggleFavoritoFactura(fav,context);
         obtenerFavoritos();
         break;
 
@@ -202,7 +204,9 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   Widget queCardMuestro(Favorito fav) {
     switch (fav.tipo) {
       case FavoritoTipo.consultaFactura:
-        return Column(children: [Text("NIS ${fav.title}. Consulta de Factura")]);
+        return Column(
+          children: [Text("NIS ${fav.title}. Consulta de Factura")],
+        );
 
       case FavoritoTipo.datosReclamo:
         return Column(
@@ -299,7 +303,11 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            buildList("Sevicios por NIS", favFacturas, toggleFavoritoFactura),
+            buildList(
+              "Sevicios por NIS",
+              favFacturas,
+              (fav) => toggleFavoritoFactura(fav,context),
+            ),
             buildList(
               "Últimos Reclamos Realizados",
               favReclamos,

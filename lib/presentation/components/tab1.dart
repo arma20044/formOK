@@ -308,7 +308,6 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
               "\n\nCargar reclamo con los datos obtenidos?",
           onConfirm: () async {
             if (datos == null) return;
-
             setState(() {
               nombreApellidoController.text = datos.nombreApellido ?? '';
               nisController.text = datos.nis.toString();

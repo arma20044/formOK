@@ -359,7 +359,7 @@ num calcularCifra(String nis, String fechaVencimiento) {
   }
 
 
-  Future<void> toggleFavoritoFactura(Favorito fav) async {
+  Future<void> toggleFavoritoFactura(Favorito fav, BuildContext context) async {
     // Forzamos el tipo correcto
     fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.consultaFactura);
 
@@ -374,11 +374,11 @@ num calcularCifra(String nis, String fechaVencimiento) {
     await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
     
 
-   /* CustomSnackbar.show(
+   CustomSnackbar.show(
       context,
       message: exists
-          ? "${fav.title} eliminado de favoritos"
-          : "${fav.title} agregado a favoritos",
+          ? "NIS: ${fav.title} eliminado de favoritos"
+          : "NIS: ${fav.title} agregado a favoritos",
       type: exists ? MessageType.error : MessageType.success,
-    );*/
+    );
   }

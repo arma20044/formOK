@@ -263,7 +263,7 @@ class _ConsultaFacturasScreenState
                             String nis = _nisController.text;
                             toggleFavoritoFactura(
                               Favorito(id: nis, title: nis),
-                              
+                              context
                             );
                            obtenerFavoritos();
                           },
