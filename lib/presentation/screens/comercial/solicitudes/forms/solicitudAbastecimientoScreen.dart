@@ -1,7 +1,4 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/model/model.dart';
@@ -11,13 +8,13 @@ import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/custom_map_modal.dart';
+import 'package:form/presentation/components/common/map_selector_inline.dart';
 import 'package:form/presentation/components/common/media_selector.list.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 
 class SolicitudAbastecimientoScreen extends StatefulWidget {
   const SolicitudAbastecimientoScreen({super.key});
@@ -27,86 +24,52 @@ class SolicitudAbastecimientoScreen extends StatefulWidget {
       _SolicitudAbastecimientoScreenState();
 }
 
-void _openMapModal(BuildContext context) async {
-  LatLng initialPosition = LatLng(-25.2637, -57.5759); // Ejemplo: Asunción
-  LatLng? selectedLocation = await showDialog<LatLng>(
-    context: context,
-    builder: (context) => CustomMapModal(initialPosition: initialPosition),
-  );
-
-  if (selectedLocation != null) {
-    print(
-      'Ubicación seleccionada: ${selectedLocation.latitude}, ${selectedLocation.longitude}',
-    );
-  }
-
-  if (selectedLocation != null) {
-    // Aquí ya tenés latitud y longitud
-    double lat = selectedLocation.latitude;
-    double lon = selectedLocation.longitude;
-    print('Latitud: $lat, Longitud: $lon');
-  }
-}
-
 class _SolicitudAbastecimientoScreenState
     extends State<SolicitudAbastecimientoScreen> {
-  late final ValueChanged<ArchivoAdjunto?> onChanged;
   final _formKey = GlobalKey<FormState>();
-  bool isLoading = false;
+  bool _isLoadingSolicitud = false;
 
+  // Controllers
   final nombreController = TextEditingController();
   final apellidoController = TextEditingController();
   final numeroDocumentoController = TextEditingController();
   final numeroCelularController = TextEditingController();
   final correoController = TextEditingController();
 
+  // Ubicación
   LatLng? ubicacion;
+  bool showMap = false;
 
-  final ImagePicker _picker = ImagePicker();
-  Uint8List? _videoThumbnail;
+  // Archivos adjuntos
+  List<ArchivoAdjunto> selectedFileSolicitudList = [];
+  List<ArchivoAdjunto> selectedFileFotocopiaAutenticadaList = [];
+  List<ArchivoAdjunto> selectedFileFotocopiaSimpleCedulaSolicitanteList = [];
+  List<ArchivoAdjunto> selectedFileCopiaSimpleCarnetElectricistaList = [];
+  List<ArchivoAdjunto> selectedFileOtrosDocumentosList = [];
+
+  // ------------------------- FUNCIONES -------------------------
 
   Future<Position?> determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return null;
 
-    // Verificar si el GPS está habilitado
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Podés mostrar un diálogo o notificación para que lo habilite
-      return null;
-    }
-
-    // Verificar permisos
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permiso denegado
-        return null;
-      }
+      if (permission == LocationPermission.denied) return null;
     }
+    if (permission == LocationPermission.deniedForever) return null;
 
-    if (permission == LocationPermission.deniedForever) {
-      // Permiso denegado permanentemente
-      return null;
-    }
-
-    // Obtener la ubicación actual
     return await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
   }
 
-  void _openMapModalWithPermission(BuildContext context) async {
+  void _openMapModalWithPermission() async {
     Position? position = await determinePosition();
-
-    LatLng initialPosition;
-    if (position != null) {
-      initialPosition = LatLng(position.latitude, position.longitude);
-    } else {
-      // Posición por defecto si el GPS no está disponible
-      initialPosition = LatLng(-25.2637, -57.5759); // Asunción
-    }
+    LatLng initialPosition = position != null
+        ? LatLng(position.latitude, position.longitude)
+        : const LatLng(-25.2637, -57.5759);
 
     LatLng? selectedLocation = await showDialog<LatLng>(
       context: context,
@@ -114,439 +77,28 @@ class _SolicitudAbastecimientoScreenState
     );
 
     if (selectedLocation != null) {
-      print(
-        'Latitud: ${selectedLocation.latitude}, Longitud: ${selectedLocation.longitude}',
-      );
       setState(() => ubicacion = selectedLocation);
     }
   }
 
-  ArchivoAdjunto? selectedFileSolicitud;
-  ArchivoAdjunto? selectedFileFotocopiaAutenticada;
-  ArchivoAdjunto? selectedFileFotocopiaSimpleCedulaSolicitante;
-  ArchivoAdjunto? selectedFileCopiaSimpleCarnetElectricista;
-  ArchivoAdjunto? selectedFileOtrosDocumentos;
-
-  List<ArchivoAdjunto>? selectedFileSolicitudList;
-  List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList;
-  List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList;
-  List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList;
-  List<ArchivoAdjunto>? selectedFileOtrosDocumentosList;
-
-  String fileCaption = 'asdas';
-
-  bool _isLoadingSolicitud = false;
-
   void limpiarTodo() {
-    // Limpia controladores ANTES del rebuild
     nombreController.clear();
     apellidoController.clear();
     numeroDocumentoController.clear();
     numeroCelularController.clear();
     correoController.clear();
 
-    // Limpia estado visual
     setState(() {
-      selectedFileSolicitudList = [];
-      selectedFileFotocopiaAutenticadaList = [];
-      selectedFileFotocopiaSimpleCedulaSolicitanteList = [];
-      selectedFileCopiaSimpleCarnetElectricistaList = [];
-      selectedFileOtrosDocumentosList = [];
-
       ubicacion = null;
+      selectedFileSolicitudList.clear();
+      selectedFileFotocopiaAutenticadaList.clear();
+      selectedFileFotocopiaSimpleCedulaSolicitanteList.clear();
+      selectedFileCopiaSimpleCarnetElectricistaList.clear();
+      selectedFileOtrosDocumentosList.clear();
       _formKey.currentState?.reset();
     });
 
-    FocusScope.of(context).unfocus(); // cierra el teclado
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Scaffold(
-      endDrawer: CustomDrawer(),
-      appBar: AppBar(title: Text("Solicitud de Abastecimiento de Energía")),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                CustomComment(
-                  text:
-                      "Solicitud para nueva conexión en Baja Tensión (hasta 40 kW). Solicitud de abastecimiento de Energía Eléctrica, División de Instalación, Cambio de Sitio de Medidor, Reposición / Reconexión, Aumento de Carga, Reducción de Carga, Cambio de Nombre, Cambio de categoría Tarifaria.",
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  key: ValueKey(nombreController.text),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  controller: nombreController,
-                  decoration: InputDecoration(
-                    labelText: 'Nombre(s) del Titular',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Ingrese Nombre(s) del Titular';
-                    }
-                    return null;
-                  },
-                  //enabled: !isLoading,
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  controller: apellidoController,
-                  decoration: InputDecoration(
-                    labelText: 'Apellido(s) del Titular',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Ingrese Apellido(s) del Titular';
-                    }
-                    return null;
-                  },
-                  //enabled: !isLoading,
-                ),
-
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: numeroDocumentoController,
-                  decoration: InputDecoration(
-                    labelText: 'Número de Documento del Titular',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Ingrese Número de Documento del Titular';
-                    }
-                    return null;
-                  },
-                  //enabled: !isLoading,
-                ),
-                const SizedBox(height: 24),
-
-                CustomPhoneField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  controller: numeroCelularController,
-                  label: 'Número de Celular del Titular',
-                  onChanged: (value) {
-                    print("Número completo: $value");
-                  },
-                  required: true,
-                ),
-                const SizedBox(height: 24),
-                /*TextFormField(
-                  controller: numeroCelularController,
-                  decoration: InputDecoration(
-                    labelText: 'Número de Celular del Titular',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Ingrese Número de Celular del Titular';
-                    }
-                    return null;
-                  },
-                  //enabled: !isLoading,
-                ),
-                const SizedBox(height: 24),*/
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  controller: correoController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(labelText: 'Correo del Titular'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Ingrese Correo del Titular';
-                    }
-                    if (!emailRegex.hasMatch(value)) {
-                      return "Ingrese formato de correo válido.";
-                    }
-                    return null;
-                  },
-                  //enabled: !isLoading,
-                ),
-                const SizedBox(height: 24),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                      ), // 👈 mejora el alto
-                    ),
-                    onPressed: () {
-                      _openMapModalWithPermission(context);
-                    },
-                    child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center, // 👈 centra ícono + texto
-                      mainAxisSize: MainAxisSize
-                          .min, // 👈 evita que Row se expanda innecesariamente
-                      children: const [
-                        Icon(Icons.location_on, size: 25),
-                        SizedBox(width: 8),
-                        CustomText("Agregar punto en Mapa"),
-                      ],
-                    ),
-                  ),
-                ),
-
-                Text(ubicacion?.toString() ?? ""),
-
-                const SizedBox(height: 8),
-
-                CustomCard(
-                  child: Column(
-                    children: [
-                      CustomText(
-                        "Formulario de Solicitud de Abastecimiento",
-                        fontWeight: FontWeight.bold,
-                      ),
-                      CustomText(
-                        '1) Descargar formulario y completar.',
-                        fontWeight: FontWeight.bold,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          lanzarUrl('URL_SOLICITUD_ABASTECIMIENTO');
-                        },
-                        child: Text(
-                          "Descargar Formulario de Solicitud de Abastecimiento.",
-                        ),
-                      ),
-                      CustomText(
-                        'Solicitud de abastecimiento de Energía Eléctrica, División de Instalación, Cambio de Sitio de Medidor, Reposición / Reconexión, Aumento de Carga, Reducción de Carga, Cambio de Nombre, Cambio de categoría Tarifaria.',
-                        overflow: TextOverflow.clip,
-                      ),
-                      CustomText('2) Adjuntar como documento de respaldo.'),
-                    ],
-                  ),
-                ),
-                CustomCard(
-                  child: Column(
-                    children: [
-                      CustomText(
-                        'PASO 2: Adjuntar Documentos requeridos para poder tratar la solicitud, leer las condiciones a continuación:',
-                        overflow: TextOverflow.clip,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      CustomText(
-                        '1) Se puede adjuntar documentos en formato PDF o imágenes JPG, JPEG, PNG.',
-                        overflow: TextOverflow.clip,
-                      ),
-                      CustomText(
-                        '2) El tamaño máximo de cada archivo es de 10 MB.',
-                        overflow: TextOverflow.clip,
-                      ),
-                      CustomText(
-                        '3) Los documentos deben estar legibles.',
-                        overflow: TextOverflow.clip,
-                      ),
-                      CustomText(
-                        '4) Mientras el tamaño de archivo sea más grande, la transacción tardará más y podría cortarse por condiciones de internet fluctuantes.',
-                        overflow: TextOverflow.clip,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                CustomCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.clip,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 8),
-
-                      MediaSelectorList(
-                        key: ValueKey(selectedFileSolicitudList),
-                        maxAdjuntos: 2,
-                        ayuda:
-                            "Seleccionar archivo desde la Galería o la Cámara",
-                        type: MediaType.foto,
-                        files: selectedFileSolicitudList ?? [],
-                        onChanged: (archivo) {
-                          setState(() {
-                            selectedFileSolicitudList = archivo;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                CustomCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        "b) Fotocopia Autenticada por Escribanía del título de Propiedad o equivalente",
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.clip,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 8),
-                      MediaSelectorList(
-                        maxAdjuntos: 2,
-                        files: selectedFileFotocopiaAutenticadaList ?? [],
-                        ayuda:
-                            "(Contrato Privado de Compra /Venta con certificación de firma, Sentencia Declaratoria de adjudicación del inmueble) o Constancia de la Inmobiliaria (original) o Constancia Municipal (original).",
-                        type: MediaType.foto,
-
-                        onChanged: (archivo) {
-                          setState(() {
-                            selectedFileFotocopiaAutenticadaList = archivo;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                CustomCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        "c) Copia simple de Cédula Identidad del Solicitante",
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.clip,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 8),
-                      MediaSelectorList(
-                        ayuda:
-                            "Seleccionar archivo desde la Galería o la Cámara.",
-                        type: MediaType.foto,
-                        files:
-                            selectedFileFotocopiaSimpleCedulaSolicitanteList ??
-                            [],
-                        onChanged: (archivo) {
-                          setState(() {
-                            selectedFileFotocopiaSimpleCedulaSolicitanteList =
-                                archivo;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                CustomCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        "d) Copia simple de Carnet del Electricista Matriculado en ANDE",
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.clip,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 8),
-                      MediaSelectorList(
-                        ayuda:
-                            "Seleccionar archivo desde la Galería o la Cámara.",
-                        type: MediaType.foto,
-                        files:
-                            selectedFileCopiaSimpleCarnetElectricistaList ?? [],
-                        onChanged: (archivo) {
-                          setState(() {
-                            selectedFileCopiaSimpleCarnetElectricistaList =
-                                archivo;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                CustomCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        "e) Otros documentose",
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.clip,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 8),
-                      MediaSelectorList(
-                        ayuda:
-                            "Seleccionar archivo desde la Galería o la Cámara.",
-                        type: MediaType.foto,
-                        files: selectedFileOtrosDocumentosList ?? [],
-                        onChanged: (archivo) {
-                          setState(() {
-                            selectedFileOtrosDocumentosList = archivo;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-                CustomCard(
-                  child: Column(
-                    children: [
-                      CustomText("ATENCIÓN", fontWeight: FontWeight.bold),
-                      CustomText(
-                        'Los documentos remitidos via web deberán ser entregados al técnico al momento de realizarse la conexión.',
-                        overflow: TextOverflow.clip,
-                      ),
-                    ],
-                  ),
-                ),
-
-                /*                 SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : () => _enviarFormulario(),
-                    child: Text("Enviar Solicitud"),
-                  ),
-                ), */
-                const SizedBox(height: 8),
-                CustomCard(
-                  child: Column(
-                    children: [
-                      CustomText(
-                        '- Para conexiones nuevas en baja tensión adjuntar documentos indicados en los ítems a, b, c, d.- Para división de instalación adjuntar documentos indicados en los ítems a, c, d.- Para actualización de nombre adjuntar documentos indicados en los ítems a, b, c.- Para aumento o reducción de carga adjuntar documentos indicados en los ítems a, c, d.- Para cambio de sitio de medidor adjuntar documentos indicados en los ítems a, c, d.- Para reposición de medidor adjuntar documentos indicados en los ítems a, c, d.',
-                        overflow: TextOverflow.clip,
-                      ),
-                    ],
-                  ),
-                ),
-                //const SizedBox(height: 24),
-              ],
-            ),
-          ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          onPressed: _isLoadingSolicitud ? null : _enviarFormulario,
-          child: _isLoadingSolicitud
-              ? const SizedBox(child: CircularProgressIndicator())
-              : Text("Enviar Solicitud"),
-        ),
-      ),
-    );
+    FocusScope.of(context).unfocus();
   }
 
   void _enviarFormulario() async {
@@ -557,10 +109,10 @@ class _SolicitudAbastecimientoScreenState
       return;
     }
 
-    if (selectedFileSolicitudList == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Debe adjuntar archivo.')));
+    if (selectedFileSolicitudList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debe adjuntar archivo en el punto a).')),
+      );
       return;
     }
 
@@ -571,68 +123,362 @@ class _SolicitudAbastecimientoScreenState
       return;
     }
 
-    SolicitudAbastecimientoResponse result =
-        await _fecthSolicitudAbastecimiento();
-    if (!mounted) return;
-    if (!result.mensaje!.contains("Se ha creado exitosamente")) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            result.errorValList == null
-                ? result.errorValList![0]
-                : result.mensaje,
-          ),
-        ),
-      );
-      return;
-    }
-
-    //limpiarTodo();
-
-    showCustomDialog(
-      context: context,
-      message: result.mensaje!,
-      showCopyButton: false,
-      title: "Éxito.",
-      type: DialogType.success,
-    ).then((_) {
-      Navigator.of(context).pop();
-    });
-  }
-
-  Future<SolicitudAbastecimientoResponse>
-  _fecthSolicitudAbastecimiento() async {
     try {
-      final repoSolicitudAbastecimiento = SolicitudAbastecimientoRepositoryImpl(
+      setState(() => _isLoadingSolicitud = true);
+
+      final repo = SolicitudAbastecimientoRepositoryImpl(
         SolicitudAbastecimientoDatasourceImp(MiAndeApi()),
       );
 
-      setState(() {
-        _isLoadingSolicitud = true;
+      final result = await repo.getSolicitudAbastecimiento(
+        nombreController.text,
+        apellidoController.text,
+        numeroDocumentoController.text,
+        numeroCelularController.text,
+        correoController.text,
+        '1',
+        selectedFileSolicitudList,
+        selectedFileFotocopiaAutenticadaList,
+        selectedFileFotocopiaSimpleCedulaSolicitanteList,
+        selectedFileCopiaSimpleCarnetElectricistaList,
+        selectedFileOtrosDocumentosList,
+      );
+
+      if (!mounted) return;
+
+      if (result.mensaje == null ||
+          !result.mensaje!.contains("Se ha creado exitosamente")) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result.errorValList != null && result.errorValList!.isNotEmpty
+                  ? result.errorValList!.first
+                  : (result.mensaje ?? "Ocurrió un error"),
+            ),
+          ),
+        );
+        return;
+      }
+
+      showCustomDialog(
+        context: context,
+        message: result.mensaje!,
+        showCopyButton: false,
+        title: "Éxito.",
+        type: DialogType.success,
+      ).then((_) {
+        Navigator.of(context).pop();
       });
-
-      final solicitudAbastecimientoResponse = await repoSolicitudAbastecimiento
-          .getSolicitudAbastecimiento(
-            nombreController.text,
-            apellidoController.text,
-            numeroDocumentoController.text,
-            numeroCelularController.text,
-            correoController.text,
-            '1',
-            selectedFileSolicitudList,
-            selectedFileFotocopiaAutenticadaList,
-            selectedFileFotocopiaSimpleCedulaSolicitanteList,
-            selectedFileCopiaSimpleCarnetElectricistaList,
-            selectedFileOtrosDocumentosList,
-          );
-
-      return solicitudAbastecimientoResponse;
     } catch (e) {
-      throw Exception();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error al enviar la solicitud")),
+      );
     } finally {
-      setState(() {
-        _isLoadingSolicitud = false;
-      });
+      setState(() => _isLoadingSolicitud = false);
     }
+  }
+
+  void _mostrarMapa() {
+    setState(() {
+      showMap = true;
+    });
+  }
+  // ------------------------- BUILD -------------------------
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      endDrawer: const CustomDrawer(),
+      appBar: AppBar(
+        title: const Text("Solicitud de Abastecimiento de Energía"),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+          onPressed: _isLoadingSolicitud ? null : _enviarFormulario,
+          child: _isLoadingSolicitud
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text("Enviar Solicitud"),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // ------------------------- INTRO -------------------------
+                const CustomComment(
+                  text:
+                      "Solicitud para nueva conexión en Baja Tensión (hasta 40 kW). Solicitud de abastecimiento de Energía Eléctrica, División de Instalación, Cambio de Sitio de Medidor, Reposición / Reconexión, Aumento de Carga, Reducción de Carga, Cambio de Nombre, Cambio de categoría Tarifaria.",
+                ),
+                const SizedBox(height: 24),
+
+                // ------------------------- CAMPOS -------------------------
+                TextFormField(
+                  controller: nombreController,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre(s) del Titular',
+                  ),
+                  validator: (v) =>
+                      (v == null || v.isEmpty) ? 'Ingrese Nombre(s)' : null,
+                ),
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: apellidoController,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  decoration: const InputDecoration(
+                    labelText: 'Apellido(s) del Titular',
+                  ),
+                  validator: (v) =>
+                      (v == null || v.isEmpty) ? 'Ingrese Apellido(s)' : null,
+                ),
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: numeroDocumentoController,
+                  decoration: const InputDecoration(
+                    labelText: 'Número de Documento del Titular',
+                  ),
+                  validator: (v) => (v == null || v.isEmpty)
+                      ? 'Ingrese Número de Documento'
+                      : null,
+                ),
+                const SizedBox(height: 24),
+                CustomPhoneField(
+                  controller: numeroCelularController,
+                  label: 'Número de Celular del Titular',
+                  onChanged: (v) {},
+                  required: true,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                ),
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: correoController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Correo del Titular',
+                  ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Ingrese Correo';
+                    if (!emailRegex.hasMatch(v))
+                      return 'Ingrese un correo válido';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                // ------------------------- UBICACIÓN -------------------------
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.location_on),
+                    label: const Text("Agregar punto en Mapa"),
+                    onPressed: _mostrarMapa,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+                Visibility(
+                  visible: showMap,
+                  child: Column(
+                    children: [
+                      MapSelectorInline(
+                        initialLocation: ubicacion,
+                        onLocationSelected: (loc) {
+                          setState(() => ubicacion = loc);
+                        },
+                      ),
+                       const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+
+                // ------------------------- FORMULARIO DESCARGA -------------------------
+                CustomCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const CustomText(
+                        "Formulario de Solicitud de Abastecimiento",
+                        fontWeight: FontWeight.bold,
+                      ),
+                      const CustomText(
+                        '1) Descargar formulario y completar.',
+                        fontWeight: FontWeight.bold,
+                      ),
+                      TextButton(
+                        onPressed: () =>
+                            lanzarUrl('URL_SOLICITUD_ABASTECIMIENTO'),
+                        child: const Text(
+                          "Descargar Formulario de Solicitud de Abastecimiento.",
+                        ),
+                      ),
+                      const CustomText(
+                        'Solicitud de abastecimiento de Energía Eléctrica, División de Instalación, Cambio de Sitio de Medidor, Reposición / Reconexión, Aumento de Carga, Reducción de Carga, Cambio de Nombre, Cambio de categoría Tarifaria.',
+                        overflow: TextOverflow.clip,
+                      ),
+                      const CustomText(
+                        '2) Adjuntar como documento de respaldo.',
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // ------------------------- PASO 2 -------------------------
+                CustomCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      CustomText(
+                        'PASO 2: Adjuntar Documentos requeridos para poder tratar la solicitud, leer las condiciones a continuación:',
+                        overflow: TextOverflow.clip,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      CustomText(
+                        '1) Se puede adjuntar documentos en formato PDF o imágenes JPG, JPEG, PNG.',
+                      ),
+                      CustomText(
+                        '2) El tamaño máximo de cada archivo es de 10 MB.',
+                      ),
+                      CustomText('3) Los documentos deben estar legibles.'),
+                      CustomText(
+                        '4) Mientras el tamaño de archivo sea más grande, la transacción tardará más y podría cortarse por condiciones de internet fluctuantes.',
+                        overflow: TextOverflow.clip,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // ------------------------- ADJUNTOS a) a e) -------------------------
+                _buildMediaCard(
+                  title:
+                      "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
+                  files: selectedFileSolicitudList,
+                  onChanged: (lista) =>
+                      setState(() => selectedFileSolicitudList = lista),
+                  ayuda: "Seleccionar archivo desde la Galería o la Cámara",
+                  theme: theme,
+                ),
+                const SizedBox(height: 24),
+                _buildMediaCard(
+                  title:
+                      "b) Fotocopia Autenticada por Escribanía del título de Propiedad o equivalente",
+                  files: selectedFileFotocopiaAutenticadaList,
+                  onChanged: (lista) => setState(
+                    () => selectedFileFotocopiaAutenticadaList = lista,
+                  ),
+                  ayuda:
+                      "(Contrato Privado de Compra /Venta con certificación de firma, Sentencia Declaratoria de adjudicación del inmueble) o Constancia de la Inmobiliaria (original) o Constancia Municipal (original).",
+                  theme: theme,
+                ),
+                const SizedBox(height: 24),
+                _buildMediaCard(
+                  title: "c) Copia simple de Cédula Identidad del Solicitante",
+                  files: selectedFileFotocopiaSimpleCedulaSolicitanteList,
+                  onChanged: (lista) => setState(
+                    () => selectedFileFotocopiaSimpleCedulaSolicitanteList =
+                        lista,
+                  ),
+                  ayuda: "Seleccionar archivo desde la Galería o la Cámara.",
+                  theme: theme,
+                ),
+                const SizedBox(height: 24),
+                _buildMediaCard(
+                  title:
+                      "d) Copia simple de Carnet del Electricista Matriculado en ANDE",
+                  files: selectedFileCopiaSimpleCarnetElectricistaList,
+                  onChanged: (lista) => setState(
+                    () => selectedFileCopiaSimpleCarnetElectricistaList = lista,
+                  ),
+                  ayuda: "Seleccionar archivo desde la Galería o la Cámara.",
+                  theme: theme,
+                ),
+                const SizedBox(height: 24),
+                _buildMediaCard(
+                  title: "e) Otros documentos",
+                  files: selectedFileOtrosDocumentosList,
+                  onChanged: (lista) =>
+                      setState(() => selectedFileOtrosDocumentosList = lista),
+                  ayuda: "Seleccionar archivo desde la Galería o la Cámara.",
+                  theme: theme,
+                ),
+                const SizedBox(height: 24),
+
+                // ------------------------- ATENCIÓN -------------------------
+                CustomCard(
+                  child: Column(
+                    children: const [
+                      CustomText("ATENCIÓN", fontWeight: FontWeight.bold),
+                      CustomText(
+                        'Los documentos remitidos via web deberán ser entregados al técnico al momento de realizarse la conexión.',
+                        overflow: TextOverflow.clip,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // ------------------------- INSTRUCCIONES FINALES -------------------------
+                CustomCard(
+                  child: Column(
+                    children: const [
+                      CustomText(
+                        '- Para conexiones nuevas en baja tensión adjuntar documentos indicados en los ítems a, b, c, d.- Para división de instalación adjuntar documentos indicados en los ítems a, c, d.- Para actualización de nombre adjuntar documentos indicados en los ítems a, b, c.- Para aumento o reducción de carga adjuntar documentos indicados en los ítems a, c, d.- Para cambio de sitio de medidor adjuntar documentos indicados en los ítems a, c, d.- Para reposición de medidor adjuntar documentos indicados en los ítems a, c, d.',
+                        overflow: TextOverflow.clip,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // ------------------------- BOTÓN -------------------------
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMediaCard({
+    required String title,
+    required List<ArchivoAdjunto> files,
+    required ValueChanged<List<ArchivoAdjunto>> onChanged,
+    required String ayuda,
+    required ThemeData theme,
+  }) {
+    return CustomCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CustomText(
+            title,
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.primary,
+            overflow: TextOverflow.clip,
+          ),
+          const SizedBox(height: 8),
+          MediaSelectorList(
+            maxAdjuntos: 2,
+            ayuda: ayuda,
+            type: MediaType.foto,
+            files: files,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
   }
 }

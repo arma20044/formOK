@@ -5,7 +5,6 @@ import 'package:form/presentation/components/common/custom_text.dart';
 import 'package:form/presentation/components/widgets/media/MediaPickerButton.dart';
 import 'package:form/presentation/components/widgets/media/MediaPreview.dart';
 import 'package:form/utils/utils.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:mime/mime.dart';
