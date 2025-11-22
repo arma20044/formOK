@@ -1,11 +1,15 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/infrastructure/comercial/solicitudes/calculo_consumo_datasource_imp.dart';
 import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/model/consulta_facturas.dart';
 import 'package:form/model/mi_cuenta/mi_cuenta_situacion_actual_model.dart';
+import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
@@ -13,6 +17,7 @@ import 'package:form/presentation/components/common/custom_bottom_sheet_image.da
 import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/repositories/repositories.dart';
+import 'package:form/utils/utils.dart';
 
 class SolicitudYoFacturoMiLuz extends ConsumerStatefulWidget {
   const SolicitudYoFacturoMiLuz({super.key});
@@ -25,6 +30,7 @@ class SolicitudYoFacturoMiLuz extends ConsumerStatefulWidget {
 class _SolicitudYoFacturoMiLuzState
     extends ConsumerState<SolicitudYoFacturoMiLuz> {
   final _formKey = GlobalKey<FormState>();
+  final _formKeyCalculoConsumo = GlobalKey<FormState>();
 
   final TextEditingController _nisController = TextEditingController();
   final TextEditingController _lecturaActualController =
@@ -33,6 +39,7 @@ class _SolicitudYoFacturoMiLuzState
 
   SituacionActualResultado?
   situacionActualResultado; // <-- aquí guardamos los resultados
+  ResultadoCalculoConsumo? calculoConsumoResultado;
   DatosCliente? datosCliente;
 
   Future<void> _consultar() async {
@@ -112,6 +119,61 @@ class _SolicitudYoFacturoMiLuzState
     }
   }
 
+  Future<void> _calcularConsumo() async {
+    if (!_formKeyCalculoConsumo.currentState!.validate()) {
+      return;
+    }
+
+    try {
+      final repoConsultaCalculoConsumo = CalculoConsumoRepositoryImpl(
+        CalculoConsumoDatasourceImp(MiAndeApi()),
+      );
+
+      final consultaCalculoConsumoResponse = await repoConsultaCalculoConsumo
+          .getCalculoConsumo(
+            _nisController.text,
+            _lecturaActualController.text,
+          );
+
+      if (consultaCalculoConsumoResponse.error == true) {
+        /*ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Favor intente nuevamente la consulta"),
+          ),
+        );*/
+        CustomSnackbar.show(
+          context,
+          message: "Ocurrió un error, Favor intente nuevamente la consulta",
+          type: MessageType.error,
+        );
+
+        setState(() {
+          //  facturas = [];
+          isLoading = false;
+        });
+        return;
+      }
+
+      setState(() {
+        calculoConsumoResultado = consultaCalculoConsumoResponse.resultado;
+        //datosCliente = consultaFacturasResponse.resultado?.datosCliente;
+        // print(datosCliente);
+        isLoading = false;
+      });
+
+      /*ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Consultando NIS: $nis')),
+      );*/
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
+
   Widget mostrarResultadoConsulta() {
     return situacionActualResultado != null
         ? Column(
@@ -163,19 +225,30 @@ class _SolicitudYoFacturoMiLuzState
               ),
               const SizedBox(height: 10),
 
-              TextFormField(
-                controller: _lecturaActualController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Lectura Actual del Medidor',
-                  border: OutlineInputBorder(),
+              Form(
+                key: _formKeyCalculoConsumo,
+                child: TextFormField(
+                  controller: _lecturaActualController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Lectura Actual del Medidor',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa Lectura Actual del Medidor';
+                    }
+
+                    return null;
+                  },
                 ),
               ),
+
               const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : _consultar,
+                  onPressed: isLoading ? null : _calcularConsumo,
                   child: isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text('Presionar para Calcular Consumo'),
@@ -187,7 +260,221 @@ class _SolicitudYoFacturoMiLuzState
   }
 
   Widget mostrarResultadoCalularConsumo() {
-    return Text("resultado Calcular Consumo");
+    return calculoConsumoResultado != null
+        ? Column(
+            children: [
+              CustomCard(
+                child: CustomText(
+                  "El importe calculado no incluye IVA, Alumbrado público ni otros cargos. Se facturará obligatoriamente un mínimo de kWh mensuales, según la carga contratada",
+                  overflow: TextOverflow.clip,
+                ),
+              ),
+              _resultadoBox(),
+              CustomCard(
+                title: "Atención",
+                child: CustomText(
+                  "La lectura ingresada es de exclusiva responsabilidad del cliente. Una vez confirmada la lectura, ésta ya no puede ser modificada por este medio.",
+                  overflow: TextOverflow.clip,
+                ),
+              ),
+            ],
+          )
+        : Text("");
+
+    Text("${calculoConsumoResultado!.cantidadDias}");
+  }
+
+  Widget _resultadoBox() {
+    final theme = Theme.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            // color: theme.colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(8),
+            border: BoxBorder.all(color: isDark ? Colors.green : Colors.black),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Mostramos los datos
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[600] : Colors.grey[300],
+                ),
+                width: double.infinity,
+                child: CustomText("Cálculo del Consumo en kWh"),
+              ),
+
+              Row(
+                children: [
+                  SizedBox(
+                    width: 80,
+                    child: CustomText(
+                      formatNumero(_lecturaActualController.text),
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Lectura Actual.',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 80,
+                    child: CustomText(
+                      formatNumero(
+                        situacionActualResultado!
+                            .calculoConsumo!
+                            .leturaAnterior,
+                      ),
+                      textAlign: TextAlign.right,
+                      underline: true,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Lectura anterior.',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 80,
+                    child: CustomText(
+                      formatNumero(
+                        int.parse(_lecturaActualController.text) -
+                            situacionActualResultado!
+                                .calculoConsumo!
+                                .leturaAnterior!
+                                .toInt(),
+                      ),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        // color: Colors.black,
+                      ), // Estilo por defecto para todo el texto
+                      children: <TextSpan>[
+                        // TextSpan(text: 'Este es texto normal, '),
+                        TextSpan(
+                          text: 'Consumo kWh',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: '(Lectura Actual menos \n Lectura Anterior)',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[600] : Colors.grey[300],
+                ),
+                width: double.infinity,
+                child: CustomText("Cálculo del Consumo en kWh"),
+              ),
+
+              Row(
+                children: [
+                  SizedBox(
+                    width: 80,
+                    child: CustomText(
+                      formatNumero(calculoConsumoResultado?.consumo.toString()),
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Consumo kWh.',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 80,
+                    child: CustomText(
+                      formatNumero(calculoConsumoResultado!.tarifa.toString()),
+                      textAlign: TextAlign.right,
+                       underline: true,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Tarifa Gs.',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+
+              Row(
+                children: [
+                  SizedBox(
+                    width: 80,
+                    child: CustomText(
+                      formatNumero(
+                        (calculoConsumoResultado?.consumo?.toInt() ?? 0) *
+                            (calculoConsumoResultado?.tarifa?.toInt() ?? 0),
+                      ),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        //color: Colors.black,
+                      ), // Estilo por defecto para todo el texto
+                      children: <TextSpan>[
+                        // TextSpan(text: 'Este es texto normal, '),
+                        TextSpan(
+                          text: 'Importe Gs.',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: '\n (Consumo multiplicado por Tarifa)',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
   }
 
   @override
@@ -214,6 +501,18 @@ class _SolicitudYoFacturoMiLuzState
                     labelText: 'NIS',
                     border: OutlineInputBorder(),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa un NIS';
+                    }
+                    if (!RegExp(r'^\d+$').hasMatch(value)) {
+                      return 'Solo números permitidos';
+                    }
+                    if (value.length != 7) {
+                      return 'NIS debe ser de 7 dígitos.';
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 10),
@@ -228,6 +527,7 @@ class _SolicitudYoFacturoMiLuzState
                 ),
 
                 mostrarResultadoConsulta(),
+                mostrarResultadoCalularConsumo(),
               ],
             ),
           ),

@@ -1,11 +1,11 @@
-class CalcularConsumoResponse {
+class CalculoConsumoResponse {
   final ResultadoCalculoConsumo? resultado;
   final List<dynamic>? mensajeList;
   final String? mensaje;
   final bool? error;
   final List<dynamic>? errorValList;
 
-  CalcularConsumoResponse({
+  CalculoConsumoResponse({
     this.resultado,
     this.mensajeList,
     this.mensaje,
@@ -13,9 +13,9 @@ class CalcularConsumoResponse {
     this.errorValList,
   });
 
-  factory CalcularConsumoResponse.fromJson(Map<String, dynamic>? json) {
+  factory CalculoConsumoResponse.fromJson(Map<String, dynamic>? json) {
     json ??= {};
-    return CalcularConsumoResponse(
+    return CalculoConsumoResponse(
       resultado: json['resultado'] != null ? ResultadoCalculoConsumo.fromJson(json['resultado']) : null,
        mensajeList: json['mensajeList'] != null ? List<dynamic>.from(json['mensajeList'].map((item) => item)) : null,
       mensaje: json['mensaje'],
@@ -34,14 +34,14 @@ class CalcularConsumoResponse {
     };
   }
 
-  CalcularConsumoResponse copyWith({
+  CalculoConsumoResponse copyWith({
     ResultadoCalculoConsumo? resultado,
     List<dynamic>? mensajeList,
     String? mensaje,
     bool? error,
     List<dynamic>? errorValList,
   }) {
-    return CalcularConsumoResponse(
+    return CalculoConsumoResponse(
       resultado: resultado ?? this.resultado,
       mensajeList: mensajeList ?? this.mensajeList,
       mensaje: mensaje ?? this.mensaje,
