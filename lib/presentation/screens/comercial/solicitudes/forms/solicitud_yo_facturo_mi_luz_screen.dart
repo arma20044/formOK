@@ -7,8 +7,6 @@ import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/infrastructure/comercial/solicitudes/calculo_consumo_datasource_imp.dart';
 import 'package:form/infrastructure/infrastructure.dart';
-import 'package:form/model/consulta_facturas.dart';
-import 'package:form/model/mi_cuenta/mi_cuenta_situacion_actual_model.dart';
 import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
@@ -36,6 +34,7 @@ class _SolicitudYoFacturoMiLuzState
   final TextEditingController _lecturaActualController =
       TextEditingController();
   bool isLoading = false;
+  bool isLoadingCalcularConsumo = false;
 
   SituacionActualResultado?
   situacionActualResultado; // <-- aquí guardamos los resultados
@@ -124,6 +123,9 @@ class _SolicitudYoFacturoMiLuzState
       return;
     }
 
+      setState(() {
+        isLoadingCalcularConsumo=true;
+      });
     try {
       final repoConsultaCalculoConsumo = CalculoConsumoRepositoryImpl(
         CalculoConsumoDatasourceImp(MiAndeApi()),
@@ -150,6 +152,7 @@ class _SolicitudYoFacturoMiLuzState
         setState(() {
           //  facturas = [];
           isLoading = false;
+          calculoConsumoResultado = null;
         });
         return;
       }
@@ -166,11 +169,21 @@ class _SolicitudYoFacturoMiLuzState
       );*/
     } catch (e) {
       setState(() {
-        isLoading = false;
+        calculoConsumoResultado = null;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      
+
+      CustomSnackbar.show(
+      context,
+      message: "Error: $e",
+      type: MessageType.error,
+      //duration: Durations.long4,
+    );
+    }
+    finally{
+       setState(() {
+        isLoadingCalcularConsumo=false;
+      });
     }
   }
 
@@ -248,8 +261,8 @@ class _SolicitudYoFacturoMiLuzState
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : _calcularConsumo,
-                  child: isLoading
+                  onPressed: isLoadingCalcularConsumo ? null : _calcularConsumo,
+                  child: isLoadingCalcularConsumo
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text('Presionar para Calcular Consumo'),
                 ),
