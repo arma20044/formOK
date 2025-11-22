@@ -8,19 +8,24 @@ import 'package:form/presentation/components/menu/main_menu.dart';
 import 'package:form/presentation/screens/splash_screen.dart';
 import 'package:form/provider/theme_provider.dart';
 import 'package:go_router/go_router.dart';
-
 import 'presentation/components/menu/menu_data.dart';
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
-// Container global para acceso a providers desde cualquier parte
+/// ⚡ Provider container global para acceder desde cualquier parte
 final container = ProviderContainer();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  runApp(UncontrolledProviderScope(container: container, child: MyApp()));
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {
@@ -31,28 +36,34 @@ class MyApp extends ConsumerWidget {
     final themeStateAsync = ref.watch(themeNotifierProvider);
     final router = ref.watch(goRouterProvider);
 
-    // ⚡ MaterialApp.router SIEMPRE arriba
     return MaterialApp.router(
       scaffoldMessengerKey: rootScaffoldMessengerKey,
-      theme: ThemeData.light(), // fallback temporal
+
+      /// ⚠️ Estos se usan SOLO como fallbacks mientras carga el provider
+      theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.light,
+
+      /// ❌ Antes estaba fijo en light → NO permitía modo oscuro
+      /// ✔ Ahora vendrá desde el `themeState`
+      themeMode: ThemeMode.system,
+
       routerConfig: router,
+
+      /// Builder se ejecuta SIEMPRE → aquí aplicamos el tema dinámico
       builder: (context, child) {
         return themeStateAsync.when(
           data: (themeState) {
+            final appTheme = AppTheme(
+              selectedColor: themeState.selectedColor,
+              isDarkMode: themeState.isDarkMode,
+            ).getTheme();
+
             return Theme(
-              data: AppTheme(
-                selectedColor: themeState.selectedColor,
-                isDarkMode: themeState.isDarkMode,
-              ).getTheme(),
+              data: appTheme,
               child: child!,
             );
           },
-          loading: () {
-            // ⚡ Aquí mostramos SplashScreen con Scaffold y Directionality
-            return const SplashScreen();
-          },
+          loading: () => const SplashScreen(),
           error: (e, st) => Center(child: Text('Error cargando tema: $e')),
         );
       },
@@ -60,6 +71,9 @@ class MyApp extends ConsumerWidget {
   }
 }
 
+/// ------------------------------------------------------
+/// HOME
+/// ------------------------------------------------------
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -71,19 +85,18 @@ class HomeScreen extends StatelessWidget {
         title: Center(
           child: Image.asset('assets/images/logoande.png', height: 50),
         ),
-
         leading: Padding(
           padding: const EdgeInsets.only(left: 12),
           child: IconButton(
-            icon:Icon(Icons.star, color: Colors.yellow[600], size: 50),
+            icon: Icon(Icons.star, color: Colors.yellow[600], size: 50),
             onPressed: () => GoRouter.of(context).push('/favoritos'),
-            ),
+          ),
         ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: MainMenu(
-          groups: menuGroups, // ✅ datos externos unificados
+          groups: menuGroups,
           iconSize: 44,
         ),
       ),
