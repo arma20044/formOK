@@ -38,16 +38,23 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
 
   final TextEditingController telefonoController = TextEditingController();
   final TextEditingController nisController = TextEditingController();
-  final TextEditingController nombreApellidoController = TextEditingController();
+  final TextEditingController nombreApellidoController =
+      TextEditingController();
   final TextEditingController direccionController = TextEditingController();
   final TextEditingController correoController = TextEditingController();
   final TextEditingController referenciaController = TextEditingController();
 
-  final repoDepartamento = DepartamentoRepositoryImpl(DepartamentoDatasourceImpl(MiAndeApi()));
+  final repoDepartamento = DepartamentoRepositoryImpl(
+    DepartamentoDatasourceImpl(MiAndeApi()),
+  );
   final repoCiudad = CiudadRepositoryImpl(CiudadDatasourceImpl(MiAndeApi()));
   final repoBarrio = BarrioRepositoryImpl(BarrioDatasourceImpl(MiAndeApi()));
-  final repoTipoReclamo = TipoReclamoRepositoryImpl(TipoReclamoDatasourceImpl(MiAndeApi()));
-  final repoUltimosReclamos = ReclamoRecuperadoRepositoryImpl(ReclamoRecuperadoDatasourceImpl(MiAndeApi()));
+  final repoTipoReclamo = TipoReclamoRepositoryImpl(
+    TipoReclamoDatasourceImpl(MiAndeApi()),
+  );
+  final repoUltimosReclamos = ReclamoRecuperadoRepositoryImpl(
+    ReclamoRecuperadoDatasourceImpl(MiAndeApi()),
+  );
 
   List<Departamento> listaDepartamentos = [];
   List<Ciudad> listaCiudades = [];
@@ -88,7 +95,8 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     });
 
     validators = {
-      'direccion': (val) => val == null || val.isEmpty ? "Ingrese una Dirección" : null,
+      'direccion': (val) =>
+          val == null || val.isEmpty ? "Ingrese una Dirección" : null,
       'telefono': (val) {
         if ((selectedTipoReclamo?.nisObligatorio ?? 'N') == 'S') {
           if (val == null || val.isEmpty) return "Ingrese un teléfono";
@@ -97,12 +105,18 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
         return null;
       },
       'referencia': (val) {
-        if (widget.tipoReclamo != "CX" && (val == null || val.isEmpty)) return "Ingrese Referencia";
+        if (widget.tipoReclamo != "CX" && (val == null || val.isEmpty)) {
+          return "Ingrese Referencia";
+        }
         return null;
       },
       'nombreApellido': (val) {
-        if ((widget.tipoReclamo == "FE" || widget.tipoReclamo == "CO" || widget.tipoReclamo == "AP") &&
-            (val == null || val.isEmpty)) return "Ingrese Nombre y Apellido";
+        if ((widget.tipoReclamo == "FE" ||
+                widget.tipoReclamo == "CO" ||
+                widget.tipoReclamo == "AP") &&
+            (val == null || val.isEmpty)) {
+          return "Ingrese Nombre y Apellido";
+        }
         return null;
       },
     };
@@ -117,26 +131,25 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
   }
 
   void limpiar() {
-  setState(() {
-    selectedDept = null;
-    selectedCiudad = null;
-    selectedBarrio = null;
-    selectedTipoReclamo = null;
+    setState(() {
+      selectedDept = null;
+      selectedCiudad = null;
+      selectedBarrio = null;
+      selectedTipoReclamo = null;
 
-    listaCiudades = [];
-    listaBarrios = [];
+      listaCiudades = [];
+      listaBarrios = [];
 
-    telefonoController.clear();
-    nisController.clear();
-    nombreApellidoController.clear();
-    direccionController.clear();
-    correoController.clear();
-    referenciaController.clear();
+      telefonoController.clear();
+      nisController.clear();
+      nombreApellidoController.clear();
+      direccionController.clear();
+      correoController.clear();
+      referenciaController.clear();
 
-    esFavorito = false;
-  });
-}
-
+      esFavorito = false;
+    });
+  }
 
   // -------------------- FETCH --------------------
   Future<void> _fetchDepartamentos() async {
@@ -175,7 +188,9 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
   Future<void> _fetchTipoReclamo() async {
     setState(() => isLoadingTipoReclamo = true);
     try {
-      listaTipoReclamo = await repoTipoReclamo.getTipoReclamo(widget.tipoReclamo);
+      listaTipoReclamo = await repoTipoReclamo.getTipoReclamo(
+        widget.tipoReclamo,
+      );
     } catch (e) {
       print("Error al cargar tipo reclamo: $e");
     } finally {
@@ -195,7 +210,8 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
       ciudadDescripcion: selectedCiudad?.nombre ?? '',
       idBarrio: selectedBarrio?.idBarrio.toInt() ?? 0,
       barrioDescripcion: selectedBarrio?.nombre ?? '',
-      idTipoReclamoCliente: selectedTipoReclamo?.idTipoReclamoCliente.toInt() ?? 0,
+      idTipoReclamoCliente:
+          selectedTipoReclamo?.idTipoReclamoCliente.toInt() ?? 0,
       telefono: telefonoController.text,
       nombreApellido: nombreApellidoController.text,
       direccion: direccionController.text,
@@ -209,30 +225,30 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     );
   }
 
-Future<void> toggleFavoritoReclamo(Favorito fav) async {
-  // Crear favorito con tipo reclamo y datos completos
-  final nuevoFavorito = Favorito(
-    id: fav.id,
-    title: fav.title,
-    tipo: FavoritoTipo.datosReclamo,
-    datos: obtenerDatosReclamo(), // <-- aquí agregás todos los datos del formulario
-  );
+  Future<void> toggleFavoritoReclamo(Favorito fav) async {
+    // Crear favorito con tipo reclamo y datos completos
+    final nuevoFavorito = Favorito(
+      id: fav.id,
+      title: fav.title,
+      tipo: FavoritoTipo.datosReclamo,
+      datos:
+          obtenerDatosReclamo(), // <-- aquí agregás todos los datos del formulario
+    );
 
-  final exists = favReclamos.any((e) => e.id == nuevoFavorito.id);
+    final exists = favReclamos.any((e) => e.id == nuevoFavorito.id);
 
-  if (exists) {
-    favReclamos.removeWhere((e) => e.id == nuevoFavorito.id);
-  } else {
-    favReclamos.add(nuevoFavorito);
+    if (exists) {
+      favReclamos.removeWhere((e) => e.id == nuevoFavorito.id);
+    } else {
+      favReclamos.add(nuevoFavorito);
+    }
+
+    await FavoritosStorage.saveLista(FavoritosStorage.keyReclamos, favReclamos);
+
+    setState(() {
+      esFavorito = !exists;
+    });
   }
-
-  await FavoritosStorage.saveLista(FavoritosStorage.keyReclamos, favReclamos);
-
-  setState(() {
-    esFavorito = !exists;
-  });
-}
-
 
   Future<void> obtenerFavoritos() async {
     final favoritos = await cargarDatosFacturas();
@@ -270,15 +286,17 @@ Future<void> toggleFavoritoReclamo(Favorito fav) async {
     );
 
     try {
-      listaUltimosReclamos = await repoUltimosReclamos.getReclamoRecuperado(telefono);
+      listaUltimosReclamos = await repoUltimosReclamos.getReclamoRecuperado(
+        telefono,
+      );
       final datos = listaUltimosReclamos.respuesta?.datos?[0];
       if (datos != null) {
-        showConfirmDialog(
+        showConfirmDialog(          
+          title: "Con el teléfono ingresado se encontró:",
           type: DialogType.info,
           context: context,
-          message:
-              "Con el teléfono ingresado se encontró:" +
-              "\n\n✓ Teléfono: ${datos.telefono}" +
+          message:               
+              "✓ Teléfono: ${datos.telefono}" +
               "\n✓ Nombre y Apellido: ${datos.nombreApellido}" +
               "\n✓ NIS: ${datos.nis}" +
               "\n✓ Departamento: ${datos.departamentoNombre}" +
@@ -335,51 +353,25 @@ Future<void> toggleFavoritoReclamo(Favorito fav) async {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: TextFormField(
-                  focusNode: _focusNode,
-                  controller: telefonoController,
-                  keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: "Teléfono",
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: validators['telefono'],
-                ),
-              ),
-              IconButton(
-                onPressed: () async {
-                  final telefono = telefonoController.text;
-                  if (telefono.isEmpty) return;
-
-                  final favorito = Favorito(
-                    id: telefono,
-                    title: telefono,
-                    tipo: FavoritoTipo.datosReclamo,
-                    datos: obtenerDatosReclamo(),
-                  );
-
-                  await toggleFavoritoReclamo(favorito);
-                  await obtenerFavoritos();
-                },
-                icon: Icon(
-                  esFavorito ? Icons.star : Icons.star_border_sharp,
-                  color: esFavorito ? Colors.amber : Colors.green,
-                  size: 30,
-                ),
-              ),
-            ],
+          TextFormField(
+            focusNode: _focusNode,
+            controller: telefonoController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              labelText: "Teléfono",
+              border: OutlineInputBorder(),
+            ),
+            validator: validators['telefono'],
           ),
+
           const SizedBox(height: 20),
           DropdownCustom<TipoReclamo>(
             label: "Tipo Reclamo",
             items: listaTipoReclamo,
             value: selectedTipoReclamo,
             displayBuilder: (b) => b.nombre!,
-            validator: (val) => val == null ? "Seleccione un tipo Reclamo" : null,
+            validator: (val) =>
+                val == null ? "Seleccione un tipo Reclamo" : null,
             onChanged: (val) => setState(() => selectedTipoReclamo = val),
           ),
           const SizedBox(height: 20),
@@ -409,7 +401,8 @@ Future<void> toggleFavoritoReclamo(Favorito fav) async {
             items: listaDepartamentos,
             value: selectedDept,
             displayBuilder: (d) => d.nombre!,
-            validator: (val) => val == null ? "Seleccione un Departamento" : null,
+            validator: (val) =>
+                val == null ? "Seleccione un Departamento" : null,
             onChanged: (val) {
               setState(() {
                 selectedDept = val;
@@ -466,8 +459,10 @@ Future<void> toggleFavoritoReclamo(Favorito fav) async {
             ),
             validator: (val) {
               if ((selectedTipoReclamo?.correoObligatorio ?? 'N') == 'S') {
-                if (val == null || val.isEmpty) return "Ingrese Correo Electrónico";
-                if (!emailRegex.hasMatch(val)) return "Ingrese formato de correo válido.";
+                if (val == null || val.isEmpty)
+                  return "Ingrese Correo Electrónico";
+                if (!emailRegex.hasMatch(val))
+                  return "Ingrese formato de correo válido.";
               }
               return null;
             },

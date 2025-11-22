@@ -15,6 +15,7 @@ Color _dialogBgColor(BuildContext context, DialogType type) {
       return cs.secondaryContainer;
   }
 }
+
 Color _dialogOnColor(BuildContext context, DialogType type) {
   final cs = Theme.of(context).colorScheme;
 
@@ -52,18 +53,17 @@ String _defaultTitle(DialogType type) {
     case DialogType.warning:
       return "Advertencia";
     case DialogType.info:
-      return "Información";
+      return "Información";      
   }
 }
-
-
 
 Future<void> showConfirmDialog({
   required BuildContext context,
   required String message,
-  required Function() onConfirm,  // callback al Aceptar
+  required Function() onConfirm, // callback al Aceptar
   String? title,
   DialogType type = DialogType.warning,
+  bool? showIcon=false
 }) async {
   final theme = Theme.of(context);
   final cs = theme.colorScheme;
@@ -83,7 +83,7 @@ Future<void> showConfirmDialog({
 
         title: Row(
           children: [
-            Icon(_dialogIcon(type), color: onColor, size: 28),
+            showIcon == true ? Icon(_dialogIcon(type), color: onColor, size: 28) : Text(""),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -99,23 +99,10 @@ Future<void> showConfirmDialog({
 
         content: Text(
           message,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: onColor,
-          ),
+          style: theme.textTheme.bodyMedium?.copyWith(color: onColor),
         ),
 
         actions: [
-          // CANCELAR
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(
-              "Cancelar",
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: cs.primary,
-              ),
-            ),
-          ),
-
           // ACEPTAR (EJECUTA CALLBACK)
           TextButton(
             onPressed: () {
@@ -128,6 +115,14 @@ Future<void> showConfirmDialog({
                 color: cs.primary,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+          ),
+          // CANCELAR
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(
+              "Cancelar",
+              style: theme.textTheme.labelLarge?.copyWith(color: cs.primary),
             ),
           ),
         ],
