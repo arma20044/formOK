@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/auth/auth_notifier.dart';
-import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/model/login_model.dart';
 import 'package:form/presentation/components/comercial/number_list_component.dart';
 import 'package:form/provider/servicios_nis_provider.dart';

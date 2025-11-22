@@ -40,7 +40,6 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
 
   SuministrosList? selectedNIS;
   String? _token;
-  bool? _indicador;
   bool _hasFetched = false; // Para controlar fetch único
 
   bool _isListenerSet = false;

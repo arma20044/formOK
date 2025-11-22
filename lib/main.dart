@@ -20,12 +20,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const MyApp(),
-    ),
-  );
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -43,9 +38,8 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
 
-      /// ❌ Antes estaba fijo en light → NO permitía modo oscuro
-      /// ✔ Ahora vendrá desde el `themeState`
-      themeMode: ThemeMode.system,
+    
+      themeMode: ref.watch(themeNotifierProvider.notifier).themeMode,
 
       routerConfig: router,
 
@@ -58,10 +52,7 @@ class MyApp extends ConsumerWidget {
               isDarkMode: themeState.isDarkMode,
             ).getTheme();
 
-            return Theme(
-              data: appTheme,
-              child: child!,
-            );
+            return Theme(data: appTheme, child: child!);
           },
           loading: () => const SplashScreen(),
           error: (e, st) => Center(child: Text('Error cargando tema: $e')),
@@ -95,10 +86,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
-        child: MainMenu(
-          groups: menuGroups,
-          iconSize: 44,
-        ),
+        child: MainMenu(groups: menuGroups, iconSize: 44),
       ),
     );
   }

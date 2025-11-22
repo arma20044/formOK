@@ -11,7 +11,6 @@ import 'package:form/presentation/components/common/datos_card.dart';
 import 'package:form/presentation/components/common/factura_scroll_horizontal.dart';
 import 'package:form/presentation/components/common/info_card.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
-import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:form/utils/utils.dart';
 import '../../../infrastructure/infrastructure.dart';
 import '../../../repositories/repositories.dart';
