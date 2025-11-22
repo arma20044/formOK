@@ -31,4 +31,12 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     necesitaAuth: false,
     path: "/solicitudAbastecimiento",
   ),
+  InfoItem(
+    title: "Yo facturo mi Luz",
+    description:
+        "Ingrese los datos del NIS y lectura de Medidor.",
+    buttonText: "Solicitar",
+    necesitaAuth: false,
+    path: "/solicitudYoFacturoMiLuz",
+  ),
 ];

@@ -9,6 +9,7 @@ import 'package:form/main.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/registro_numero_celular_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitudAbastecimientoScreen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_factura_fija_screen.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_yo_facturo_mi_luz_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/solicitudes_screen.dart';
 import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -139,6 +140,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/favoritos',
         builder: (context, state) => const FavoritosScreen(),
+      ),
+      GoRoute(
+        path: '/solicitudYoFacturoMiLuz',
+        builder: (context, state) => const SolicitudYoFacturoMiLuz(),
       ),
     ],
 

@@ -66,7 +66,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
               String cifra = '';
               if (situacionActual.facturaDatos != null) {
                 fechaVencimiento =
-                    situacionActual.facturaDatos!.recibo.fechaVencimiento!;
+                    situacionActual.facturaDatos!.recibo!.fechaVencimiento!;
 
                 num nisParcial = int.parse(
                   widget.selectedNIS!.nisRad.toString().substring(0, 3),
@@ -173,7 +173,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                                   .facturaPenultima?['recibo']?['fechaVencimiento'] ??
                               "Sin dato",
                           lectura:
-                              situacionActual.calculoConsumo?['consumo']
+                              situacionActual.calculoConsumo!.consumo
                                   ?.toString() ??
                               "-",
                           consumo: "",
