@@ -14,6 +14,7 @@ import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/custom_bottom_sheet_image.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:form/presentation/components/youtube_webview.dart';
 import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
 
@@ -93,6 +94,9 @@ class _SolicitudYoFacturoMiLuzState
         //datosCliente = consultaFacturasResponse.resultado?.datosCliente;
         // print(datosCliente);
         isLoading = false;
+
+        calculoConsumoResultado = null;
+        _lecturaActualController.text = "";
       });
 
       showModalBottomSheet(
@@ -123,9 +127,9 @@ class _SolicitudYoFacturoMiLuzState
       return;
     }
 
-      setState(() {
-        isLoadingCalcularConsumo=true;
-      });
+    setState(() {
+      isLoadingCalcularConsumo = true;
+    });
     try {
       final repoConsultaCalculoConsumo = CalculoConsumoRepositoryImpl(
         CalculoConsumoDatasourceImp(MiAndeApi()),
@@ -171,20 +175,144 @@ class _SolicitudYoFacturoMiLuzState
       setState(() {
         calculoConsumoResultado = null;
       });
-      
 
       CustomSnackbar.show(
-      context,
-      message: "Error: $e",
-      type: MessageType.error,
-      //duration: Durations.long4,
-    );
-    }
-    finally{
-       setState(() {
-        isLoadingCalcularConsumo=false;
+        context,
+        message: "Error: $e",
+        type: MessageType.error,
+        //duration: Durations.long4,
+      );
+    } finally {
+      setState(() {
+        isLoadingCalcularConsumo = false;
       });
     }
+  }
+
+  Widget mostrarResultadoConsulta2() {
+    if (situacionActualResultado == null) return const SizedBox();
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        CustomText(
+          "NIS: ${_nisController.text} - ${situacionActualResultado!.nombre} ${situacionActualResultado!.apellido}",
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          overflow: TextOverflow.clip,
+        ),
+        CustomText(
+          "Fecha aproximada de Próxima Lectura: ${situacionActualResultado!.lecturaTeorica}",
+        ),
+
+        CustomCard(
+          child: Column(
+            children: [
+              CustomText(
+                "Marca del Medidor: ${situacionActualResultado!.marcaAparato}",
+              ),
+              CustomText(
+                "Número del Medidor: ${situacionActualResultado!.numeroAparato}",
+              ),
+              if (situacionActualResultado!.tipoTension!.contains("BT"))
+                CustomText(
+                  "Última lectura: ${situacionActualResultado!.calculoConsumo!.leturaAnterior}",
+                ),
+              CustomText(
+                "Última fecha de lectura: ${situacionActualResultado!.calculoConsumo!.ultimaFechaLectura}",
+              ),
+              CustomText(
+                "Días de consumo desde la última lectura: ${situacionActualResultado!.calculoConsumo!.cantidadDias}",
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 10),
+        CustomComment(
+          text:
+              "Antes de ingresar su lectura, por favor vea el video demostrativo de cómo leer su medidor",
+          bold: true,
+        ),
+
+        const SizedBox(height: 10),
+        Form(
+          key: _formKeyCalculoConsumo,
+          child: TextFormField(
+            controller: _lecturaActualController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Lectura Actual del Medidor',
+              border: OutlineInputBorder(),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor ingresa Lectura Actual del Medidor';
+              }
+              return null;
+            },
+          ),
+        ),
+
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: isLoadingCalcularConsumo ? null : _calcularConsumo,
+            child: isLoadingCalcularConsumo
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text('Presionar para Calcular Consumo'),
+          ),
+        ),
+
+        const SizedBox(height: 10),
+        // Botón para abrir video en ModalBottomSheet
+        Visibility(
+          visible: situacionActualResultado?.tieneVideo ?? false,
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.play_circle_fill),
+              label: const Text("Ver video demostrativo"),
+              onPressed: () {
+                showModalBottomSheet(
+                  isDismissible: true,
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 24,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          color: Colors.white,
+                          height: MediaQuery.of(context).size.height * 0.34,
+                          width:
+                              MediaQuery.of(context).size.width *
+                              0.9, // 90% del ancho
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: YoutubeVideoScreen(
+                              videoUrl:
+                                  "https://www.youtube.com/watch?v=nncePhsN7bI",
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget mostrarResultadoConsulta() {
@@ -267,6 +395,12 @@ class _SolicitudYoFacturoMiLuzState
                       : const Text('Presionar para Calcular Consumo'),
                 ),
               ),
+              YoutubeVideoScreen(
+                videoUrl: "https://www.youtube.com/watch?v=nncePhsN7bI",
+                //url: situacionActualResultado!.tieneVideo!
+                //? situacionActualResultado?.url ?? ""
+                //  : "", // ID del video
+              ),
             ],
           )
         : Text("");
@@ -276,6 +410,9 @@ class _SolicitudYoFacturoMiLuzState
     return calculoConsumoResultado != null
         ? Column(
             children: [
+              if (calculoConsumoResultado!.lecturaAnomala != null)
+                CustomCard(borderColor: Colors.red,child: CustomText("${calculoConsumoResultado!.lecturaAnomala} Favor adjuntar Fotografía o Video para confirmar su lectura.",overflow: TextOverflow.clip,),),
+
               CustomCard(
                 child: CustomText(
                   "El importe calculado no incluye IVA, Alumbrado público ni otros cargos. Se facturará obligatoriamente un mínimo de kWh mensuales, según la carga contratada",
@@ -435,7 +572,7 @@ class _SolicitudYoFacturoMiLuzState
                     child: CustomText(
                       formatNumero(calculoConsumoResultado!.tarifa.toString()),
                       textAlign: TextAlign.right,
-                       underline: true,
+                      underline: true,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -474,9 +611,7 @@ class _SolicitudYoFacturoMiLuzState
                           text: 'Importe Gs.',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        TextSpan(
-                          text: '\n (Consumo multiplicado por Tarifa)',
-                        ),
+                        TextSpan(text: '\n (Consumo multiplicado por Tarifa)'),
                       ],
                     ),
                   ),
@@ -539,7 +674,7 @@ class _SolicitudYoFacturoMiLuzState
                   ),
                 ),
 
-                mostrarResultadoConsulta(),
+                mostrarResultadoConsulta2(),
                 mostrarResultadoCalularConsumo(),
               ],
             ),

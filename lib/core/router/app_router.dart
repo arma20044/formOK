@@ -35,6 +35,7 @@ final privateRoutes = [
   '/consultaFacturas',
   '/cambioContrasenha',
   '/suministros',
+  '/solicitudYoFacturoMiLuz'
 ];
 
 final goRouterProvider = Provider<GoRouter>((ref) {
