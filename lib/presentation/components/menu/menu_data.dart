@@ -78,8 +78,8 @@ final List<MenuGroup> menuGroups = [
       MenuItemModel(
         id: 'yoFacturoMiLuz',
         icon: Icons.electric_meter,
-        label: 'Yo Facturo mi Luz',
-        enabled: false,
+        label: 'Yo Facturo mi Luz',        
+        onTap: (context) => context.push('/solicitudYoFacturoMiLuz')
       ),
     ],
   ),

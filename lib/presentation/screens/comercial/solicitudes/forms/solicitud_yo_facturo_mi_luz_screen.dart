@@ -11,6 +11,7 @@ import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
+import 'package:form/presentation/components/common/adjuntos.dart';
 import 'package:form/presentation/components/common/custom_bottom_sheet_image.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
@@ -30,19 +31,27 @@ class _SolicitudYoFacturoMiLuzState
     extends ConsumerState<SolicitudYoFacturoMiLuz> {
   final _formKey = GlobalKey<FormState>();
   final _formKeyCalculoConsumo = GlobalKey<FormState>();
+  final _formKeyConfirmarLectura = GlobalKey<FormState>();
 
   final TextEditingController _nisController = TextEditingController();
   final TextEditingController _lecturaActualController =
       TextEditingController();
+
+  final TextEditingController telefonoController = TextEditingController();
+
   bool isLoading = false;
   bool isLoadingCalcularConsumo = false;
+  bool isLoadingConfirmarLectura = false;
 
   SituacionActualResultado?
   situacionActualResultado; // <-- aquí guardamos los resultados
   ResultadoCalculoConsumo? calculoConsumoResultado;
   DatosCliente? datosCliente;
 
+  ArchivoAdjunto? _archivoSeleccionado1;
+
   Future<void> _consultar() async {
+    _formKey.currentState!.save();
     if (!_formKey.currentState!.validate()) return;
 
     final nis = _nisController.text;
@@ -119,6 +128,19 @@ class _SolicitudYoFacturoMiLuzState
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
+
+  Future<void> _confirmarLectura() async {
+    if (!_formKeyConfirmarLectura.currentState!.validate()) {
+      return;
+    }
+
+    if (_archivoSeleccionado1 == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Es necesario anexar foto o video.")),
+      );
+      return;
     }
   }
 
@@ -411,7 +433,22 @@ class _SolicitudYoFacturoMiLuzState
         ? Column(
             children: [
               if (calculoConsumoResultado!.lecturaAnomala != null)
-                CustomCard(borderColor: Colors.red,child: CustomText("${calculoConsumoResultado!.lecturaAnomala} Favor adjuntar Fotografía o Video para confirmar su lectura.",overflow: TextOverflow.clip,),),
+                CustomCard(
+                  borderColor: Colors.red,
+                  child: CustomText(
+                    "${calculoConsumoResultado!.lecturaAnomala} Favor adjuntar Fotografía o Video para confirmar su lectura.",
+                    overflow: TextOverflow.clip,
+                  ),
+                ),
+
+              if (calculoConsumoResultado!.lecturaAnomala != null)
+                Adjuntos(
+                  label: 'Adjuntar imagen o video',
+                  validator: (value) => 'Debes adjuntar un archivo',
+                  onChanged: (archivo) =>
+                      //print('Seleccionado: ${archivo?.file.path}'),
+                      _archivoSeleccionado1 = archivo,
+                ),
 
               CustomCard(
                 child: CustomText(
@@ -427,6 +464,40 @@ class _SolicitudYoFacturoMiLuzState
                   overflow: TextOverflow.clip,
                 ),
               ),
+              const SizedBox(height: 10),
+
+              Form(
+                key: _formKeyConfirmarLectura,
+                child: TextFormField(
+                  // focusNode: _focusNode,
+                  controller: telefonoController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: "Titular Número de Teléfono",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) {
+                      return "Debe ingresar teléfono";
+                    }
+
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isLoadingConfirmarLectura
+                      ? null
+                      : _confirmarLectura,
+                  child: isLoadingConfirmarLectura
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Confirmar Lectura'),
+                ),
+              ),
+              const SizedBox(height: 10),
             ],
           )
         : Text("");
@@ -464,7 +535,7 @@ class _SolicitudYoFacturoMiLuzState
               Row(
                 children: [
                   SizedBox(
-                    width: 80,
+                    width: 90,
                     child: CustomText(
                       formatNumero(_lecturaActualController.text),
                       textAlign: TextAlign.right,
@@ -482,7 +553,7 @@ class _SolicitudYoFacturoMiLuzState
               Row(
                 children: [
                   SizedBox(
-                    width: 80,
+                    width: 90,
                     child: CustomText(
                       formatNumero(
                         situacionActualResultado!
@@ -505,7 +576,7 @@ class _SolicitudYoFacturoMiLuzState
               Row(
                 children: [
                   SizedBox(
-                    width: 80,
+                    width: 90,
                     child: CustomText(
                       formatNumero(
                         int.parse(_lecturaActualController.text) -
@@ -550,7 +621,7 @@ class _SolicitudYoFacturoMiLuzState
               Row(
                 children: [
                   SizedBox(
-                    width: 80,
+                    width: 90,
                     child: CustomText(
                       formatNumero(calculoConsumoResultado?.consumo.toString()),
                       textAlign: TextAlign.right,
@@ -568,7 +639,7 @@ class _SolicitudYoFacturoMiLuzState
               Row(
                 children: [
                   SizedBox(
-                    width: 80,
+                    width: 90,
                     child: CustomText(
                       formatNumero(calculoConsumoResultado!.tarifa.toString()),
                       textAlign: TextAlign.right,
@@ -588,7 +659,7 @@ class _SolicitudYoFacturoMiLuzState
               Row(
                 children: [
                   SizedBox(
-                    width: 80,
+                    width: 90,
                     child: CustomText(
                       formatNumero(
                         (calculoConsumoResultado?.consumo?.toInt() ?? 0) *
@@ -596,6 +667,7 @@ class _SolicitudYoFacturoMiLuzState
                       ),
                       textAlign: TextAlign.right,
                       fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.clip,
                     ),
                   ),
                   const SizedBox(width: 16),
