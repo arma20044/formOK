@@ -6,7 +6,7 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     description: "Solicitar Fraccionamiento de deuda.",
     buttonText: "Solicitar",
     necesitaAuth: true,
-    path: "/",
+    path: "/solicitudFraccionamientoDeuda",
   ),
   InfoItem(
     title: "Registro de número de Teléfono Celular",

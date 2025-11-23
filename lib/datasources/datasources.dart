@@ -17,4 +17,6 @@ export 'comercial/solicitudes/solicitud_abastecimiento_energia_datasource.dart';
 export 'comercial/solicitudes/registro_numero_celular_datasource.dart';
 export 'comercial/solicitudes/factura_fija_datasource.dart';
 export 'comercial/solicitudes/calculo_consumo_datasource.dart';
+export 'comercial/solicitudes/solicitud_fraccionamiento_datasource.dart';
+
 export 'reclamo_recuperado_datasource.dart';

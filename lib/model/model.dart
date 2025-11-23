@@ -16,5 +16,6 @@ export './comercial/historico_recuperar.dart';
 export 'comercial/solicitudes/solicitud_abastecimiento_model.dart';
 export 'comercial/solicitudes/registro_numero_celular_model.dart';
 export 'comercial/solicitudes/factura_fija_model.dart';
+export 'comercial/solicitudes/solicitud_fraccionamiento_model.dart';
 export 'reclamo_recuperado_model.dart';
 export 'comercial/solicitudes/calcular_consumo_bt_model.dart';

@@ -14,4 +14,5 @@ export 'comercial/historico_consumo_monto_repository_impl.dart';
 export 'comercial/recuperar_historico_repository_impl.dart';
 export 'comercial/solicitudes/solicitud_abastecimiento_energia_repository_impl.dart';
 export 'comercial/solicitudes/calculo_consumo_repository_impl.dart';
+export 'comercial/solicitudes/solicitud_fraccionamiento_repository_impl.dart';
 export 'reclamo_recuperado_repository_impl.dart';
