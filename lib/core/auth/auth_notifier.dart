@@ -282,7 +282,20 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
       debugPrint('Error guardando userDatosAnexos: $e');
     }
   }
+
+  Future<void> logoutForzado() async {
+  // Limpia storage
+  await _storage.delete(key: _userKey);
+
+  // Limpia estado
+  state = const AsyncValue.data(
+    AuthStateData(state: AuthState.unauthenticated),
+  );
 }
+}
+
+
+
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, AuthStateData>(
   AuthNotifier.new,

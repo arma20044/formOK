@@ -228,7 +228,7 @@ String obtenerFechaActual() {
   return fechaFormateada;
 }
 
-String formatMiles(num number) {
+String formatMiles(num? number) {
   final formatter = NumberFormat("#,##0", "es_PY"); // Español - Paraguay
   return formatter.format(number);
 }

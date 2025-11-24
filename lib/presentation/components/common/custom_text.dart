@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form/utils/utils.dart';
 
 class CustomText extends StatelessWidget {
   final String text;
@@ -12,6 +13,7 @@ class CustomText extends StatelessWidget {
   final double? height;
   final bool? adaptToTheme;
   final bool? underline;
+  final bool? separadorMiles;
 
   const CustomText(
     this.text, {
@@ -25,7 +27,8 @@ class CustomText extends StatelessWidget {
     this.letterSpacing,
     this.height,
     this.adaptToTheme = true,
-    this.underline = false
+    this.underline = false, 
+    this.separadorMiles=false,
   });
 
   @override
@@ -34,7 +37,7 @@ class CustomText extends StatelessWidget {
     return SizedBox(
       //width: double.infinity, // ocupa todo el ancho disponible
       child: Text(
-        text,
+        separadorMiles == true ? formatMiles(int.parse(text.replaceAll(r'\D+', ''))) : text,
         textAlign: textAlign ?? TextAlign.start,
         maxLines: maxLines,
         overflow: overflow ?? TextOverflow.ellipsis,
