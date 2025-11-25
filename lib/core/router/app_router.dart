@@ -26,7 +26,7 @@ final publicRoutes = [
   '/solicitudes',
   '/solicitudAbastecimiento',
   '/reclamosFaltaEnergia',
-  '/solicitudesPublico',
+  //'/solicitudesPublico',
   '/solicitudFacturaFija',
   '/favoritos',
 ];
@@ -120,10 +120,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/suministros',
         builder: (context, state) => const SuministrosScreen(),
       ),
-      GoRoute(
+     /* GoRoute(
         path: '/solicitudesPublico',
         builder: (context, state) => const SolicitudesScreen(true),
-      ),
+      ),*/
       GoRoute(
         path: '/solicitudes',
         builder: (context, state) => const SolicitudesScreen(false),

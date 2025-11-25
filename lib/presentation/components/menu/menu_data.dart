@@ -70,10 +70,11 @@ final List<MenuGroup> menuGroups = [
         onTap: (context) => context.push('/consultaFacturas'),
       ),
       MenuItemModel(
-        id: 'solicitudes_publico',
+        //id: 'solicitudes_publico',
+        id: 'solicitudes',
         icon: Icons.edit_document,
         label: 'Solicitudes',
-        onTap: (context) => context.push('/solicitudesPublico'),
+        onTap: (context) => context.push('/solicitudes'),
       ),
       MenuItemModel(
         id: 'yoFacturoMiLuz',
