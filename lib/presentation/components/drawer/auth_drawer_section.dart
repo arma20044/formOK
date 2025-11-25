@@ -26,6 +26,7 @@ class AuthDrawerSection extends ConsumerWidget {
         if (state.state == AuthState.authenticated) {
           return Column(
             children: [
+              if(authState.value?.user?.tipoCliente == '1')
               _drawerItem(
                 context,
                 icon: Icons.electric_meter_outlined,

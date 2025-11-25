@@ -7,6 +7,7 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     buttonText: "Solicitar",
     necesitaAuth: true,
     path: "/solicitudFraccionamientoDeuda",
+    comercial: true
   ),
     InfoItem(
     title: "Fraccionamiento a Terceros",
@@ -14,6 +15,7 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     buttonText: "Solicitar",
     necesitaAuth: true,
     path: "/solicitudFraccionamientoDeudaATerceros",
+    comercial: false
   ),
   InfoItem(
     title: "Registro de número de Teléfono Celular",
@@ -22,6 +24,7 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     buttonText: "Registrar",
     necesitaAuth: false,
     path: "/registroNumeroCelular",
+    comercial: false
   ),
   InfoItem(
     title: "Solicitud de Factura Fija",
@@ -29,6 +32,7 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     buttonText: "Solicitar",
     necesitaAuth: false,
     path: "/solicitudFacturaFija",
+    comercial: false
   ),
   InfoItem(
     title: "Solicitud de Abastecimiento",
@@ -37,6 +41,7 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     buttonText: "Solicitar",
     necesitaAuth: false,
     path: "/solicitudAbastecimiento",
+    comercial: false
   ),
   InfoItem(
     title: "Yo facturo mi Luz",
@@ -45,5 +50,6 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     buttonText: "Solicitar",
     necesitaAuth: false,
     path: "/solicitudYoFacturoMiLuz",
+    comercial: false
   ),
 ];
