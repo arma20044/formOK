@@ -19,3 +19,4 @@ export 'comercial/solicitudes/factura_fija_model.dart';
 export 'comercial/solicitudes/solicitud_fraccionamiento_model.dart';
 export 'reclamo_recuperado_model.dart';
 export 'comercial/solicitudes/calcular_consumo_bt_model.dart';
+export 'comercial/solicitudes/solicitar_fraccionamiento_model.dart';

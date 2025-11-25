@@ -28,11 +28,12 @@ class SolicitudFraccionamientoDeudaScreen extends ConsumerStatefulWidget {
 
 class _SolicitudFraccionamientoDeudaScreenState
     extends ConsumerState<SolicitudFraccionamientoDeudaScreen> {
-  final nisController = TextEditingController();
+  //final nisController = TextEditingController();
   final entregaController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoadingConsultar = false;
   bool _isLoadingSimular = false;
+  bool _isLoadingSolicitar = false;
 
   SuministrosList? selectedNIS;
   int? selectedCuota;
@@ -245,110 +246,182 @@ class _SolicitudFraccionamientoDeudaScreenState
       ],
     );
   }
-Widget mostrarResultadoSimular() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch, // hijos ocupan todo el ancho disponible
-    children: [
-      // Card con la información
-      CustomCard(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0), // padding interno para que no toque los bordes
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomTextWithChildren(
-                children: [
-                  TextSpan(text: "Deuda Total Gs.:  "),
-                  TextSpan(
-                    text: formatMiles(solicitudFraccionamientoResponse?.resultado?.deuda),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              CustomTextWithChildren(
-                children: [
-                  TextSpan(text: "Monto Entrega Gs.:  "),
-                  TextSpan(
-                    text: formatMiles(solicitudFraccionamientoResponse?.resultado?.entrega),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              CustomTextWithChildren(
-                children: [
-                  TextSpan(text: "Cantidad de Cuotas:  "),
-                  TextSpan(
-                    text: formatMiles(solicitudFraccionamientoResponse?.resultado?.cantidadCuotas),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              CustomTextWithChildren(
-                children: [
-                  TextSpan(text: "Monto Cuota Gs.: "),
-                  TextSpan(
-                    text: formatMiles(solicitudFraccionamientoResponse?.resultado?.cuotas),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              CustomTextWithChildren(
-                children: [
-                  TextSpan(text: "Recargo por mora Gs.: "),
-                  TextSpan(
-                    text: formatMiles(solicitudFraccionamientoResponse?.resultado?.multas),
-                  ),
-                ],
-              ),
-            ],
+
+  Widget mostrarResultadoSimular() {
+    return Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.stretch, // hijos ocupan todo el ancho disponible
+      children: [
+        // Card con la información
+        CustomCard(
+          child: Padding(
+            padding: const EdgeInsets.all(
+              16.0,
+            ), // padding interno para que no toque los bordes
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomTextWithChildren(
+                  children: [
+                    TextSpan(text: "Deuda Total Gs.:  "),
+                    TextSpan(
+                      text: formatMiles(
+                        solicitudFraccionamientoResponse?.resultado?.deuda,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                CustomTextWithChildren(
+                  children: [
+                    TextSpan(text: "Monto Entrega Gs.:  "),
+                    TextSpan(
+                      text: formatMiles(
+                        solicitudFraccionamientoResponse?.resultado?.entrega,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                CustomTextWithChildren(
+                  children: [
+                    TextSpan(text: "Cantidad de Cuotas:  "),
+                    TextSpan(
+                      text: formatMiles(
+                        solicitudFraccionamientoResponse
+                            ?.resultado
+                            ?.cantidadCuotas,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                CustomTextWithChildren(
+                  children: [
+                    TextSpan(text: "Monto Cuota Gs.: "),
+                    TextSpan(
+                      text: formatMiles(
+                        solicitudFraccionamientoResponse?.resultado?.cuotas,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                CustomTextWithChildren(
+                  children: [
+                    TextSpan(text: "Recargo por mora Gs.: "),
+                    TextSpan(
+                      text: formatMiles(
+                        solicitudFraccionamientoResponse?.resultado?.multas,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
 
-      const SizedBox(height: 16), // separación entre card y botón
-
-      // Botón alineado al ancho del card
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0), // mismo padding que el card
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _isLoadingSimular ? null : () => solicitar(true),
-            child: _isLoadingSimular
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text("Solicitar"),
+        const SizedBox(height: 16), // separación entre card y botón
+        // Botón alineado al ancho del card
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+          ), // mismo padding que el card
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _isLoadingSimular ? null : () => solicitar(false),
+              child: _isLoadingSimular
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text("Solicitar"),
+            ),
           ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
+  Future<SolicitarFraccionamientoResponse> _fetchSolicitarFraccionamiento(
+    bool solicitarOTP,
+  ) async {
+    final authState = ref.read(authProvider);
+    final token = authState.value?.user?.token;
 
-Future<void> solicitar(bool solicitarOTP) async {
+    final repo = SolicitarFraccionamientoDeudaRepositoryImpl(
+      SolicitarFraccionamientoDatasourceImp(MiAndeApi()),
+    );
+    return await repo.getSolicitarFraccionamientoDeuda(
+      selectedNIS!.nisRad!.toString(),
+      solicitarOTP ? 'S' : 'N',
+      solicitudFraccionamientoResponse?.toJson().toString() ?? "sin datos",
+      token!,
+      'N',
+    );
+  }
 
-print(solicitudFraccionamientoResponse?.resultado?.toJson());
+  Future<void> solicitar(bool solicitarOTP) async {
+    _formKey.currentState!.save();
 
+    if (_isLoadingSolicitar) return;
 
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ingrese los campos obligatorios')),
+      );
+      return;
+    }
 
-}
+    setState(() => _isLoadingSolicitar = true);
+
+    try {
+      final result = await _fetchSolicitarFraccionamiento(solicitarOTP);
+
+      if (result.error!) {
+        DialogHelper.showMessage(
+          context,
+          MessageType.error,
+          'Error',
+          result.errorValList?.first ?? 'Error desconocido',
+        );
+        return;
+      }
+
+      setState(() {});
+
+      CustomSnackbar.show(
+        context,
+        message: result.mensaje!,
+        type: MessageType.success,
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+    } finally {
+      setState(() => _isLoadingSolicitar = false);
+    }
+  }
+
+  List<SuministrosList?>? dropDownItemsSuministro;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final authState = ref.read(authProvider);
+    dropDownItemsSuministro = authState.value?.user?.userDatosAnexos;
+
+    if (dropDownItemsSuministro != null &&
+        dropDownItemsSuministro!.length > 0) {
+      selectedNIS = dropDownItemsSuministro![0]; // valor inicial
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-
-    final List<SuministrosList?>? dropDownItemsSuministro =
-        authState.value!.user?.userDatosAnexos;
-
-    // Asignar valor por defecto cuando la lista ya existe
-    if (dropDownItemsSuministro != null && dropDownItemsSuministro.isNotEmpty) {
-      selectedNIS = dropDownItemsSuministro.first; // 👈 Valor por defecto
-    }
-
     return Scaffold(
       appBar: AppBar(title: Text("Fraccionamiento de Deuda")),
       endDrawer: CustomDrawer(),
@@ -376,6 +449,8 @@ print(solicitudFraccionamientoResponse?.resultado?.toJson());
                     if (value == null) return;
 
                     setState(() => selectedNIS = value);
+
+                    setState(() {});
                   },
 
                   validator: (value) =>
