@@ -18,24 +18,25 @@ import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
 
-class SolicitudFraccionamientoDeudaScreen extends ConsumerStatefulWidget {
-  const SolicitudFraccionamientoDeudaScreen({super.key});
+class SolicitudFraccionamientoDeudaATercerosScreen
+    extends ConsumerStatefulWidget {
+  const SolicitudFraccionamientoDeudaATercerosScreen({super.key});
 
   @override
-  ConsumerState<SolicitudFraccionamientoDeudaScreen> createState() =>
-      _SolicitudFraccionamientoDeudaScreenState();
+  ConsumerState<SolicitudFraccionamientoDeudaATercerosScreen> createState() =>
+      _SolicitudFraccionamientoDeudaATercerosScreenState();
 }
 
-class _SolicitudFraccionamientoDeudaScreenState
-    extends ConsumerState<SolicitudFraccionamientoDeudaScreen> {
-  //final nisController = TextEditingController();
+class _SolicitudFraccionamientoDeudaATercerosScreenState
+    extends ConsumerState<SolicitudFraccionamientoDeudaATercerosScreen> {
+  final nisController = TextEditingController();
   final entregaController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoadingConsultar = false;
   bool _isLoadingSimular = false;
   bool _isLoadingSolicitar = false;
 
-  SuministrosList? selectedNIS;
+  //SuministrosList? selectedNIS;
   int? selectedCuota;
 
   SolicitudFraccionamientoResponse? solicitudFraccionamientoResponse;
@@ -45,12 +46,13 @@ class _SolicitudFraccionamientoDeudaScreenState
   bool mostrarErrorSimular = false;
   String mensajeError = "";
 
+  bool mostrarConsultar = false;
   bool mostrarSimular = false;
 
   void enviarFormulario(bool simular) async {
     if (_isLoadingConsultar) return;
 
-    if (simular && !_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ingrese los campos obligatorios')),
       );
@@ -60,7 +62,7 @@ class _SolicitudFraccionamientoDeudaScreenState
     setState(() => _isLoadingConsultar = true);
     try {
       final result = await _fetchSolicitudFraccionamiento(
-        selectedNIS!.nisRad.toString(),
+        nisController.text,
         simular,
       );
 
@@ -71,6 +73,7 @@ class _SolicitudFraccionamientoDeudaScreenState
           'Error',
           result.errorValList?.first ?? 'Error desconocido',
         );
+        
         return;
       }
 
@@ -89,11 +92,10 @@ class _SolicitudFraccionamientoDeudaScreenState
               "0";
           "";
 
-            selectedCuota = dropDownCantidadCuotas.last;
+          selectedCuota = dropDownCantidadCuotas.last;
         }
-
-       
-       
+        mostrarConsultar = true;
+        
       });
 
       /*DialogHelper.showMessage(
@@ -123,6 +125,11 @@ class _SolicitudFraccionamientoDeudaScreenState
       }
       // DialogHelper.showMessage(context, MessageType.error, 'Error', errorMsg);
       setState(() {
+
+if(simular == false){
+   mostrarConsultar = false;
+}
+
         mostrarErrorSimular = true;
         mensajeError = errorMsg.contains("tokenerror")
             ? "Su sesión ha expirado."
@@ -171,6 +178,7 @@ class _SolicitudFraccionamientoDeudaScreenState
   }
 
   Widget mostrarResultadoConsulta() {
+    _formKey.currentState!.save();
     //selectedCuota= dropDownCantidadCuotas.first;
 
     return Column(
@@ -179,7 +187,7 @@ class _SolicitudFraccionamientoDeudaScreenState
           child: CustomTitle(
             size: 'large',
             text:
-                "NIS: ${selectedNIS?.nisRad.toString() ?? 'sin datos'} - ${solicitudFraccionamientoResponse?.resultado?.nombreApellido ?? "sin datos"}",
+                "NIS: ${nisController.text ?? 'sin datos'} - ${solicitudFraccionamientoResponse?.resultado?.nombreApellido ?? "sin datos"}",
           ),
         ),
         SizedBox(
@@ -359,7 +367,7 @@ class _SolicitudFraccionamientoDeudaScreenState
       SolicitarFraccionamientoDatasourceImp(MiAndeApi()),
     );
     return await repo.getSolicitarFraccionamientoDeuda(
-      selectedNIS!.nisRad!.toString(),
+      nisController.text,
       solicitarOTP ? 'S' : 'N',
       solicitudFraccionamientoResponse?.toJson().toString() ?? "sin datos",
       token!,
@@ -410,23 +418,28 @@ class _SolicitudFraccionamientoDeudaScreenState
 
   List<SuministrosList?>? dropDownItemsSuministro;
 
+  late final tipoCliente;
+
   @override
   void initState() {
     super.initState();
 
     final authState = ref.read(authProvider);
+
+    tipoCliente = authState.value?.user?.tipoCliente;
+
     dropDownItemsSuministro = authState.value?.user?.userDatosAnexos;
 
     if (dropDownItemsSuministro != null &&
-        dropDownItemsSuministro!.length > 0) {
-      selectedNIS = dropDownItemsSuministro![0]; // valor inicial
+        dropDownItemsSuministro!.isNotEmpty) {
+      //selectedNIS = dropDownItemsSuministro![0]; // valor inicial
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Fraccionamiento de Deuda")),
+      appBar: AppBar(title: Text("Fraccionamiento a Terceros")),
       endDrawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Form(
@@ -437,37 +450,15 @@ class _SolicitudFraccionamientoDeudaScreenState
               children: [
                 const SizedBox(height: 24),
 
-                DropdownButtonFormField<SuministrosList>(
-                  initialValue: selectedNIS,
-                  hint: const Text("Seleccionar NIS"),
-                  items: (dropDownItemsSuministro ?? [])
-                      .map(
-                        (item) => DropdownMenuItem(
-                          value: item,
-                          child: Text('NIS: ${item?.nisRad ?? ""}'),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    if (value == null) return;
-
-                    setState(() => selectedNIS = value);
-
-                    setState(() {});
-                  },
-
-                  validator: (value) =>
-                      value == null ? 'Seleccione un NIS' : null,
-                ),
-
-                /* TextFormField(
+                TextFormField(
                   controller: nisController,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   keyboardType: TextInputType.number,
+                  maxLength: 7,
                   decoration: const InputDecoration(labelText: 'NIS'),
                   validator: (value) =>
                       (value == null || value.isEmpty) ? 'Ingrese NIS' : null,
-                ),*/
+                ),
                 const SizedBox(height: 24),
 
                 SizedBox(
@@ -486,7 +477,9 @@ class _SolicitudFraccionamientoDeudaScreenState
                   ),
                 ),
 
-                if (solicitudFraccionamientoResponse != null)
+                if (solicitudFraccionamientoResponse != null &&
+                    solicitudFraccionamientoResponse?.error != true &&
+                    mostrarConsultar)
                   mostrarResultadoConsulta(),
 
                 if (mostrarSimular) mostrarResultadoSimular(),

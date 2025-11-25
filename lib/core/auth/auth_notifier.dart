@@ -285,7 +285,7 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
 
   Future<void> logoutForzado() async {
   // Limpia storage
-  await _storage.delete(key: _userKey);
+  //await _storage.delete(key: _userKey);
 
   // Limpia estado
   state = const AsyncValue.data(

@@ -2,11 +2,18 @@ import 'package:form/model/comercial/info_item_comercial_solicitud.dart';
 
 final List<InfoItem> itemsSolicitudesComerciales = [
   InfoItem(
-    title: "Fraccionamiento",
-    description: "Solicitar Fraccionamiento de deuda.",
+    title: "Tú Fraccionamiento",
+    description: "Solicitar Tú Fraccionamiento de deuda.",
     buttonText: "Solicitar",
     necesitaAuth: true,
     path: "/solicitudFraccionamientoDeuda",
+  ),
+    InfoItem(
+    title: "Fraccionamiento a Terceros",
+    description: "Solicitar Fraccionamiento de deuda a terceros.",
+    buttonText: "Solicitar",
+    necesitaAuth: true,
+    path: "/solicitudFraccionamientoDeudaATerceros",
   ),
   InfoItem(
     title: "Registro de número de Teléfono Celular",
