@@ -20,6 +20,7 @@ class MiCuentaScreen extends ConsumerWidget {
     }
 
     final botones = [
+      if(authState.value?.user?.tipoCliente == '1')
       BotonNavegacion(
         icon: Icons.electric_meter,
         texto: 'Suministros',

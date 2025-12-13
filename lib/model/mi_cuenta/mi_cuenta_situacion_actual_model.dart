@@ -291,14 +291,14 @@ class FacturaDatos {
 
 class Lectura {
   final String? tipoConsumo;
-  final num? consumo;
+  final String? consumo;
   final String? numeroAparato;
-  final num? constante;
-  final num? lecturaAnterior;
+  final String? constante;
+  final String? lecturaAnterior;
   final num? constanteAparato;
   final String? fechaLectura;
-  final num? csmoMin;
-  final num? lecturaActual;
+  final String? csmoMin;
+  final String? lecturaActual;
 
   Lectura({
     this.tipoConsumo,
@@ -343,14 +343,14 @@ class Lectura {
 
   Lectura copyWith({
     String? tipoConsumo,
-    num? consumo,
+    String? consumo,
     String? numeroAparato,
-    num? constante,
-    num? lecturaAnterior,
+    String? constante,
+    String? lecturaAnterior,
     num? constanteAparato,
     String? fechaLectura,
-    num? csmoMin,
-    num? lecturaActual,
+    String? csmoMin,
+    String? lecturaActual,
   }) {
     return Lectura(
       tipoConsumo: tipoConsumo ?? this.tipoConsumo,

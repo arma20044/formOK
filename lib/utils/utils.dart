@@ -6,12 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:form/config/constantes.dart';
+import 'package:form/model/archivo_adjunto_model.dart';
 import 'package:form/model/constans/mensajes_servicios.dart';
 import 'package:form/model/favoritos/favoritos_model.dart';
 import 'package:form/model/favoritos/favoritos_tipo_model.dart';
 import 'package:form/model/servicios_nis_telefono.dart';
+import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/custom_pdf_modal.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
+import 'package:form/presentation/components/common/custom_text.dart';
+import 'package:form/presentation/components/common/media_selector.list.dart';
 import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -380,5 +384,36 @@ num calcularCifra(String nis, String fechaVencimiento) {
           ? "NIS: ${fav.title} eliminado de favoritos"
           : "NIS: ${fav.title} agregado a favoritos",
       type: exists ? MessageType.error : MessageType.success,
+    );
+  }
+
+
+    Widget buildMediaCard({
+    required String title,
+    required List<ArchivoAdjunto> files,
+    required ValueChanged<List<ArchivoAdjunto>> onChanged,
+    required String ayuda,
+    required ThemeData theme,
+  }) {
+    return CustomCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CustomText(
+            title,
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.primary,
+            overflow: TextOverflow.clip,
+          ),
+          const SizedBox(height: 8),
+          MediaSelectorList(
+            maxAdjuntos: 2,
+            ayuda: ayuda,
+            type: MediaType.foto,
+            files: files,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
     );
   }

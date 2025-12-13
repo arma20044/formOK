@@ -362,7 +362,7 @@ class _SolicitudAbastecimientoScreenState
                 const SizedBox(height: 24),
 
                 // ------------------------- ADJUNTOS a) a e) -------------------------
-                _buildMediaCard(
+                buildMediaCard(
                   title:
                       "a) Solicitud de Abastecimiento de Energía Eléctrica (SAEE)",
                   files: selectedFileSolicitudList,
@@ -372,7 +372,7 @@ class _SolicitudAbastecimientoScreenState
                   theme: theme,
                 ),
                 const SizedBox(height: 24),
-                _buildMediaCard(
+                buildMediaCard(
                   title:
                       "b) Fotocopia Autenticada por Escribanía del título de Propiedad o equivalente",
                   files: selectedFileFotocopiaAutenticadaList,
@@ -384,7 +384,7 @@ class _SolicitudAbastecimientoScreenState
                   theme: theme,
                 ),
                 const SizedBox(height: 24),
-                _buildMediaCard(
+                buildMediaCard(
                   title: "c) Copia simple de Cédula Identidad del Solicitante",
                   files: selectedFileFotocopiaSimpleCedulaSolicitanteList,
                   onChanged: (lista) => setState(
@@ -395,7 +395,7 @@ class _SolicitudAbastecimientoScreenState
                   theme: theme,
                 ),
                 const SizedBox(height: 24),
-                _buildMediaCard(
+                buildMediaCard(
                   title:
                       "d) Copia simple de Carnet del Electricista Matriculado en ANDE",
                   files: selectedFileCopiaSimpleCarnetElectricistaList,
@@ -406,7 +406,7 @@ class _SolicitudAbastecimientoScreenState
                   theme: theme,
                 ),
                 const SizedBox(height: 24),
-                _buildMediaCard(
+                buildMediaCard(
                   title: "e) Otros documentos",
                   files: selectedFileOtrosDocumentosList,
                   onChanged: (lista) =>
@@ -452,33 +452,5 @@ class _SolicitudAbastecimientoScreenState
     );
   }
 
-  Widget _buildMediaCard({
-    required String title,
-    required List<ArchivoAdjunto> files,
-    required ValueChanged<List<ArchivoAdjunto>> onChanged,
-    required String ayuda,
-    required ThemeData theme,
-  }) {
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CustomText(
-            title,
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.primary,
-            overflow: TextOverflow.clip,
-          ),
-          const SizedBox(height: 8),
-          MediaSelectorList(
-            maxAdjuntos: 2,
-            ayuda: ayuda,
-            type: MediaType.foto,
-            files: files,
-            onChanged: onChanged,
-          ),
-        ],
-      ),
-    );
-  }
+
 }

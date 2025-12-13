@@ -8,6 +8,7 @@ import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/main.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/registro_numero_celular_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitudAbastecimientoScreen.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_alumbrado_publico_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_factura_fija_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_fraccionamiento_deuda_a_terceros_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_fraccionamiento_deuda_screen.dart';
@@ -155,6 +156,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/solicitudFraccionamientoDeudaATerceros',
         builder: (context, state) => const SolicitudFraccionamientoDeudaATercerosScreen(),
+      ),
+      GoRoute(
+        path: '/solicitudAlumbradoPublico',
+        builder: (context, state) => const SolicitudAlumbradoPublico(),
       ),
     ],
 
