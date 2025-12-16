@@ -60,4 +60,13 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     comercial: false,
     
   ),
+  InfoItem(
+    title: "Solicitud de extensión de línea en Baja Tensión",
+    description: "Solicite extensión de línea en Baja Tensión.",
+    buttonText: "Solicitar",
+    necesitaAuth: false,
+    path: "/solicitudExtencionBajaTension",
+    comercial: false,
+    
+  ),
 ];
