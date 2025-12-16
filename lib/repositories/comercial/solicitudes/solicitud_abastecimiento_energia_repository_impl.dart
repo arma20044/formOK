@@ -1,6 +1,7 @@
 import 'package:form/datasources/datasources.dart';
 import 'package:form/model/model.dart';
 import 'package:form/repo/repo.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SolicitudAbastecimientoRepositoryImpl
     extends SolicitudAbastecimientoRepository {
@@ -21,6 +22,7 @@ class SolicitudAbastecimientoRepositoryImpl
     List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
     List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
+    LatLng? latitudLongitud
   ) {
     return datasource.getSolicitudAbastecimiento(
       titularNombres,
@@ -34,6 +36,7 @@ class SolicitudAbastecimientoRepositoryImpl
       selectedFileFotocopiaSimpleCedulaSolicitanteList,
       selectedFileCopiaSimpleCarnetElectricistaList,
       selectedFileOtrosDocumentosList,
+      latitudLongitud
     );
   }
 }

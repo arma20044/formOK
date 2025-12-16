@@ -45,6 +45,7 @@ class CustomPhoneField extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             IntlPhoneField(
+              invalidNumberMessage: "Número de teléfono inválido",
               controller: controller,
               enabled: enabled,
               countries: onlyPYCountry,

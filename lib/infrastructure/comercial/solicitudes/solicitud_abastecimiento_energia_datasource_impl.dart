@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/core/enviromens/Enrivoment.dart';
 import 'package:form/datasources/datasources.dart';
 import 'package:form/model/model.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SolicitudAbastecimientoDatasourceImp
     extends SolicitudAbastecimientoDatasource {
@@ -27,6 +29,7 @@ class SolicitudAbastecimientoDatasourceImp
     List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
     List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
+    LatLng? latitudLongitud
   ) async {
     final Map<String, Object> formMap = {
       'titularNombres': titularNombres,
@@ -36,20 +39,28 @@ class SolicitudAbastecimientoDatasourceImp
       'titularCorreo': titularCorreo,
       'idTipoReclamo': idTipoReclamo,
       'clientKey': Environment.clientKey,
-    };
+      'latitud' : latitudLongitud?.latitude ?? '',
+      'longitud' : latitudLongitud?.longitude ?? '',
+      //'solicitudOTP' :'S',
+      //'codigoOTP' : '00'
 
-    if (selectedFileSolicitudList!.isNotEmpty) {
-      int pos = 0;
-      for (var foto in selectedFileSolicitudList) {
-        pos++;
-        formMap['saee_adjuntoSaee$pos'] = [
-          await MultipartFile.fromFile(
-            foto.file.path,
-            filename: foto.file.path.split('/').last,
-          ),
-        ];
-        formMap['saee_adjuntoSaee${pos}Extra'] = jsonEncode(foto.info);
+    };
+    try {
+      if (selectedFileSolicitudList!.isNotEmpty) {
+        int pos = 0;
+        for (var foto in selectedFileSolicitudList) {
+          pos++;
+          formMap['saee_adjuntoSaee$pos'] = [
+            await MultipartFile.fromFile(
+              foto.file.path,
+              filename: foto.file.path.split('/').last,
+            ),
+          ];
+          formMap['saee_adjuntoSaee${pos}Extra'] = jsonEncode(foto.info);
+        }
       }
+    } catch (e) {
+      log(e.toString());
     }
 
     if (selectedFileFotocopiaAutenticadaList!.isNotEmpty) {

@@ -142,6 +142,7 @@ class _SolicitudAbastecimientoScreenState
         selectedFileFotocopiaSimpleCedulaSolicitanteList,
         selectedFileCopiaSimpleCarnetElectricistaList,
         selectedFileOtrosDocumentosList,
+        null
       );
 
       if (!mounted) return;
@@ -192,7 +193,7 @@ class _SolicitudAbastecimientoScreenState
     return Scaffold(
       endDrawer: const CustomDrawer(),
       appBar: AppBar(
-        title: const Text("Solicitud de Abastecimiento de Energía"),
+        title: const Text("Solicitud de \nAbastecimiento de Energía",textAlign: TextAlign.center,),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),

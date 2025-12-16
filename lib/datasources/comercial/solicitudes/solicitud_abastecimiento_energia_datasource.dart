@@ -1,4 +1,5 @@
 import 'package:form/model/model.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 abstract class SolicitudAbastecimientoDatasource {
   Future<SolicitudAbastecimientoResponse> getSolicitudAbastecimiento(
@@ -13,5 +14,6 @@ abstract class SolicitudAbastecimientoDatasource {
     List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
     List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
+    LatLng? latitudLongitud
   );
 }
