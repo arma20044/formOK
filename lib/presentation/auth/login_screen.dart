@@ -25,9 +25,9 @@ final List<DropdownItem> dropDownItems = [
 ];
 
 class LoginScreen extends ConsumerStatefulWidget {
-final String from;
+  final String from;
 
-  const LoginScreen(   {super.key,required this.from,});
+  const LoginScreen({super.key, required this.from});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -74,10 +74,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
 
-             
             if (widget.from.isNotEmpty) {
               //return '/$previousUri';
-                context.pushReplacement(widget.from);
+              context.pushReplacement(widget.from);
             } else {
               GoRouter.of(context).go('/'); // navega al home
             }
@@ -279,13 +278,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
                         ),
-                        child: const Text(
-                          'Acceder',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: isLoading
+                            ? CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 3,
+                              )
+                            : const Text(
+                                'Acceder',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
 
@@ -325,18 +329,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
             ),
-
-            // Overlay de bloqueo
-            if (isLoading)
-              Container(
-                color: Colors.black.withOpacity(0.5),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 3,
-                  ),
-                ),
-              ),
           ],
         ),
       ),
