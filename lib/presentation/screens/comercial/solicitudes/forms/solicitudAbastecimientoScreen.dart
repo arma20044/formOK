@@ -142,7 +142,10 @@ class _SolicitudAbastecimientoScreenState
         selectedFileFotocopiaSimpleCedulaSolicitanteList,
         selectedFileCopiaSimpleCarnetElectricistaList,
         selectedFileOtrosDocumentosList,
-        null
+        null,
+        "",
+        "",
+        ""
       );
 
       if (!mounted) return;

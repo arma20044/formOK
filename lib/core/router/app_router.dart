@@ -9,6 +9,7 @@ import 'package:form/main.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/registro_numero_celular_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitudAbastecimientoScreen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_alumbrado_publico_screen.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_consumo_inteligente_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_extension_baja_tension_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_factura_fija_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_fraccionamiento_deuda_a_terceros_screen.dart';
@@ -31,6 +32,7 @@ final publicRoutes = [
   //'/solicitudesPublico',
   '/solicitudFacturaFija',
   '/favoritos',
+  '/solicitudConsumoInteligente'
 ];
 final privateRoutes = [
   '/miCuenta',
@@ -165,6 +167,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/solicitudExtencionBajaTension',
         builder: (context, state) => const SolicitudExtencionBajaTension(),
+      ),
+
+
+      GoRoute(
+        path: '/solicitudConsumoInteligente',
+        builder: (context, state) => const SolicitudConsumoInteligenteScreen(),
       ),
     ],
 

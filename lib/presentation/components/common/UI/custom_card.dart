@@ -9,6 +9,8 @@ class CustomCard extends StatelessWidget {
   final Color? borderColor;
   final Widget child;
   final BoxDecoration? styleAdd;
+  final Color? backgroundColor;
+
 
   const CustomCard({
     super.key,
@@ -17,7 +19,8 @@ class CustomCard extends StatelessWidget {
     this.titleColor,
     this.borderWidth = 1.0,
     required this.child,
-    this.styleAdd, this.borderColor,
+    this.styleAdd,
+    this.borderColor, this.backgroundColor,
   });
 
   @override
@@ -26,15 +29,19 @@ class CustomCard extends StatelessWidget {
     final colors = theme.colorScheme;
 
     //final borderColor = colors.outlineVariant; // equivalente a colors.tertiary
-    final dividerColor = colors.surfaceContainerHighest; // equivalente a colors.neutral1
+    final dividerColor =
+        colors.surfaceContainerHighest; // equivalente a colors.neutral1
 
     return Container(
-      decoration: styleAdd ??
+      decoration:
+          styleAdd ??
           BoxDecoration(
+            color: backgroundColor ?? colors.surface, // 👈 fondo
+
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               width: borderWidth,
-              color: borderColor != null ? borderColor! :colors.outlineVariant,
+              color: borderColor != null ? borderColor! : colors.outlineVariant,
             ),
           ),
       padding: const EdgeInsets.all(10),

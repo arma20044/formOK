@@ -162,6 +162,9 @@ class _SolicitudExtencionBajaTensionState
       selectedFileCopiaSimpleCarnetElectricistaList,
       selectedFileOtrosDocumentosList,
       ubicacion,
+      "",
+      "",
+      ""
     );
   }
 

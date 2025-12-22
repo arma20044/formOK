@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/config/constantes.dart';
@@ -211,8 +209,39 @@ class _SolicitudYoFacturoMiLuzState
     }
   }
 
+  Widget mostrarLecturaNOHabilitada() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          CustomText(
+            "NIS: ${_nisController.text} - ${situacionActualResultado!.nombre} ${situacionActualResultado!.apellido}",
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            overflow: TextOverflow.clip,
+          ),
+
+          CustomText(
+            "Fecha aproximada de Próxima Lectura: ${situacionActualResultado!.lecturaTeorica}",
+          ),
+          const SizedBox(height: 10),
+
+          CustomCard(
+            child: Text(
+              situacionActualResultado?.habilitarAporteLectura?.mensaje,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget mostrarResultadoConsulta2() {
     if (situacionActualResultado == null) return const SizedBox();
+
+    if (situacionActualResultado?.habilitarAporteLectura?.habilitado == 'N') {
+      return mostrarLecturaNOHabilitada();
+    }
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

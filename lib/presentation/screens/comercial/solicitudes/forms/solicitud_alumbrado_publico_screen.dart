@@ -159,6 +159,9 @@ class _SolicitudAlumbradoPublicoState extends State<SolicitudAlumbradoPublico> {
       selectedFileCopiaSimpleCarnetElectricistaList,
       selectedFileOtrosDocumentosList,
       ubicacion,
+      "",
+      "",
+      ""
     );
   }
 

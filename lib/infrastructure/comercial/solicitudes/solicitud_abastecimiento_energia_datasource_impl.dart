@@ -29,7 +29,10 @@ class SolicitudAbastecimientoDatasourceImp
     List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
     List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
-    LatLng? latitudLongitud
+    LatLng? latitudLongitud,
+    String? solicitudOTP,
+    String? codigoOTP,
+    String? metodo,
   ) async {
     final Map<String, Object> formMap = {
       'titularNombres': titularNombres,
@@ -39,11 +42,11 @@ class SolicitudAbastecimientoDatasourceImp
       'titularCorreo': titularCorreo,
       'idTipoReclamo': idTipoReclamo,
       'clientKey': Environment.clientKey,
-      'latitud' : latitudLongitud?.latitude ?? '',
-      'longitud' : latitudLongitud?.longitude ?? '',
-      //'solicitudOTP' :'S',
-      //'codigoOTP' : '00'
-
+      'latitud': latitudLongitud?.latitude ?? '',
+      'longitud': latitudLongitud?.longitude ?? '',
+      'metodo': metodo ?? 'CEL',
+      'solicitudOTP' :solicitudOTP ?? 'N',
+      'codigoOTP' : codigoOTP ??  '00'
     };
     try {
       if (selectedFileSolicitudList!.isNotEmpty) {

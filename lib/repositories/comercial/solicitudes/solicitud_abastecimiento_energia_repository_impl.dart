@@ -22,7 +22,10 @@ class SolicitudAbastecimientoRepositoryImpl
     List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
     List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
-    LatLng? latitudLongitud
+    LatLng? latitudLongitud,
+    String? solicitudOTP,
+    String? codigoOTP,
+    String? metodo,
   ) {
     return datasource.getSolicitudAbastecimiento(
       titularNombres,
@@ -36,7 +39,10 @@ class SolicitudAbastecimientoRepositoryImpl
       selectedFileFotocopiaSimpleCedulaSolicitanteList,
       selectedFileCopiaSimpleCarnetElectricistaList,
       selectedFileOtrosDocumentosList,
-      latitudLongitud
+      latitudLongitud,
+      solicitudOTP,
+      codigoOTP,
+      metodo
     );
   }
 }

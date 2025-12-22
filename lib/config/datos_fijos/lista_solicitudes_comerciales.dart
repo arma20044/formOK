@@ -69,4 +69,58 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     comercial: false,
     
   ),
+  InfoItem(
+    title: "Comunicación de avería de electrodomésticos",
+    description: "Comunique la avería de electrodomésticos.",
+    buttonText: "Solicitar",
+    necesitaAuth: false,
+    path: "/solicitudComunicacionAveria",
+    comercial: false,
+    
+  ),
+  InfoItem(
+    title: "Solicitud de Retiro del Medidor",
+    description: "Solicite el Retiro del Medidor.",
+    buttonText: "Solicitar",
+    necesitaAuth: false,
+    path: "/solicitudRetiroMedidor",
+    comercial: false,
+    
+  ),
+  InfoItem(
+    title: "Solicitud de Consulta previa superior a 40 KW",
+    description: "Solicite Consulta previa superior a 40 KW.",
+    buttonText: "Solicitar",
+    necesitaAuth: false,
+    path: "/solicitudConsultaPreviaSuperior40kw",
+    comercial: false,
+    
+  ),
+  InfoItem(
+    title: "Solicitud de Actualización de Carga Hasta 40 kW",
+    description: "Solicite Actualizacion de Carga Hasta 40 kW.",
+    buttonText: "Solicitar",
+    necesitaAuth: false,
+    path: "/solicitudActualizacionCargaHasta40kw",
+    comercial: false,
+    
+  ),
+  InfoItem(
+    title: "Solicitud de Actualización de datos",
+    description: "Solicite Actualizacion de datos.",
+    buttonText: "Solicitar",
+    necesitaAuth: false,
+    path: "/solicitudActualizacionDatos",
+    comercial: false,
+    
+  ),
+  InfoItem(
+    title: "Solicitud de Consumo Inteligente",
+    description: "Solicite el cambio de categoría a Consumo Inteligente, tarifa por tramos horarios.",
+    buttonText: "Solicitar",
+    necesitaAuth: false,
+    path: "/solicitudConsumoInteligente",
+    comercial: false,
+    
+  ),
 ];
