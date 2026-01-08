@@ -106,7 +106,9 @@ class _SolicitudYoFacturoMiLuzState
         _lecturaActualController.text = "";
       });
 
-      showModalBottomSheet(
+
+      if(consultaSituacionActualResponse.resultado?.habilitarAporteLectura?.habilitado == 'S') {
+        showModalBottomSheet(
         isDismissible: false,
         context: context, // Contexto de la pantalla actual
         isScrollControlled: true, // Permite que ocupe más espacio (ej. 80%)
@@ -115,6 +117,7 @@ class _SolicitudYoFacturoMiLuzState
         builder: (_) =>
             const ImageBottomSheet(assetPath: 'assets/images/yofacturo.png'),
       );
+      }
 
       /*ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Consultando NIS: $nis')),

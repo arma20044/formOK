@@ -1,24 +1,32 @@
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
+import 'package:form/core/auth/auth_notifier.dart';
+import 'package:form/core/router/app_router.dart';
 import 'package:form/main.dart';
 
 class ErrorInterceptor extends Interceptor {
+  bool _redirecting = false;
+
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     final data = response.data;
 
-    // Verifica si es un Map y tiene "error"
     if (data is Map<String, dynamic> && data['error'] == true) {
       String mensaje = "Ha ocurrido un error inesperado";
+      bool isAuthError = false;
 
-      if (data['tokenerror'] != null && data['tokenerror'].toString().isNotEmpty) {
-        mensaje = "Error de autenticación: ${data['tokenerror']}";
-      } else if (data['errorValidacion'] == true && data['errorValList'] != null) {
-        mensaje = "Errores de validación: ${data['errorValList'].join(", ")}";
+      if (data['tokenerror'] != null &&
+          data['tokenerror'].toString().isNotEmpty) {
+        mensaje = "Sesión expirada. Inicie sesión nuevamente.";
+        isAuthError = true;
+      } else if (data['errorValidacion'] == true &&
+          data['errorValList'] != null) {
+        mensaje =
+            "Errores de validación: ${data['errorValList'].join(", ")}";
       }
 
-      // Mostrar SnackBar usando GlobalKey
+      // 🔔 Snackbar global
       rootScaffoldMessengerKey.currentState?.showSnackBar(
         SnackBar(
           content: Text(mensaje),
@@ -26,23 +34,28 @@ class ErrorInterceptor extends Interceptor {
         ),
       );
 
-      // Rechazar la respuesta para que el .catchError() también lo capture si quieres
+      // 🔐 REDIRECCIÓN CON GOROUTER
+      if (isAuthError && !_redirecting) {
+        _redirecting = true;
+
+        Future.microtask(() {
+          container.read(authProvider.notifier).logout();
+          
+          container.read(goRouterProvider).push('/login');
+          _redirecting = false;
+        });
+      }
+
       return handler.reject(
-        DioError(
+        DioException(
           requestOptions: response.requestOptions,
           response: response,
-          type: DioErrorType.badResponse,
+          type: DioExceptionType.badResponse,
           error: mensaje,
         ),
       );
     }
 
-    super.onResponse(response, handler);
-  }
-
-  @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
-    // Aquí puedes manejar errores de red globales si quieres
-    super.onError(err, handler);
+    return handler.next(response);
   }
 }
