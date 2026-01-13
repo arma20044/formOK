@@ -115,11 +115,7 @@ class _SolicitudAlumbradoPublicoState extends State<SolicitudAlumbradoPublico> {
         solicitudAbastecimientoResult = result.resultado;
       });
 
-      /*CustomSnackbar.show(
-        context,
-        message: "Simulacion Correcta.",
-        type: MessageType.success,
-      );*/
+      
       limpiarTodo();
 
       DialogHelper.showMessage(
@@ -149,6 +145,7 @@ class _SolicitudAlumbradoPublicoState extends State<SolicitudAlumbradoPublico> {
     return await repo.getSolicitudAbastecimiento(
       titularNombresController.text,
       titularApellidosController.text,
+      '',
       titularNumeroDcumentoController.text,
       numeroTelefonoController.text,
       correoController.text,

@@ -20,6 +20,7 @@ class SolicitudAbastecimientoDatasourceImp
   Future<SolicitudAbastecimientoResponse> getSolicitudAbastecimiento(
     String titularNombres,
     String titularApellidos,
+    String? tipoDocumento,
     String titularDocumentoNumero,
     String titularNumeroTelefono,
     String titularCorreo,
@@ -37,6 +38,7 @@ class SolicitudAbastecimientoDatasourceImp
     final Map<String, Object> formMap = {
       'titularNombres': titularNombres,
       'titularApellidos': titularApellidos,
+      'idTipoDocumento' :tipoDocumento ?? '',
       'titularDocumentoNumero': titularDocumentoNumero,
       'titularNumeroTelefono': titularNumeroTelefono,
       'titularCorreo': titularCorreo,

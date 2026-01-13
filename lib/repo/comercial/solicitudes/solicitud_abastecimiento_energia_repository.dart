@@ -5,6 +5,7 @@ abstract class SolicitudAbastecimientoRepository {
   Future<SolicitudAbastecimientoResponse> getSolicitudAbastecimiento(
     String titularNombres,
     String titularApellidos,
+    String? tipoDocumento,
     String titularDocumentoNumero,
     String titularNumeroTelefono,
     String titularCorreo,

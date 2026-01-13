@@ -13,6 +13,7 @@ class SolicitudAbastecimientoRepositoryImpl
   Future<SolicitudAbastecimientoResponse> getSolicitudAbastecimiento(
     String titularNombres,
     String titularApellidos,
+    String? tipoDocumento,
     String titularDocumentoNumero,
     String titularNumeroTelefono,
     String titularCorreo,
@@ -30,6 +31,7 @@ class SolicitudAbastecimientoRepositoryImpl
     return datasource.getSolicitudAbastecimiento(
       titularNombres,
       titularApellidos,
+      tipoDocumento,
       titularDocumentoNumero,
       titularNumeroTelefono,
       titularCorreo,
