@@ -8,6 +8,7 @@ import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/main.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/registro_numero_celular_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitudAbastecimientoScreen.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_actualizacion_carga_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_actualizacion_datos_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_alumbrado_publico_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_consumo_inteligente_screen.dart';
@@ -34,7 +35,9 @@ final publicRoutes = [
   '/solicitudFacturaFija',
   '/favoritos',
   '/solicitudConsumoInteligente',
-  '/solicitudActualizacionDatos'
+  '/solicitudActualizacionDatos',
+  '/solicitudActualizacionCargaHasta40kw',
+  '/registroNumeroCelular'
 ];
 final privateRoutes = [
   '/miCuenta',
@@ -43,7 +46,7 @@ final privateRoutes = [
   '/consultaFacturas',
   '/cambioContrasenha',
   '/suministros',
-  '/solicitudYoFacturoMiLuz'
+  '/solicitudYoFacturoMiLuz',
 ];
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -91,10 +94,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: ':telefono',
             builder: (context, state) {
               final nis = state.pathParameters['telefono'];
-              return ReclamosScreen(telefono: nis, tipoReclamo: 'FE',);
+              return ReclamosScreen(telefono: nis, tipoReclamo: 'FE');
             },
           ),
-        ]
+        ],
       ),
       GoRoute(
         path: '/splash',
@@ -126,7 +129,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/suministros',
         builder: (context, state) => const SuministrosScreen(),
       ),
-     /* GoRoute(
+      /* GoRoute(
         path: '/solicitudesPublico',
         builder: (context, state) => const SolicitudesScreen(true),
       ),*/
@@ -156,11 +159,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/solicitudFraccionamientoDeuda',
-        builder: (context, state) => const SolicitudFraccionamientoDeudaScreen(),
+        builder: (context, state) =>
+            const SolicitudFraccionamientoDeudaScreen(),
       ),
       GoRoute(
         path: '/solicitudFraccionamientoDeudaATerceros',
-        builder: (context, state) => const SolicitudFraccionamientoDeudaATercerosScreen(),
+        builder: (context, state) =>
+            const SolicitudFraccionamientoDeudaATercerosScreen(),
       ),
       GoRoute(
         path: '/solicitudAlumbradoPublico',
@@ -171,7 +176,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SolicitudExtencionBajaTension(),
       ),
 
-
       GoRoute(
         path: '/solicitudConsumoInteligente',
         builder: (context, state) => const SolicitudConsumoInteligenteScreen(),
@@ -179,9 +183,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
 
 
-            GoRoute(
+      GoRoute(
         path: '/solicitudActualizacionDatos',
         builder: (context, state) => const SolicitudActualizacionDatosScreen(),
+      ),
+
+
+            GoRoute(
+        path: '/solicitudActualizacionCargaHasta40kw',
+        builder: (context, state) => const SolicitudActualizacionCargaScreen(),
       ),
     ],
 

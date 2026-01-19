@@ -185,7 +185,7 @@ class _SolicitudAbastecimientoScreenState
 
   void _mostrarMapa() {
     setState(() {
-      showMap = true;
+      showMap = !showMap;
     });
   }
   // ------------------------- BUILD -------------------------

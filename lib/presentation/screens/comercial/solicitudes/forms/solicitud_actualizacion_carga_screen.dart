@@ -7,67 +7,244 @@ import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
+import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
+import 'package:form/presentation/components/common/map_selector_inline.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class SolicitudActualizacionDatosScreen extends StatefulWidget {
-  const SolicitudActualizacionDatosScreen({super.key});
+class SolicitudActualizacionCargaScreen extends StatefulWidget {
+  const SolicitudActualizacionCargaScreen({super.key});
 
   @override
-  State<SolicitudActualizacionDatosScreen> createState() =>
-      _SolicitudActualizacionDatosScreenState();
+  State<SolicitudActualizacionCargaScreen> createState() =>
+      _SolicitudActualizacionCargaScreenState();
 }
+
+
+
+class _SolicitudActualizacionCargaScreenState
+    extends State<SolicitudActualizacionCargaScreen> {
+
+bool isLoadingConsultaDocumento = false;
 
 final formKey = GlobalKey<FormState>();
 bool _isLoadingSolicitud = false;
 
-class _SolicitudActualizacionDatosScreenState
-    extends State<SolicitudActualizacionDatosScreen> {
-  final List<DropdownItem> dropDownItems = [
-    DropdownItem(id: 'TD001', name: 'C.I. Civil'),
-    DropdownItem(id: 'TD002', name: 'RUC'),
-    //DropdownItem(id: 'TD004', name: 'Pasaporte'),
-  ];
+final List<DropdownItem> dropDownItems = [
+  DropdownItem(id: 'TD001', name: 'C.I. Civil'),
+  DropdownItem(id: 'TD002', name: 'RUC'),
+  //DropdownItem(id: 'TD004', name: 'Pasaporte'),
+];
 
-  bool isLoadingConsultaDocumento = false;
-  final TextEditingController nombreObtenido = TextEditingController();
-  final TextEditingController apellidoObtenido = TextEditingController();
+DropdownItem? selectedTipoDocumento;
 
-  DropdownItem? selectedTipoDocumento;
+late ConsultaDocumentoResultado consultaDocumentoResponse;
+
+final TextEditingController numeroDocumentoController = TextEditingController();
+
+final TextEditingController numeroTelefonoCelularController =
+    TextEditingController();
+
+final TextEditingController correoController = TextEditingController();
+
+final TextEditingController nombreObtenido = TextEditingController();
+final TextEditingController apellidoObtenido = TextEditingController();
+
+// Ubicación
+LatLng? ubicacion;
+
+LatLng? _currentPosition;
+LatLng? _selected;
+
+GoogleMapController? _mapController;
+
+// Archivos adjuntos
+List<ArchivoAdjunto> selectedFileSolicitudList = [];
+List<ArchivoAdjunto> selectedFileFotocopiaAutenticadaList = [];
+List<ArchivoAdjunto> selectedFileFotocopiaSimpleCedulaSolicitanteList = [];
+List<ArchivoAdjunto> selectedFileCopiaSimpleCarnetElectricistaList = [];
+List<ArchivoAdjunto> selectedFileOtrosDocumentosList = [];
+
   final _numeroDocumentoFieldKey = GlobalKey<FormFieldState<String>>();
-
   final FocusNode _focusNode = FocusNode();
 
-  late ConsultaDocumentoResultado consultaDocumentoResponse;
+  bool showMap = false;
 
-  final TextEditingController numeroDocumentoController =
-      TextEditingController();
+  void _mostrarMapa() {
+    setState(() {
+      showMap = !showMap;
+    });
+  }
 
-  final TextEditingController numeroTelefonoCelularController =
-      TextEditingController();
+  void limpiarTodo() {
+    nombreObtenido.text = '';
+    apellidoObtenido.text = '';
+    numeroDocumentoController.clear();
+    numeroTelefonoCelularController.clear();
+    correoController.clear();
 
-  final TextEditingController correoController = TextEditingController();
+    setState(() {
+      showMap = false;
+      ubicacion = null;
+      selectedFileSolicitudList.clear();
+      selectedFileFotocopiaAutenticadaList.clear();
+      selectedFileFotocopiaSimpleCedulaSolicitanteList.clear();
+      selectedFileCopiaSimpleCarnetElectricistaList.clear();
+      selectedFileOtrosDocumentosList.clear();
+      //_formKey.currentState?.reset();
+    });
 
-  LatLng? ubicacion;
+    FocusScope.of(context).unfocus();
+  }
 
-  dynamic solicitudAbastecimientoResult;
+  Future<void> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
 
-  // Archivos adjuntos
-  List<ArchivoAdjunto> selectedFileSolicitudList = [];
-  List<ArchivoAdjunto> selectedFileFotocopiaAutenticadaList = [];
-  List<ArchivoAdjunto> selectedFileFotocopiaSimpleCedulaSolicitanteList = [];
-  List<ArchivoAdjunto> selectedFileCopiaSimpleCarnetElectricistaList = [];
-  List<ArchivoAdjunto> selectedFileOtrosDocumentosList = [];
+    // Verificar si el servicio de ubicación está habilitado
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      debugPrint('Servicio de ubicación deshabilitado');
+      setState(() {
+        _currentPosition = const LatLng(-25.2637, -57.5759); // fallback
+      });
+      return;
+    }
+
+    // Verificar permisos
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        debugPrint('Permiso denegado');
+        setState(() {
+          _currentPosition = const LatLng(-25.2637, -57.5759); // fallback
+        });
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      debugPrint('Permiso denegado permanentemente');
+      setState(() {
+        _currentPosition = const LatLng(-25.2637, -57.5759); // fallback
+      });
+      return;
+    }
+
+    // Permiso otorgado, obtener posición
+    try {
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+      setState(() {
+        _currentPosition = LatLng(pos.latitude, pos.longitude);
+      });
+      if (_mapController != null) {
+        _mapController!.animateCamera(
+          CameraUpdate.newLatLng(_currentPosition!),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error obteniendo ubicación: $e");
+      setState(() {
+        _currentPosition = const LatLng(-25.2882897, -57.6120394); // fallback
+      });
+    }
+  }
+
+  void _enviarFormulario() async {
+    if (_isLoadingSolicitud) return;
+
+    if (!formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ingrese los campos obligatorios')),
+      );
+      return;
+    }
+
+    if (ubicacion == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Agregue ubicación en el Mapa.')),
+      );
+      return;
+    }
+
+    try {
+      setState(() => _isLoadingSolicitud = true);
+
+      final repo = SolicitudAbastecimientoRepositoryImpl(
+        SolicitudAbastecimientoDatasourceImp(MiAndeApi()),
+      );
+
+      final result = await repo.getSolicitudAbastecimiento(
+        nombreObtenido.text,
+        apellidoObtenido.text,
+        selectedTipoDocumento?.id,
+        numeroDocumentoController.text,
+        numeroTelefonoCelularController.text,
+        correoController.text,
+        '1',
+        selectedFileSolicitudList,
+        selectedFileFotocopiaAutenticadaList,
+        selectedFileFotocopiaSimpleCedulaSolicitanteList,
+        selectedFileCopiaSimpleCarnetElectricistaList,
+        selectedFileOtrosDocumentosList,
+        ubicacion,
+        "",
+        "",
+        "",
+      );
+
+      if (!mounted) return;
+
+      if (result.mensaje == null ||
+          !result.mensaje!.contains("Se ha creado exitosamente")) {
+        limpiarTodo();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result.errorValList != null && result.errorValList!.isNotEmpty
+                  ? result.errorValList!.first
+                  : (result.mensaje ?? "Ocurrió un error"),
+            ),
+          ),
+        );
+        return;
+      }
+
+      showCustomDialog(
+        context: context,
+        message: result.mensaje!,
+        showCopyButton: false,
+        title: "Éxito.",
+        type: DialogType.success,
+      ).then((_) {
+        Navigator.of(context).pop();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error al enviar la solicitud")),
+      );
+    } finally {
+      setState(() => _isLoadingSolicitud = false);
+    }
+  }
 
   final repoConsultaDocumento = ConsultaDocumentoRepositoryImpl(
     ConsultaDocumentoDatasourceImpl(MiAndeApi()),
   );
 
   void consultarDocumento(String documento) async {
+    if (!mounted) return;
+
     setState(() {
       isLoadingConsultaDocumento = true;
       nombreObtenido.text = "";
@@ -103,33 +280,15 @@ class _SolicitudActualizacionDatosScreenState
     }
   }
 
-  void limpiarTodo() {
-    numeroTelefonoCelularController.clear();
-    numeroDocumentoController.clear();
-    nombreObtenido.text = '';
-    apellidoObtenido.text = '';
-    correoController.clear();
-
-    setState(() {
-      ubicacion = null;
-      selectedFileSolicitudList.clear();
-      selectedFileFotocopiaAutenticadaList.clear();
-      selectedFileFotocopiaSimpleCedulaSolicitanteList.clear();
-      selectedFileCopiaSimpleCarnetElectricistaList.clear();
-      selectedFileOtrosDocumentosList.clear();
-      //_formKey.currentState?.reset();
-    });
-
-    FocusScope.of(context).unfocus();
-  }
-
   @override
   void initState() {
     super.initState();
 
+    _determinePosition();
+
     _focusNode.addListener(() {
       if (selectedTipoDocumento?.id == null) return;
-      if (selectedTipoDocumento?.id == 'TD004') return;
+
       if (!_focusNode.hasFocus) {
         // 🔹 Esperar a que se estabilice el árbol de widgets
         WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -147,94 +306,14 @@ class _SolicitudActualizacionDatosScreenState
     });
   }
 
-  Future<SolicitudAbastecimientoResponse>
-  _fecthSolicitudActualizacionDatos() async {
-    final repo = SolicitudAbastecimientoRepositoryImpl(
-      SolicitudAbastecimientoDatasourceImp(MiAndeApi()),
-    );
-
-    return await repo.getSolicitudAbastecimiento(
-      nombreObtenido.text,
-      apellidoObtenido.text,
-      selectedTipoDocumento?.id,
-      numeroDocumentoController.text,
-      numeroTelefonoCelularController.text,
-      correoController.text,
-      "10",
-      selectedFileSolicitudList,
-      selectedFileFotocopiaAutenticadaList,
-      selectedFileFotocopiaSimpleCedulaSolicitanteList,
-      selectedFileCopiaSimpleCarnetElectricistaList,
-      selectedFileOtrosDocumentosList,
-      ubicacion,
-      "",
-      "",
-      "",
-    );
-  }
-
-  void _enviarFormulario() async {
-    if (_isLoadingSolicitud) return;
-
-    if (!formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese los campos obligatorios')),
-      );
-      return;
-    }
-
-    if (selectedFileSolicitudList.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debe adjuntar archivo en el punto a).')),
-      );
-      return;
-    }
-
-    setState(() => _isLoadingSolicitud = true);
-
-    try {
-      final result = await _fecthSolicitudActualizacionDatos();
-
-      if (result.error!) {
-        DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList?.first ?? 'Error desconocido',
-        );
-        return;
-      }
-
-      setState(() {
-        solicitudAbastecimientoResult = result.resultado;
-      });
-
-      limpiarTodo();
-
-      DialogHelper.showMessage(
-        context,
-        MessageType.success,
-        'Éxito',
-        result.mensaje!,
-      );
-    } catch (e) {
-      DialogHelper.showMessage(
-        context,
-        MessageType.error,
-        'Error',
-        'Ocurrió un error inesperado',
-      );
-    } finally {
-      setState(() => _isLoadingSolicitud = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Solicitud de Actualización \nde Datos.")),
+      appBar: AppBar(
+        title: Text("Solicitud para Actualización \nde Carga Hasta 41,58 kW."),
+      ),
       endDrawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Form(key: formKey, child: cuerpo(context, theme)),
@@ -268,7 +347,8 @@ class _SolicitudActualizacionDatosScreenState
             hint: const Text("Seleccionar Tipo de Documento"),
             items: dropDownItems
                 .map(
-                  (item) => DropdownMenuItem(value: item, child: Text(item.name)),
+                  (item) =>
+                      DropdownMenuItem(value: item, child: Text(item.name)),
                 )
                 .toList(),
             onChanged: (value) {
@@ -276,7 +356,7 @@ class _SolicitudActualizacionDatosScreenState
               nombreObtenido.text = '';
               apellidoObtenido.text = '';
             },
-      
+
             /*onChanged: isLoading
                             ? null
                             : (value) {
@@ -300,23 +380,23 @@ class _SolicitudActualizacionDatosScreenState
               if (val == null || val.trim().isEmpty) {
                 return "Ingrese Número de CI, RUC o Pasaporte";
               }
-      
+
               final tipo = selectedTipoDocumento!.id ?? '';
-      
+
               // C.I. Civil → solo números, entre 6 y 10 dígitos
               if (tipo == 'TD001' && !RegExp(r'^[0-9]{6,10}$').hasMatch(val)) {
                 return "Éste campo debe contener solo números.";
               }
-      
+
               // RUC → números, guion y dígito verificador
               if (tipo == 'TD002' && !RegExp(r'^\d{6,12}-\d$').hasMatch(val)) {
                 return "Este campo debe tener formato de RUC";
               }
-      
+
               return null;
             },
           ),
-      
+
           Visibility(
             visible:
                 selectedTipoDocumento?.id != null &&
@@ -327,9 +407,12 @@ class _SolicitudActualizacionDatosScreenState
                       const SizedBox(height: 20),
                       CustomText("Nombre(s) del Titular", color: Colors.green),
                       Text(nombreObtenido.text),
-      
+
                       const SizedBox(height: 20),
-                      CustomText("Apellido(s) del Titular", color: Colors.green),
+                      CustomText(
+                        "Apellido(s) del Titular",
+                        color: Colors.green,
+                      ),
                       Text(apellidoObtenido.text),
                     ],
                   )
@@ -341,12 +424,12 @@ class _SolicitudActualizacionDatosScreenState
                     ],
                   ),
           ),
-      
+
           const SizedBox(height: 20),
           CustomPhoneField(
             //focusNode: _focusNode,
             controller: numeroTelefonoCelularController,
-      
+
             validator: (val) {
               if (val == null || val.isEmpty) {
                 return "Ingrese Número Teléfono Celular";
@@ -376,28 +459,68 @@ class _SolicitudActualizacionDatosScreenState
             },
           ),
           const SizedBox(height: 24),
+
+          // ------------------------- UBICACIÓN -------------------------
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.location_on),
+              label: const Text("Agregar punto en Mapa"),
+              onPressed: _mostrarMapa,
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          if (showMap) ...[
+            MapSelectorInline(
+              initialLocation: ubicacion,
+              onLocationSelected: (loc) {
+                setState(() => ubicacion = loc);
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          const SizedBox(height: 24),
           CustomCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const CustomText(
-                  "Actualización de datos de clientes.",
+                  "Formulario de Solicitud para Actualización de Carga Hasta 41,58 kW.",
                   fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.clip,
+                  fontSize: 20,
                 ),
-                const CustomText('1) Verificar en su factura de Energía Eléctrica su nombre y documento.', overflow: TextOverflow.clip,),
-                const CustomText('2) Adjuntar la fotografía de su documento (CI, RUC).', overflow: TextOverflow.clip,),
-                const CustomText('3) En caso de tratarse de persona jurídica deberá adjuntar los documentos respaldatorios.', overflow: TextOverflow.clip,),
-                const CustomText('4) El trámite de actualización de datos es sin costo.', overflow: TextOverflow.clip,),
-                
-                
-                
-                
+                const CustomText(
+                  '1) Descargar formulario y completar:',
+                  overflow: TextOverflow.clip,
+                ),
+                TextButton(
+                  onPressed: () => lanzarUrl('URL_SOLICITUD_ABASTECIMIENTO'),
+                  child: const Text(
+                    "Descargar Formulario de Solicitud de Abastecimiento.",
+                  ),
+                ),
+                const CustomText(
+                  '2) Adjuntar como documento de respaldo.',
+                  overflow: TextOverflow.clip,
+                ),
+                const CustomText(
+                  '3) Para este trámite no es necesario la firma del profesional electricista.',
+                  overflow: TextOverflow.clip,
+                ),
+                const CustomText(
+                  '4)  El costo por la diferencia de carga a contratar será incluida en su próxima factura.',
+                  overflow: TextOverflow.clip,
+                ),
               ],
             ),
           ),
-      
+
           const SizedBox(height: 24),
-      
+
           CustomCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -419,22 +542,20 @@ class _SolicitudActualizacionDatosScreenState
               ],
             ),
           ),
-      
+
           const SizedBox(height: 24),
-      
+
           buildMediaCard(
-            title:
-                "a) Adjuntar fotografía del documento (Cédula de Identidad, Registro Único del Contribuyente (RUC)).",
+            title: "a) Solicitud para Actualización de Carga Hasta 41,58 kW.",
             files: selectedFileSolicitudList,
             onChanged: (lista) =>
                 setState(() => selectedFileSolicitudList = lista),
             ayuda: "Seleccionar archivo desde la Galería o la Cámara",
             theme: theme,
           ),
-      
+
           buildMediaCard(
-            title:
-                "b) Adjuntar fotografía de la factura de energía eléctrica. (En caso de poseer varios NIS será suficiente adjuntar la fotografía de al menos una).",
+            title: "b) Fotocopia de cedula simple del Titular del contrato.",
             files: selectedFileFotocopiaSimpleCedulaSolicitanteList,
             onChanged: (lista) => setState(
               () => selectedFileFotocopiaSimpleCedulaSolicitanteList = lista,
