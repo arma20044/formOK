@@ -417,3 +417,65 @@ num calcularCifra(String nis, String fechaVencimiento) {
       ),
     );
   }
+
+class MediaGroup {
+  final String key;
+  final String? title;
+  final String ayuda;
+  final ValueChanged<List<ArchivoAdjunto>> onChanged;
+
+  MediaGroup({
+    required this.key,
+    this.title,
+    required this.ayuda,
+    required this.onChanged,
+  });
+}
+
+
+
+Widget buildGroupedMediaCard({
+  required ThemeData theme,
+  required List<MediaGroup> groups,
+  required Map<String, List<ArchivoAdjunto>> mediaFiles,
+}) {
+  return CustomCard(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: groups.map((group) {
+        final files = mediaFiles[group.key] ?? [];
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// 🏷️ Título opcional
+              if (group.title != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomText(
+                    group.title!,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                    overflow: TextOverflow.clip,
+                  ),
+                ),
+
+              MediaSelectorList(
+                maxAdjuntos: 2,
+                ayuda: group.ayuda,
+                type: MediaType.foto,
+                files: files,
+
+                /// 👇 DELEGAMOS el cambio
+                onChanged: group.onChanged,
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    ),
+  );
+}
+

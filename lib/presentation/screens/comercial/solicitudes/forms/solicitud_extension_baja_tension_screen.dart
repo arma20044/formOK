@@ -161,6 +161,7 @@ class _SolicitudExtencionBajaTensionState
       selectedFileFotocopiaAutenticadaList,
       selectedFileFotocopiaSimpleCedulaSolicitanteList,
       selectedFileCopiaSimpleCarnetElectricistaList,
+      null,
       selectedFileOtrosDocumentosList,
       ubicacion,
       "",

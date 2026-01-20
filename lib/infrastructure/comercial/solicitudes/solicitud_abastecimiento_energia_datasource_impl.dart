@@ -29,6 +29,7 @@ class SolicitudAbastecimientoDatasourceImp
     List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList,
     List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
     List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
+    List<ArchivoAdjunto>? selectedFileTituloPropiedadList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
     LatLng? latitudLongitud,
     String? solicitudOTP,
@@ -38,7 +39,7 @@ class SolicitudAbastecimientoDatasourceImp
     final Map<String, Object> formMap = {
       'titularNombres': titularNombres,
       'titularApellidos': titularApellidos,
-      'idTipoDocumento' :tipoDocumento ?? '',
+      'idTipoDocumento': tipoDocumento ?? '',
       'titularDocumentoNumero': titularDocumentoNumero,
       'titularNumeroTelefono': titularNumeroTelefono,
       'titularCorreo': titularCorreo,
@@ -47,8 +48,8 @@ class SolicitudAbastecimientoDatasourceImp
       'latitud': latitudLongitud?.latitude ?? '',
       'longitud': latitudLongitud?.longitude ?? '',
       'metodo': metodo ?? 'CEL',
-      'solicitudOTP' :solicitudOTP ?? 'N',
-      'codigoOTP' : codigoOTP ??  '00'
+      'solicitudOTP': solicitudOTP ?? 'N',
+      'codigoOTP': codigoOTP ?? '00',
     };
     try {
       if (selectedFileSolicitudList!.isNotEmpty) {
@@ -114,7 +115,23 @@ class SolicitudAbastecimientoDatasourceImp
       }
     }
 
-    if (selectedFileOtrosDocumentosList!.isNotEmpty) {
+    if (selectedFileTituloPropiedadList!.isNotEmpty) {
+      int pos = 0;
+      for (var foto in selectedFileTituloPropiedadList) {
+        pos++;
+        formMap['saee_adjuntoTituloPropiedad$pos'] = [
+          await MultipartFile.fromFile(
+            foto.file.path,
+            filename: foto.file.path.split('/').last,
+          ),
+        ];
+        formMap['saee_adjuntoTituloPropiedad${pos}Extra'] = jsonEncode(
+          foto.info,
+        );
+      }
+    }
+
+    if (selectedFileOtrosDocumentosList != null && selectedFileOtrosDocumentosList.isNotEmpty) {
       int pos = 0;
       for (var foto in selectedFileOtrosDocumentosList) {
         pos++;

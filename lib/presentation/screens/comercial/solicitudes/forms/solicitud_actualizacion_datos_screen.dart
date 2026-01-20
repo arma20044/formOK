@@ -165,6 +165,7 @@ class _SolicitudActualizacionDatosScreenState
       selectedFileFotocopiaAutenticadaList,
       selectedFileFotocopiaSimpleCedulaSolicitanteList,
       selectedFileCopiaSimpleCarnetElectricistaList,
+      null,
       selectedFileOtrosDocumentosList,
       ubicacion,
       "",

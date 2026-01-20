@@ -154,6 +154,7 @@ class _SolicitudAlumbradoPublicoState extends State<SolicitudAlumbradoPublico> {
       selectedFileFotocopiaAutenticadaList,
       selectedFileFotocopiaSimpleCedulaSolicitanteList,
       selectedFileCopiaSimpleCarnetElectricistaList,
+      null,
       selectedFileOtrosDocumentosList,
       ubicacion,
       "",

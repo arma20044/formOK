@@ -11,11 +11,13 @@ import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitudA
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_actualizacion_carga_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_actualizacion_datos_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_alumbrado_publico_screen.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_consulta_previa_superior_41Kw_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_consumo_inteligente_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_extension_baja_tension_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_factura_fija_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_fraccionamiento_deuda_a_terceros_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_fraccionamiento_deuda_screen.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_retiro_medidor_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_yo_facturo_mi_luz_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/solicitudes_screen.dart';
 import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
@@ -37,7 +39,9 @@ final publicRoutes = [
   '/solicitudConsumoInteligente',
   '/solicitudActualizacionDatos',
   '/solicitudActualizacionCargaHasta40kw',
-  '/registroNumeroCelular'
+  '/registroNumeroCelular',
+  '/solicitudConsultaPreviaSuperior40kw',
+  '/solicitudRetiroMedidor',
 ];
 final privateRoutes = [
   '/miCuenta',
@@ -181,17 +185,26 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SolicitudConsumoInteligenteScreen(),
       ),
 
-
-
       GoRoute(
         path: '/solicitudActualizacionDatos',
         builder: (context, state) => const SolicitudActualizacionDatosScreen(),
       ),
 
-
-            GoRoute(
+      GoRoute(
         path: '/solicitudActualizacionCargaHasta40kw',
         builder: (context, state) => const SolicitudActualizacionCargaScreen(),
+      ),
+
+      GoRoute(
+        path: '/solicitudConsultaPreviaSuperior40kw',
+        builder: (context, state) =>
+            const SolicitudConsultaPreviaSuperior41KwScreen(),
+      ),
+
+      GoRoute(
+        path: '/solicitudRetiroMedidor',
+        builder: (context, state) =>
+            const SolicitudCRetiroMedidorScreen(),
       ),
     ],
 

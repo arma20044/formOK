@@ -22,6 +22,7 @@ class SolicitudAbastecimientoRepositoryImpl
     List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList,
     List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
     List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
+    List<ArchivoAdjunto>? selectedFileTituloPropiedadList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
     LatLng? latitudLongitud,
     String? solicitudOTP,
@@ -40,11 +41,12 @@ class SolicitudAbastecimientoRepositoryImpl
       selectedFileFotocopiaAutenticadaList,
       selectedFileFotocopiaSimpleCedulaSolicitanteList,
       selectedFileCopiaSimpleCarnetElectricistaList,
+      selectedFileTituloPropiedadList,
       selectedFileOtrosDocumentosList,
       latitudLongitud,
       solicitudOTP,
       codigoOTP,
-      metodo
+      metodo,
     );
   }
 }

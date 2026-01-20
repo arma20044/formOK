@@ -191,6 +191,7 @@ class _SolicitudConsumoInteligenteScreenState
       selectedFileFotocopiaAutenticadaList,
       selectedFileFotocopiaSimpleCedulaSolicitanteList,
       selectedFileCopiaSimpleCarnetElectricistaList,
+      null,
       selectedFileOtrosDocumentosList,
       null,
       solicitarOTP ? 'S' : 'N',

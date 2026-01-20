@@ -142,11 +142,12 @@ class _SolicitudAbastecimientoScreenState
         selectedFileFotocopiaAutenticadaList,
         selectedFileFotocopiaSimpleCedulaSolicitanteList,
         selectedFileCopiaSimpleCarnetElectricistaList,
+        null,
         selectedFileOtrosDocumentosList,
         null,
         "",
         "",
-        ""
+        "",
       );
 
       if (!mounted) return;
@@ -197,7 +198,10 @@ class _SolicitudAbastecimientoScreenState
     return Scaffold(
       endDrawer: const CustomDrawer(),
       appBar: AppBar(
-        title: const Text("Solicitud de \nAbastecimiento de Energía",textAlign: TextAlign.center,),
+        title: const Text(
+          "Solicitud de \nAbastecimiento de Energía",
+          textAlign: TextAlign.center,
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -302,7 +306,7 @@ class _SolicitudAbastecimientoScreenState
                           setState(() => ubicacion = loc);
                         },
                       ),
-                       const SizedBox(height: 24),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -456,6 +460,4 @@ class _SolicitudAbastecimientoScreenState
       ),
     );
   }
-
-
 }

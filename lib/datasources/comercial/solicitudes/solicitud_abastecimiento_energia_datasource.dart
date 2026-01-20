@@ -14,6 +14,7 @@ abstract class SolicitudAbastecimientoDatasource {
     List<ArchivoAdjunto>? selectedFileFotocopiaAutenticadaList,
     List<ArchivoAdjunto>? selectedFileFotocopiaSimpleCedulaSolicitanteList,
     List<ArchivoAdjunto>? selectedFileCopiaSimpleCarnetElectricistaList,
+    List<ArchivoAdjunto>? selectedFileTituloPropiedadList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
     LatLng? latitudLongitud,
     String? solicitudOTP,
