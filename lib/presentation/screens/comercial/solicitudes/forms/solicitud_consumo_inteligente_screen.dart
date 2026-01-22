@@ -9,7 +9,6 @@ import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
 import 'package:form/presentation/components/common/custom_text.dart';
-import 'package:form/presentation/components/common/info_card.dart';
 import 'package:form/presentation/components/common/info_card_simple.dart';
 import 'package:form/presentation/components/common/inputtext_custom.dart';
 import 'package:form/presentation/components/common/otp_verification_widget.dart';
@@ -93,12 +92,14 @@ class _SolicitudConsumoInteligenteScreenState
        
 
       if (result.error!) {
-        DialogHelper.showMessage(
+        if(mounted) {
+          DialogHelper.showMessage(
           context,
           MessageType.error,
           'Error',
           result.errorValList![0],
         );
+        }
 
         setState(() {
           codigoOTPObtenido = "";
@@ -107,10 +108,11 @@ class _SolicitudConsumoInteligenteScreenState
 
         return;
       } else if(solicitarOTP){
-        showModalBottomSheet<void>(
+        if(mounted) {
+          showModalBottomSheet<void>(
           context: context,
           builder: (BuildContext context) {
-            return Container(
+            return SizedBox(
               // Este es el widget que se convertirá en el modal
               height: 500,
               child: Center(
@@ -120,7 +122,7 @@ class _SolicitudConsumoInteligenteScreenState
                     OtpInputWidget(
                       isLoading: _isLoadingSolicitud,
                       tipoVerificacion: selectedTipoVerificacion!.id!,
-                      phoneNumber: numeroTelefonoController.text!,
+                      phoneNumber: numeroTelefonoController.text,
                       correo: correoController.text,
                       onSubmit: (otp) {
                         setState(() {
@@ -130,7 +132,7 @@ class _SolicitudConsumoInteligenteScreenState
                         });
 
                         _enviarFormulario(false);
-                        print("Código ingresado: $otp");
+                       
                       },
                     ),
                   ],
@@ -139,12 +141,14 @@ class _SolicitudConsumoInteligenteScreenState
             );
           },
         );
+        }
 
         setState(() {
           this.solicitarOTP = 'S';
         });
         mostrarCargarCodigoOTP = true;
-        DialogHelper.showMessage(
+        if(mounted) {
+          DialogHelper.showMessage(
           context,
           MessageType.success,
           'Éxito',
@@ -153,6 +157,7 @@ class _SolicitudConsumoInteligenteScreenState
               : "Te enviamos un código a tu correo, favor ingresa para confirmar el registro.",
           //duration: const Duration(seconds: 3),
         );
+        }
       }
 
       setState(() {
@@ -161,12 +166,14 @@ class _SolicitudConsumoInteligenteScreenState
 
       
     } catch (e) {
-      DialogHelper.showMessage(
+      if(mounted) {
+        DialogHelper.showMessage(
         context,
         MessageType.error,
         'Error',
         'Ocurrió un error inesperado',
       );
+      }
     } finally {
       setState(() => _isLoadingSolicitud = false);
     }

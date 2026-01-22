@@ -47,11 +47,11 @@ class CustomPdfModal extends StatelessWidget {
 
       final body = response.data as ResponseBody;
 
-      final total = body.contentLength ?? -1;
+      final total = body.contentLength;
       int recibido = 0;
 
-      print('Status code: ${response.statusCode}');
-      print('Headers: ${response.headers}');
+      debugPrint('Status code: ${response.statusCode}');
+      debugPrint('Headers: ${response.headers}');
 
       final sink = archivo.openWrite();
 
@@ -59,18 +59,20 @@ class CustomPdfModal extends StatelessWidget {
       await for (final chunk in body.stream) {
         recibido += chunk.length;
         if (total != -1) {
-          print('Descargando: ${(recibido / total * 100).toStringAsFixed(0)}%');
+          debugPrint(
+            'Descargando: ${(recibido / total * 100).toStringAsFixed(0)}%',
+          );
         }
         sink.add(chunk);
       }
 
       await sink.close();
-      print('Descarga completada: ${archivo.path}');
+      debugPrint('Descarga completada: ${archivo.path}');
 
-      print('Tamaño del archivo: ${await archivo.length()} bytes');
+      debugPrint('Tamaño del archivo: ${await archivo.length()} bytes');
 
       final bytes = await archivo.readAsBytes();
-      print('Primeros bytes: ${String.fromCharCodes(bytes.take(100))}');
+      debugPrint('Primeros bytes: ${String.fromCharCodes(bytes.take(100))}');
 
       return archivo;
     } catch (e) {
@@ -90,12 +92,11 @@ class CustomPdfModal extends StatelessWidget {
       final result = await SharePlus.instance.share(params);
 
       if (result.status == ShareResultStatus.success) {
-        print('Thank you for sharing my website!');
+        debugPrint('Thank you for sharing my website!');
       }
     }
 
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
+  
 
     return Dialog(
       insetPadding: EdgeInsets.zero,

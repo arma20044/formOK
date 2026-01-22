@@ -9,14 +9,14 @@ class CustomComment extends StatelessWidget {
   final bool bold;
 
   const CustomComment({
-    Key? key,
+    super.key,
     this.text,
     this.child,
     this.children,
     this.styleAdd,
     this.size = 'medium',
     this.bold = false,
-  }) : super(key: key);
+  });
 
   double _getFontSize(String size) {
     switch (size) {
@@ -44,7 +44,7 @@ class CustomComment extends StatelessWidget {
     return Container(
       decoration: styleAdd ??
           BoxDecoration(
-            color: colors.surfaceVariant.withOpacity(0.2),
+            color: colors.surfaceContainerHighest.withValues(alpha:  0.2),
             borderRadius: BorderRadius.circular(8),
           ),
       padding: const EdgeInsets.all(8),

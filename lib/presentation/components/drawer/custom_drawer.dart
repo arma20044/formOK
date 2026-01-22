@@ -111,7 +111,7 @@ class CustomDrawer extends ConsumerWidget {
           // Version
           Center(
             child: Text(
-              'Version ${Environment.appVersion.android.version} - ${Environment.appVersion.android.fecha}',
+              'Version ${environment.appVersion.android.version} - ${environment.appVersion.android.fecha}',
             ),
           ),
         ],

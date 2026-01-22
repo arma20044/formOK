@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:form/model/Cambio_contrasenha.dart';
 
 import '../core/api/mi_ande_api.dart';
-import '../core/enviromens/Enrivoment.dart';
+import '../core/enviromens/enrivoment.dart';
 import '../datasources/datasources.dart';
 
 class CambioContrasenhaDatasourceImpl extends CambioContrasenhaDatasource {
@@ -29,14 +29,14 @@ class CambioContrasenhaDatasourceImpl extends CambioContrasenhaDatasource {
     });
 
     final response = await dio.post(
-      "${Environment.hostCtxRegistroUnico}/v1/cambiarPassword",
+      "${environment.hostCtxRegistroUnico}/v1/cambiarPassword",
       data: data,
       options: Options(
-        contentType: Headers.formUrlEncodedContentType, // 👈 importante
+        contentType: Headers.formUrlEncodedContentType, 
       ),
     );
 
-    print('URL llamada: ${response.requestOptions.uri}');
+
 
     if (response.statusCode == 200) {
       final cambioContrasenhaResponse = CambioContrasenhaResponse.fromJson(

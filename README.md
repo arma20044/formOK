@@ -28,3 +28,16 @@ A new Flutter project.
 
  Expanded no puede estar dentro de un SizedBox (ni de ningún widget con ancho fijo como Container o Padding).
 Expanded solo tiene sentido como hijo directo de un Row, Column o Flex, y su propósito es ocupar el espacio restante dentro de ese Row o Column.
+
+
+
+
+__________
+
+Si aparece en la consola un error “Invalid depfile … kernel_snapshot_program.d” en Flutter es muy común en Windows y casi siempre se debe a archivos de build corruptos (especialmente después de upgrades, cambios de ruta o interrupciones del build).
+
+flutter clean
+flutter pub get
+flutter run
+
+En la mayoría de los casos, con eso desaparece el error.

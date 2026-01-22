@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../core/api/mi_ande_api.dart';
-import '../core/enviromens/Enrivoment.dart';
+import '../core/enviromens/enrivoment.dart';
 import '../datasources/barrio_datasource.dart';
 
 import '../model/barrio.dart';
@@ -21,14 +21,14 @@ class BarrioDatasourceImpl extends BarrioDatasource {
       'filtro': idCiudad
     });
 
-    final response = await dio.post("${Environment.hostCtxGra}/v1/reclamo/listarBarrios",
+    final response = await dio.post("${environment.hostCtxGra}/v1/reclamo/listarBarrios",
       data: data,
       options: Options(
-        contentType: Headers.formUrlEncodedContentType, // 👈 importante
+        contentType: Headers.formUrlEncodedContentType, 
       ),
     );
 
-    print('URL llamada: ${response.requestOptions.uri}');
+ 
 
     if (response.statusCode == 200) {
       final List<dynamic> rawList = response.data['respuesta']['datos'];

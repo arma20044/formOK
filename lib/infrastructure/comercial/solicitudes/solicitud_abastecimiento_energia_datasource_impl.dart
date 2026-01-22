@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:form/core/api/mi_ande_api.dart';
-import 'package:form/core/enviromens/Enrivoment.dart';
+import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/datasources/datasources.dart';
 import 'package:form/model/model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -44,7 +44,7 @@ class SolicitudAbastecimientoDatasourceImp
       'titularNumeroTelefono': titularNumeroTelefono,
       'titularCorreo': titularCorreo,
       'idTipoReclamo': idTipoReclamo,
-      'clientKey': Environment.clientKey,
+      'clientKey': environment.clientKey,
       'latitud': latitudLongitud?.latitude ?? '',
       'longitud': latitudLongitud?.longitude ?? '',
       'metodo': metodo ?? 'CEL',
@@ -148,14 +148,14 @@ class SolicitudAbastecimientoDatasourceImp
     final data = FormData.fromMap(formMap);
 
     final response = await dio.post(
-      "${Environment.hostCtxOpen}/v4/solicitudAbastecimientoEnergiaElectrica/nuevo",
+      "${environment.hostCtxOpen}/v4/solicitudAbastecimientoEnergiaElectrica/nuevo",
       data: data,
       options: Options(
-        contentType: Headers.formUrlEncodedContentType, // 👈 importante
+        contentType: Headers.formUrlEncodedContentType, 
       ),
     );
 
-    print('URL llamada: ${response.requestOptions.uri}');
+
 
     if (response.statusCode == 200) {
       // Dio ya devuelve un Map

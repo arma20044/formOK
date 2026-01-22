@@ -10,7 +10,6 @@ import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:form/utils/utils.dart';
 
 import '../../core/api/mi_ande_api.dart';
-import '../../core/validators/validators.dart';
 import '../../infrastructure/infrastructure.dart';
 import '../../model/model.dart';
 import '../../repositories/repositories.dart';
@@ -157,7 +156,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     try {
       listaDepartamentos = await repoDepartamento.getDepartamento();
     } catch (e) {
-      print("Error al cargar departamentos: $e");
+      debugPrint("Error al cargar departamentos: $e");
     } finally {
       setState(() => isLoadingDepartamentos = false);
     }
@@ -168,7 +167,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     try {
       listaCiudades = await repoCiudad.getCiudad(idDepartamento);
     } catch (e) {
-      print("Error al cargar ciudad: $e");
+      debugPrint("Error al cargar ciudad: $e");
     } finally {
       setState(() => isLoadingCiudades = false);
     }
@@ -179,7 +178,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     try {
       listaBarrios = await repoBarrio.getBarrio(idCiudad);
     } catch (e) {
-      print("Error al cargar barrio: $e");
+      debugPrint("Error al cargar barrio: $e");
     } finally {
       setState(() => isLoadingBarrios = false);
     }
@@ -192,7 +191,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
         widget.tipoReclamo,
       );
     } catch (e) {
-      print("Error al cargar tipo reclamo: $e");
+      debugPrint("Error al cargar tipo reclamo: $e");
     } finally {
       setState(() => isLoadingTipoReclamo = false);
     }
@@ -291,54 +290,55 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
       );
       final datos = listaUltimosReclamos.respuesta?.datos?[0];
       if (datos != null) {
-        showConfirmDialog(          
-          title: "Con el teléfono ingresado se encontró:",
-          type: DialogType.info,
-          context: context,
-          message:               
-              "✓ Teléfono: ${datos.telefono}" +
-              "\n✓ Nombre y Apellido: ${datos.nombreApellido}" +
-              "\n✓ NIS: ${datos.nis}" +
-              "\n✓ Departamento: ${datos.departamentoNombre}" +
-              "\n✓ Ciudad: ${datos.ciudadNombre}" +
-              "\n✓ Barrio: ${datos.barrioNombre}" +
-              "\n✓ Correo: ${datos.correo}" +
-              "\n✓ Dirección: ${datos.direccion}" +
-              "\n✓ Referencia: ${datos.referencia}" +
-              "\n\nCargar reclamo con los datos obtenidos?",
-          onConfirm: () async {
-            if (datos == null) return;
-            setState(() {
-              nombreApellidoController.text = datos.nombreApellido ?? '';
-              nisController.text = datos.nis.toString();
-              correoController.text = datos.correo ?? '';
-              direccionController.text = datos.direccion ?? '';
-              referenciaController.text = datos.referencia ?? '';
-            });
+        if (mounted) {
+          showConfirmDialog(
+            title: "Con el teléfono ingresado se encontró:",
+            type: DialogType.info,
+            context: context,
+            message:
+                "✓ Teléfono: ${datos.telefono}" +
+                "\n✓ Nombre y Apellido: ${datos.nombreApellido}" +
+                "\n✓ NIS: ${datos.nis}" +
+                "\n✓ Departamento: ${datos.departamentoNombre}" +
+                "\n✓ Ciudad: ${datos.ciudadNombre}" +
+                "\n✓ Barrio: ${datos.barrioNombre}" +
+                "\n✓ Correo: ${datos.correo}" +
+                "\n✓ Dirección: ${datos.direccion}" +
+                "\n✓ Referencia: ${datos.referencia}" +
+                "\n\nCargar reclamo con los datos obtenidos?",
+            onConfirm: () async {
+              setState(() {
+                nombreApellidoController.text = datos.nombreApellido ?? '';
+                nisController.text = datos.nis.toString();
+                correoController.text = datos.correo ?? '';
+                direccionController.text = datos.direccion ?? '';
+                referenciaController.text = datos.referencia ?? '';
+              });
 
-            selectedDept = listaDepartamentos.firstWhere(
-              (d) => d.idDepartamento == datos.departamentoIdDepartamento,
-            );
-
-            if (selectedDept != null) {
-              await _fetchCiudades(selectedDept!.idDepartamento);
-              selectedCiudad = listaCiudades.firstWhere(
-                (c) => c.idCiudad == datos.ciudadIdCiudad,
+              selectedDept = listaDepartamentos.firstWhere(
+                (d) => d.idDepartamento == datos.departamentoIdDepartamento,
               );
 
-              if (selectedCiudad != null) {
-                await _fetchBarrios(selectedCiudad!.idCiudad);
-                selectedBarrio = listaBarrios.firstWhere(
-                  (b) => b.idBarrio == datos.barrioIdBarrio,
+              if (selectedDept != null) {
+                await _fetchCiudades(selectedDept!.idDepartamento);
+                selectedCiudad = listaCiudades.firstWhere(
+                  (c) => c.idCiudad == datos.ciudadIdCiudad,
                 );
+
+                if (selectedCiudad != null) {
+                  await _fetchBarrios(selectedCiudad!.idCiudad);
+                  selectedBarrio = listaBarrios.firstWhere(
+                    (b) => b.idBarrio == datos.barrioIdBarrio,
+                  );
+                }
               }
-            }
-            setState(() {});
-          },
-        );
+              setState(() {});
+            },
+          );
+        }
       }
     } catch (e) {
-      print("Error al cargar UltimosReclamos: $e");
+      debugPrint("Error al cargar UltimosReclamos: $e");
     } finally {
       setState(() => isLoadingUltimosReclamos = false);
     }
@@ -458,10 +458,12 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
             ),
             validator: (val) {
               if ((selectedTipoReclamo?.correoObligatorio ?? 'N') == 'S') {
-                if (val == null || val.isEmpty)
+                if (val == null || val.isEmpty) {
                   return "Ingrese Correo Electrónico";
-                if (!emailRegex.hasMatch(val))
+                }
+                if (!emailRegex.hasMatch(val)) {
                   return "Ingrese formato de correo válido.";
+                }
               }
               return null;
             },

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -91,11 +90,8 @@ Future<File> descargarPdfConPipe(String url, String nombreArchivo) async {
 
     final body = response.data as ResponseBody;
 
-    final total = body.contentLength ?? -1;
+    final total = body.contentLength;
     int recibido = 0;
-
-    print('Status code: ${response.statusCode}');
-    print('Headers: ${response.headers}');
 
     final sink = archivo.openWrite();
 
@@ -103,18 +99,16 @@ Future<File> descargarPdfConPipe(String url, String nombreArchivo) async {
     await for (final chunk in body.stream) {
       recibido += chunk.length;
       if (total != -1) {
-        print('Descargando: ${(recibido / total * 100).toStringAsFixed(0)}%');
+        debugPrint(
+          'Descargando: ${(recibido / total * 100).toStringAsFixed(0)}%',
+        );
       }
       sink.add(chunk);
     }
 
     await sink.close();
-    print('Descarga completada: ${archivo.path}');
 
-    print('Tamaño del archivo: ${await archivo.length()} bytes');
-
-    final bytes = await archivo.readAsBytes();
-    print('Primeros bytes: ${String.fromCharCodes(bytes.take(100))}');
+    //inal bytes = await archivo.readAsBytes();
 
     return archivo;
   } catch (e) {
@@ -227,7 +221,7 @@ String obtenerFechaActual() {
 
   String fechaFormateada = formateador.format(ahora);
 
-  print(fechaFormateada); // Ejemplo: 13/11/2025 10:30:00
+  debugPrint(fechaFormateada); // Ejemplo: 13/11/2025 10:30:00
 
   return fechaFormateada;
 }
@@ -288,7 +282,6 @@ String formatNumero(dynamic valor) {
 
 List<Favorito> favFacturas = [];
 
-
 num calcularCifra(String nis, String fechaVencimiento) {
   if (nis.length < 3) return 0;
   final nisParcial = int.tryParse(nis.substring(0, 3)) ?? 0;
@@ -302,21 +295,19 @@ num calcularCifra(String nis, String fechaVencimiento) {
   return oper * mejunje;
 }
 
+Future<List<Favorito>> cargarDatosFacturas() async {
+  favFacturas = await FavoritosStorage.getLista(FavoritosStorage.keyFacturas);
+  // favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
+  return favFacturas;
+}
 
-  Future<List<Favorito>> cargarDatosFacturas() async {
-    favFacturas = await FavoritosStorage.getLista(FavoritosStorage.keyFacturas);
-   // favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
-    return favFacturas;
-  }
+Future<List<Favorito>> cargarDatosReclamos() async {
+  favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
+  // favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
+  return favReclamos;
+}
 
-    Future<List<Favorito>> cargarDatosReclamos() async {
-    favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
-   // favReclamos = await FavoritosStorage.getLista(FavoritosStorage.keyReclamos);
-    return favReclamos;
-  }
-
-
-  String formatTelefono(String telefono) {
+String formatTelefono(String telefono) {
   // Quitar el prefijo +595
   final cleaned = telefono.replaceAll('+595', '');
 
@@ -346,77 +337,77 @@ num calcularCifra(String nis, String fechaVencimiento) {
   return telefono;
 }
 
-  List<Favorito> favReclamos = [];
-   Future<void> toggleFavoritoReclamo(Favorito fav) async {
-    //fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.datosReclamo,);
+List<Favorito> favReclamos = [];
+Future<void> toggleFavoritoReclamo(Favorito fav) async {
+  //fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.datosReclamo,);
 
-    final exists = favReclamos.any((e) => e.id == fav.id);
+  final exists = favReclamos.any((e) => e.id == fav.id);
 
-    if (exists) {
-      favReclamos.removeWhere((e) => e.id == fav.id);
-    } else {
-      favReclamos.add(fav);
-    }
-
-    await FavoritosStorage.saveLista(FavoritosStorage.keyReclamos, favReclamos);
-    
+  if (exists) {
+    favReclamos.removeWhere((e) => e.id == fav.id);
+  } else {
+    favReclamos.add(fav);
   }
 
+  await FavoritosStorage.saveLista(FavoritosStorage.keyReclamos, favReclamos);
+}
 
-  Future<void> toggleFavoritoFactura(Favorito fav, BuildContext context) async {
-    // Forzamos el tipo correcto
-    fav = Favorito(id: fav.id, title: fav.title, tipo: FavoritoTipo.consultaFactura);
+Future<void> toggleFavoritoFactura(Favorito fav, BuildContext context) async {
+  // Forzamos el tipo correcto
+  fav = Favorito(
+    id: fav.id,
+    title: fav.title,
+    tipo: FavoritoTipo.consultaFactura,
+  );
 
-    final exists = favFacturas.any((e) => e.id == fav.id);
+  final exists = favFacturas.any((e) => e.id == fav.id);
 
-    if (exists) {
-      favFacturas.removeWhere((e) => e.id == fav.id);
-    } else {
-      favFacturas.add(fav);
-    }
-
-    await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
-    
-
-   CustomSnackbar.show(
-      context,
-      message: exists
-          ? "NIS: ${fav.title} eliminado de favoritos"
-          : "NIS: ${fav.title} agregado a favoritos",
-      type: exists ? MessageType.error : MessageType.success,
-    );
+  if (exists) {
+    favFacturas.removeWhere((e) => e.id == fav.id);
+  } else {
+    favFacturas.add(fav);
   }
 
+  await FavoritosStorage.saveLista(FavoritosStorage.keyFacturas, favFacturas);
 
-    Widget buildMediaCard({
-    required String title,
-    required List<ArchivoAdjunto> files,
-    required ValueChanged<List<ArchivoAdjunto>> onChanged,
-    required String ayuda,
-    required ThemeData theme,
-  }) {
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CustomText(
-            title,
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.primary,
-            overflow: TextOverflow.clip,
-          ),
-          const SizedBox(height: 8),
-          MediaSelectorList(
-            maxAdjuntos: 2,
-            ayuda: ayuda,
-            type: MediaType.foto,
-            files: files,
-            onChanged: onChanged,
-          ),
-        ],
-      ),
-    );
-  }
+  CustomSnackbar.show(
+    context,
+    message: exists
+        ? "NIS: ${fav.title} eliminado de favoritos"
+        : "NIS: ${fav.title} agregado a favoritos",
+    type: exists ? MessageType.error : MessageType.success,
+  );
+}
+
+Widget buildMediaCard({
+  required String title,
+  required List<ArchivoAdjunto> files,
+  required ValueChanged<List<ArchivoAdjunto>> onChanged,
+  required String ayuda,
+  required ThemeData theme,
+}) {
+  return CustomCard(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomText(
+          title,
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+          overflow: TextOverflow.clip,
+        ),
+        const SizedBox(height: 8),
+        MediaSelectorList(
+          maxAdjuntos: 2,
+          ayuda: ayuda,
+          type: MediaType.foto,
+          files: files,
+          onChanged: onChanged,
+        ),
+      ],
+    ),
+  );
+}
 
 class MediaGroup {
   final String key;
@@ -431,8 +422,6 @@ class MediaGroup {
     required this.onChanged,
   });
 }
-
-
 
 Widget buildGroupedMediaCard({
   required ThemeData theme,
@@ -478,4 +467,3 @@ Widget buildGroupedMediaCard({
     ),
   );
 }
-

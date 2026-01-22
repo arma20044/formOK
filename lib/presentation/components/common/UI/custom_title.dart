@@ -7,12 +7,12 @@ class CustomTitle extends StatelessWidget {
   final TextStyle? styleAdd;
 
   const CustomTitle({
-    Key? key,
+    super.key,
     required this.text,
     this.color,
     this.size = 'medium',
     this.styleAdd,
-  }) : super(key: key);
+  });
 
   double _getFontSize(String size) {
     switch (size) {

@@ -96,13 +96,14 @@ class _SolicitudCRetiroMedidorScreenState
         }
       });
     } catch (e) {
-      print("Error al consultar Documento: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
           content: Text("$e", style: TextStyle(color: Colors.white)),
         ),
       );
+      }
       return;
     } finally {
       setState(() => isLoadingConsultaDocumento = false);
@@ -228,7 +229,9 @@ class _SolicitudCRetiroMedidorScreenState
         title: "Éxito.",
         type: DialogType.success,
       ).then((_) {
-        Navigator.of(context).pop();
+       if( mounted) {
+         Navigator.of(context).pop();
+       }
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -303,7 +306,7 @@ class _SolicitudCRetiroMedidorScreenState
                 return "Ingrese Número de CI, RUC o Pasaporte";
               }
 
-              final tipo = selectedTipoDocumento!.id ?? '';
+              final tipo = selectedTipoDocumento?.id ?? '';
 
               // C.I. Civil → solo números, entre 6 y 10 dígitos
               if (tipo == 'TD001' && !RegExp(r'^[0-9]{6,10}$').hasMatch(val)) {

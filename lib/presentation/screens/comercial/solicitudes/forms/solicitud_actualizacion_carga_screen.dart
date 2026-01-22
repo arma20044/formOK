@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:form/config/constantes.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/model/model.dart';
@@ -9,7 +8,6 @@ import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
-import 'package:form/presentation/components/common/custom_show_dialog.dart';
 import 'package:form/presentation/components/common/map_selector_inline.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/repositories/repositories.dart';
@@ -25,50 +23,47 @@ class SolicitudActualizacionCargaScreen extends StatefulWidget {
       _SolicitudActualizacionCargaScreenState();
 }
 
-
-
 class _SolicitudActualizacionCargaScreenState
     extends State<SolicitudActualizacionCargaScreen> {
+  bool isLoadingConsultaDocumento = false;
 
-bool isLoadingConsultaDocumento = false;
+  final formKey = GlobalKey<FormState>();
+  bool _isLoadingSolicitud = false;
 
-final formKey = GlobalKey<FormState>();
-bool _isLoadingSolicitud = false;
+  final List<DropdownItem> dropDownItems = [
+    DropdownItem(id: 'TD001', name: 'C.I. Civil'),
+    DropdownItem(id: 'TD002', name: 'RUC'),
+    //DropdownItem(id: 'TD004', name: 'Pasaporte'),
+  ];
 
-final List<DropdownItem> dropDownItems = [
-  DropdownItem(id: 'TD001', name: 'C.I. Civil'),
-  DropdownItem(id: 'TD002', name: 'RUC'),
-  //DropdownItem(id: 'TD004', name: 'Pasaporte'),
-];
+  DropdownItem? selectedTipoDocumento;
 
-DropdownItem? selectedTipoDocumento;
+  late ConsultaDocumentoResultado consultaDocumentoResponse;
 
-late ConsultaDocumentoResultado consultaDocumentoResponse;
+  final TextEditingController numeroDocumentoController =
+      TextEditingController();
 
-final TextEditingController numeroDocumentoController = TextEditingController();
+  final TextEditingController numeroTelefonoCelularController =
+      TextEditingController();
 
-final TextEditingController numeroTelefonoCelularController =
-    TextEditingController();
+  final TextEditingController correoController = TextEditingController();
 
-final TextEditingController correoController = TextEditingController();
+  final TextEditingController nombreObtenido = TextEditingController();
+  final TextEditingController apellidoObtenido = TextEditingController();
 
-final TextEditingController nombreObtenido = TextEditingController();
-final TextEditingController apellidoObtenido = TextEditingController();
+  // Ubicación
+  LatLng? ubicacion;
 
-// Ubicación
-LatLng? ubicacion;
+  LatLng? _currentPosition;
 
-LatLng? _currentPosition;
-LatLng? _selected;
+  GoogleMapController? _mapController;
 
-GoogleMapController? _mapController;
-
-// Archivos adjuntos
-List<ArchivoAdjunto> selectedFileSolicitudList = [];
-List<ArchivoAdjunto> selectedFileFotocopiaAutenticadaList = [];
-List<ArchivoAdjunto> selectedFileFotocopiaSimpleCedulaSolicitanteList = [];
-List<ArchivoAdjunto> selectedFileCopiaSimpleCarnetElectricistaList = [];
-List<ArchivoAdjunto> selectedFileOtrosDocumentosList = [];
+  // Archivos adjuntos
+  List<ArchivoAdjunto> selectedFileSolicitudList = [];
+  List<ArchivoAdjunto> selectedFileFotocopiaAutenticadaList = [];
+  List<ArchivoAdjunto> selectedFileFotocopiaSimpleCedulaSolicitanteList = [];
+  List<ArchivoAdjunto> selectedFileCopiaSimpleCarnetElectricistaList = [];
+  List<ArchivoAdjunto> selectedFileOtrosDocumentosList = [];
 
   final _numeroDocumentoFieldKey = GlobalKey<FormFieldState<String>>();
   final FocusNode _focusNode = FocusNode();
@@ -228,7 +223,9 @@ List<ArchivoAdjunto> selectedFileOtrosDocumentosList = [];
         title: "Éxito.",
         type: DialogType.success,
       ).then((_) {
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -268,7 +265,7 @@ List<ArchivoAdjunto> selectedFileOtrosDocumentosList = [];
         }
       });
     } catch (e) {
-      print("Error al consultar Documento: $e");
+      debugPrint("Error al consultar Documento: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,

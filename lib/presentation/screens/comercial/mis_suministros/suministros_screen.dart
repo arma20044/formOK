@@ -34,8 +34,8 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
     "Configuración",
   ];
 
-  bool _showLeftArrow = false;
-  bool _showRightArrow = true;
+  final bool _showLeftArrow = false;
+  final bool _showRightArrow = true;
   final double _scrollAmount = 100;
 
   SuministrosList? selectedNIS;
@@ -94,12 +94,12 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // 🧩 Esperar a que el provider tenga valor
+   
     if (authState.value == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // ✅ Ahora es seguro acceder a los valores
+    
     final List<SuministrosList?>? dropDownItemsSuministro =
         authState.value!.user?.userDatosAnexos;
 
@@ -107,8 +107,8 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
     if (!_isListenerSet) {
       _isListenerSet = true;
       ref.listen(authProvider, (previous, next) {
-        final nuevoIndicador = next.value?.indicadorBloqueoNIS;
-        print('🔄 indicadorBloqueoNIS cambió: $nuevoIndicador');
+       // final nuevoIndicador = next.value?.indicadorBloqueoNIS;
+     
       });
     }
 
@@ -132,7 +132,7 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
 
       // Calcula indicador si querés
       final indicador = selectedNIS!.indicadorBloqueoWeb == 1 ? true : false;
-      print('📊 indicador actual: $indicador');
+      
 
       // 🔹 Posponer actualización del provider
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -154,7 +154,7 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
                 const Text('Suministro Seleccionado:'),
                 const SizedBox(height: 4),
                 DropdownButtonFormField<SuministrosList>(
-                  value: selectedNIS,
+                  initialValue: selectedNIS,
                   hint: const Text("Seleccionar NIS"),
                   items: (dropDownItemsSuministro ?? [])
                       .map(
@@ -226,7 +226,7 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
                               gradient: LinearGradient(
                                 colors: [
                                   Colors.white,
-                                  Colors.white.withOpacity(0.8),
+                                  Colors.white.withValues(alpha:  0.8),
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -253,7 +253,7 @@ class _SuministrosScreenState extends ConsumerState<SuministrosScreen>
                               gradient: LinearGradient(
                                 colors: [
                                   Colors.white,
-                                  Colors.white.withOpacity(0.8),
+                                  Colors.white.withValues(alpha:  0.8),
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,

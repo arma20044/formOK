@@ -31,14 +31,14 @@ class HorizontalComparativaChart extends StatelessWidget {
     Map<String, num> consumoAnterior = {for (var m in meses) m: 0};
 
     for (var f in facturas) {
-      if (f.fechaFacturacionMask != null) {
-        final parts = f.fechaFacturacionMask!.split('/');
+     // if (f.fechaFacturacionMask != null) {
+        final parts = f.fechaFacturacionMask.split('/');
         if (parts.length == 2) {
           final mesIndex = int.tryParse(parts[0]) ?? 1;
           final anio = int.tryParse(parts[1]) ?? anioActual;
           final mesNombre = meses[mesIndex - 1];
 
-          final valor = mostrarConsumo ? (f.consumoFacturado ?? 0) : (f.importeFacturado ?? 0)/1000;
+          final valor = mostrarConsumo ? (f.consumoFacturado) : (f.importeFacturado)/1000;
 
           if (anio == anioActual) {
             consumoActual[mesNombre] = valor;
@@ -46,7 +46,7 @@ class HorizontalComparativaChart extends StatelessWidget {
             consumoAnterior[mesNombre] = valor;
           }
         }
-      }
+      //}
     }
 
     // Convertir a listas para chart

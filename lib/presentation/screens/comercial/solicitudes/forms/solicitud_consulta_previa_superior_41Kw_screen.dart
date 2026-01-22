@@ -12,7 +12,6 @@ import 'package:form/presentation/components/common/UI/custom_submit_button.dart
 import 'package:form/presentation/components/common/custom_text.dart';
 import 'package:form/presentation/components/common/map_selector_inline.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
-import 'package:form/repositories/consulta_documento_repository_impl.dart';
 import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -103,13 +102,14 @@ class _SolicitudConsultaPreviaSuperior41KwScreenState
         }
       });
     } catch (e) {
-      print("Error al consultar Documento: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text("$e", style: TextStyle(color: Colors.white)),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("$e", style: TextStyle(color: Colors.white)),
+          ),
+        );
+      }
       return;
     } finally {
       setState(() => isLoadingConsultaDocumento = false);
@@ -235,7 +235,9 @@ class _SolicitudConsultaPreviaSuperior41KwScreenState
         title: "Éxito.",
         type: DialogType.success,
       ).then((_) {
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -314,7 +316,7 @@ class _SolicitudConsultaPreviaSuperior41KwScreenState
                 return "Ingrese Número de CI, RUC o Pasaporte";
               }
 
-              final tipo = selectedTipoDocumento!.id ?? '';
+              final tipo = selectedTipoDocumento?.id ?? '';
 
               // C.I. Civil → solo números, entre 6 y 10 dígitos
               if (tipo == 'TD001' && !RegExp(r'^[0-9]{6,10}$').hasMatch(val)) {

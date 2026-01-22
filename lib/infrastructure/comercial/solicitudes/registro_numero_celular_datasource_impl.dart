@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:form/core/api/mi_ande_api.dart';
-import 'package:form/core/enviromens/Enrivoment.dart';
+import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/datasources/datasources.dart';
 import 'package:form/model/model.dart';
 
@@ -26,21 +26,17 @@ class RegistroNumeroCelularDatasourceImp
       'fechaAlta': fechaAlta,
       'solicitudOTP': solicitudOTP,
       'codigoOTP': codigoOTP,
-      'clientKey': Environment.clientKey,
+      'clientKey': environment.clientKey,
     };
 
     // Crear FormData
     final data = FormData.fromMap(formMap);
 
     final response = await dio.post(
-      "${Environment.hostCtxOpen}/v3/cliente/numeroTelefonoViaApp",
+      "${environment.hostCtxOpen}/v3/cliente/numeroTelefonoViaApp",
       data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType, // 👈 importante
-      ),
+      options: Options(contentType: Headers.formUrlEncodedContentType),
     );
-
-    print('URL llamada: ${response.requestOptions.uri}');
 
     if (response.statusCode == 200) {
       // Dio ya devuelve un Map

@@ -58,7 +58,7 @@ class CustomPhoneField extends StatelessWidget {
                 labelStyle: TextStyle(
                   color: hasError
                       ? theme.colorScheme.error
-                      : theme.colorScheme.onSurface.withOpacity(0.8),
+                      : theme.colorScheme.onSurface.withValues(alpha:  0.8),
                 ),
                 border: const OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(

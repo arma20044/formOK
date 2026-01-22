@@ -83,11 +83,13 @@ class _SolicitudYoFacturoMiLuzState
             content: Text("Favor intente nuevamente la consulta"),
           ),
         );*/
-        CustomSnackbar.show(
-          context,
-          message: "Ocurrió un error, Favor intente nuevamente la consulta",
-          type: MessageType.error,
-        );
+        if (mounted) {
+          CustomSnackbar.show(
+            context,
+            message: "Ocurrió un error, Favor intente nuevamente la consulta",
+            type: MessageType.error,
+          );
+        }
 
         setState(() {
           //  facturas = [];
@@ -106,17 +108,23 @@ class _SolicitudYoFacturoMiLuzState
         _lecturaActualController.text = "";
       });
 
-
-      if(consultaSituacionActualResponse.resultado?.habilitarAporteLectura?.habilitado == 'S') {
-        showModalBottomSheet(
-        isDismissible: false,
-        context: context, // Contexto de la pantalla actual
-        isScrollControlled: true, // Permite que ocupe más espacio (ej. 80%)
-        backgroundColor:
-            Colors.transparent, // Fondo transparente para bordes redondeados
-        builder: (_) =>
-            const ImageBottomSheet(assetPath: 'assets/images/yofacturo.png'),
-      );
+      if (consultaSituacionActualResponse
+              .resultado
+              ?.habilitarAporteLectura
+              ?.habilitado ==
+          'S') {
+        if (mounted) {
+          showModalBottomSheet(
+            isDismissible: false,
+            context: context, // Contexto de la pantalla actual
+            isScrollControlled: true, // Permite que ocupe más espacio (ej. 80%)
+            backgroundColor: Colors
+                .transparent, // Fondo transparente para bordes redondeados
+            builder: (_) => const ImageBottomSheet(
+              assetPath: 'assets/images/yofacturo.png',
+            ),
+          );
+        }
       }
 
       /*ScaffoldMessenger.of(context).showSnackBar(
@@ -126,9 +134,11 @@ class _SolicitudYoFacturoMiLuzState
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 
@@ -170,11 +180,13 @@ class _SolicitudYoFacturoMiLuzState
             content: Text("Favor intente nuevamente la consulta"),
           ),
         );*/
-        CustomSnackbar.show(
-          context,
-          message: "Ocurrió un error, Favor intente nuevamente la consulta",
-          type: MessageType.error,
-        );
+        if (mounted) {
+          CustomSnackbar.show(
+            context,
+            message: "Ocurrió un error, Favor intente nuevamente la consulta",
+            type: MessageType.error,
+          );
+        }
 
         setState(() {
           //  facturas = [];
@@ -198,13 +210,14 @@ class _SolicitudYoFacturoMiLuzState
       setState(() {
         calculoConsumoResultado = null;
       });
-
-      CustomSnackbar.show(
-        context,
-        message: "Error: $e",
-        type: MessageType.error,
-        //duration: Durations.long4,
-      );
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: "Error: $e",
+          type: MessageType.error,
+          //duration: Durations.long4,
+        );
+      }
     } finally {
       setState(() {
         isLoadingCalcularConsumo = false;
@@ -534,11 +547,10 @@ class _SolicitudYoFacturoMiLuzState
           )
         : Text("");
 
-    Text("${calculoConsumoResultado!.cantidadDias}");
+    //Text("${calculoConsumoResultado!.cantidadDias}");
   }
 
   Widget _resultadoBox() {
-    final theme = Theme.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(

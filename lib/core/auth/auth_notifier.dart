@@ -7,7 +7,7 @@ import 'package:form/core/auth/auth_repository.dart';
 import 'package:form/core/auth/model/auth_state_data.dart';
 import 'package:form/core/auth/model/user_model.dart';
 import 'package:form/model/login_model.dart';
-import 'package:form/model/storage/userDatos.dart';
+import 'package:form/model/storage/user_datos.dart';
 import 'model/auth_state.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthStateData> {
@@ -16,7 +16,6 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
   static const _userDatosAnexos = 'user_datos_anexos';
   final _storage = const FlutterSecureStorage();
   bool _autoLoginDone = false;
-  static const _indicadorBloqueo = 'user_indicador_bloqueo';
 
   @override
   Future<AuthStateData> build() async {
@@ -140,7 +139,6 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
         modificarPassword: response.resultado!.modificarPassword!,
         userDatosAnexos: response.resultado?.suministrosList,
         verificado: response.resultado!.verificado!,
-
       );
 
       final List<SuministrosList?>? datosAnexos =
@@ -284,18 +282,15 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
   }
 
   Future<void> logoutForzado() async {
-  // Limpia storage
-  //await _storage.delete(key: _userKey);
+    // Limpia storage
+    //await _storage.delete(key: _userKey);
 
-  // Limpia estado
-  state = const AsyncValue.data(
-    AuthStateData(state: AuthState.unauthenticated),
-  );
+    // Limpia estado
+    state = const AsyncValue.data(
+      AuthStateData(state: AuthState.unauthenticated),
+    );
+  }
 }
-}
-
-
-
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, AuthStateData>(
   AuthNotifier.new,

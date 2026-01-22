@@ -38,7 +38,7 @@ class MenuButton extends StatelessWidget {
   final double borderRadius;
 
   const MenuButton({
-    Key? key,
+    super.key,
     required this.item,
     this.iconSize = 36,
     this.labelStyle,
@@ -46,7 +46,7 @@ class MenuButton extends StatelessWidget {
     this.activeColor,
     this.disabledColor,
     this.borderRadius = 12,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -123,11 +123,11 @@ class MainMenu extends StatelessWidget {
   final TextStyle? itemLabelStyle;
 
   const MainMenu({
-    Key? key,
+    super.key,
     required this.groups,
     this.iconSize = 36,
     this.itemLabelStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

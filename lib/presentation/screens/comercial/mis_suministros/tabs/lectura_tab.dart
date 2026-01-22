@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form/core/api/mi_ande_api.dart';
-import 'package:form/core/auth/auth_notifier.dart';
-import 'package:form/infrastructure/infrastructure.dart';
-import 'package:form/model/mi_cuenta/mi_cuenta_situacion_actual_model.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/provider/situacion_actual_provider.dart';
-import 'package:form/provider/suministro_provider.dart';
-import 'package:form/repositories/repositories.dart';
 
 class LecturaTab extends ConsumerStatefulWidget {
   const LecturaTab({super.key});
@@ -19,7 +13,7 @@ class LecturaTab extends ConsumerStatefulWidget {
 
 class _LecturaTabState extends ConsumerState<LecturaTab> {
   String? errorMessage;
-  SituacionActualResultado? _situacionActualResultado;
+ 
 
   bool isLoading = false;
 

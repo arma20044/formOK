@@ -52,12 +52,14 @@ class _RegistroNumeroCelularScreenState
       final result = await _fetchRegistroNumeroCelular(solicitarOTP);
 
       if (result.error) {
-        DialogHelper.showMessage(
+        if(mounted) {
+          DialogHelper.showMessage(
           context,
           MessageType.error,
           'Error',
           result.errorValList?.first ?? 'Error desconocido',
         );
+        }
         return;
       }
 
@@ -67,12 +69,14 @@ class _RegistroNumeroCelularScreenState
       } else {
         // Si fue verificación final exitosa
         if (mounted) Navigator.of(context).pop(); // Cierra el BottomSheet
-        DialogHelper.showMessage(
+        if(mounted) {
+          DialogHelper.showMessage(
           context,
           MessageType.success,
           'Éxito',
           'Número de celular registrado correctamente.',
         );
+        }
       }
     } catch (e) {
       /*DialogHelper.showMessage(

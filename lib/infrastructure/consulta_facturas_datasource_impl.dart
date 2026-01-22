@@ -1,15 +1,12 @@
 
 
-import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/datasources/consulta_facturas_datasource.dart';
 import 'package:form/model/model.dart';
 
 import '../core/api/mi_ande_api.dart';
-import '../model/archivo_adjunto_model.dart';
 
 
 class ConsultaFacturasDatasourceImpl extends ConsultaFacturasDatasource {
@@ -43,8 +40,8 @@ class ConsultaFacturasDatasourceImpl extends ConsultaFacturasDatasource {
     // Crear FormData
     final data = FormData.fromMap(formMap);
 
-    final response = await dio.post("${Environment.hostCtxOpen}/v5/suministro/ultimasFacturasPublico",
-    //final response = await dio.post("${Environment.hostCtxMiCuenta}/v3/suministro/ultimasFacturas",
+    final response = await dio.post("${environment.hostCtxOpen}/v5/suministro/ultimasFacturasPublico",
+    //final response = await dio.post("${environment.hostCtxMiCuenta}/v3/suministro/ultimasFacturas",
       data: data,
      // options: Options(contentType: Headers.formUrlEncodedContentType),
     );

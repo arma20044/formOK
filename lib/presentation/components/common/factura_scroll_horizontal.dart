@@ -73,20 +73,18 @@ class _FacturaScrollHorizontalState
             factura.fechaFacturacion ?? '',
           );
           final fechaEmision = DateTime.tryParse(factura.fechaEmision ?? '');
-          final fechaVencimiento = DateTime.tryParse(
-            factura.fechaVencimiento ?? '',
-          );
+          final fechaVencimiento = DateTime.tryParse(factura.fechaVencimiento);
 
           final String urlFinal = factura.facturaElectronica!
-              ? "${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile"
+              ? "${environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile"
                     "?nro_nis=${widget.nis.text}"
                     "&sec_nis=${factura.secNis}"
                     "&sec_rec=${factura.secRec}"
                     "&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"
-                    "&clientKey=${Environment.clientKey}"
+                    "&clientKey=${environment.clientKey}"
                     "&value=$cifra"
                     "&fecha=${factura.fechaVencimiento}"
-              : '${Environment.hostCtxOpen}/v4/suministro/facturaPdfMobile?nro_nis=${widget.nis.text}&clientKey=${Environment.clientKey}&value=$cifra&fecha=${factura.fechaVencimiento}&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}"&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"';
+              : '${environment.hostCtxOpen}/v4/suministro/facturaPdfMobile?nro_nis=${widget.nis.text}&clientKey=${environment.clientKey}&value=$cifra&fecha=${factura.fechaVencimiento}&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}"&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"';
 
           final estaDescargando = _cardsDescargando.contains(index);
 
@@ -159,16 +157,20 @@ class _FacturaScrollHorizontalState
                                         urlFinal,
                                         'factura_${factura.nirSecuencial}.pdf',
                                       );
-                                  mostrarCustomModal(
-                                    context,
-                                    archivoDescargado,
-                                  );
+                                  if (mounted) {
+                                    mostrarCustomModal(
+                                      context,
+                                      archivoDescargado,
+                                    );
+                                  }
                                 } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Error al abrir PDF: $e'),
-                                    ),
-                                  );
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Error al abrir PDF: $e'),
+                                      ),
+                                    );
+                                  }
                                 } finally {
                                   setState(() {
                                     _cardsDescargando.remove(index);

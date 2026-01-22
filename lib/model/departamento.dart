@@ -1,7 +1,7 @@
 class DepartamentoResult {
   final dynamic resultado;
   final List<dynamic>? mensajeList;
-  final _Respuesta? respuesta;
+  final RespuestaDepartamento? respuestaDepartamento;
   final String? mensaje;
   final bool? error;
   final List<dynamic>? errorValList;
@@ -9,7 +9,7 @@ class DepartamentoResult {
   DepartamentoResult({
     this.resultado,
     this.mensajeList,
-    this.respuesta,
+    this.respuestaDepartamento,
     this.mensaje,
     this.error,
     this.errorValList,
@@ -20,7 +20,7 @@ class DepartamentoResult {
     return DepartamentoResult(
       resultado: json['resultado'],
        mensajeList: json['mensajeList'] != null ? List<dynamic>.from(json['mensajeList'].map((item) => item)) : null,
-      respuesta: json['respuesta'] != null ? _Respuesta.fromJson(json['respuesta']) : null,
+      respuestaDepartamento: json['respuesta'] != null ? RespuestaDepartamento.fromJson(json['respuesta']) : null,
       mensaje: json['mensaje'],
       error: json['error'],
        errorValList: json['errorValList'] != null ? List<dynamic>.from(json['errorValList'].map((item) => item)) : null,
@@ -31,7 +31,7 @@ class DepartamentoResult {
     return {
       'resultado': resultado,
       'mensajeList': mensajeList?.map((item) => item).toList(),
-      'respuesta': respuesta?.toJson(),
+      'respuesta': respuestaDepartamento?.toJson(),
       'mensaje': mensaje,
       'error': error,
       'errorValList': errorValList?.map((item) => item).toList(),
@@ -40,22 +40,22 @@ class DepartamentoResult {
 
 }
 
-class _Respuesta {
+class RespuestaDepartamento {
   final dynamic pagina;
   final dynamic totalPaginas;
   final dynamic totalDepartamento;
   final List<Departamento?>? datos;
 
-  _Respuesta({
+  RespuestaDepartamento({
     this.pagina,
     this.totalPaginas,
     this.totalDepartamento,
     this.datos,
   });
 
-  factory _Respuesta.fromJson(Map<String, dynamic>? json) {
+  factory RespuestaDepartamento.fromJson(Map<String, dynamic>? json) {
     json ??= {};
-    return _Respuesta(
+    return RespuestaDepartamento(
       pagina: json['pagina'],
       totalPaginas: json['totalPaginas'],
       totalDepartamento: json['totalDepartamento'],

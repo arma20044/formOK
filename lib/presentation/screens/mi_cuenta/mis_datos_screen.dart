@@ -19,7 +19,6 @@ class MisDatos extends ConsumerWidget {
 
     if (authState.value?.state == AuthState.authenticated) {
       datosJson = authState.value?.user;
-      print(datosJson!.apellido);
     }
 
     return Scaffold(
@@ -77,32 +76,22 @@ class MisDatos extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    Text("Nombre: ${datosJson?.nombre ?? 'No disponible'}"),
-                    Text("Apellido: ${datosJson?.apellido ?? 'No disponible'}"),
-                    Text("Correo: ${datosJson?.correo ?? 'No disponible'}"),
-                    Text(
-                      "Teléfono Celular: ${datosJson?.telefonoCelular ?? 'No disponible'}",
-                    ),
-                    Text(
-                      "Tipo Solicitante: ${datosJson?.tipoSolicitante ?? 'No disponible'}",
-                    ),
+                    Text("Nombre: ${datosJson.nombre}"),
+                    Text("Apellido: ${datosJson.apellido}"),
+                    Text("Correo: ${datosJson.correo}"),
+                    Text("Teléfono Celular: ${datosJson.telefonoCelular}"),
+                    Text("Tipo Solicitante: ${datosJson.tipoSolicitante}"),
+
+                    Text("Dirección: ${datosJson.direccion}"),
+                    Text("País: ${datosJson.pais}"),
+                    Text("Departamento: ${datosJson.departamento}"),
+
+                    Text("Ciudad: ${datosJson.ciudad}"),
 
                     Text(
-                      "Dirección: ${datosJson?.direccion ?? 'No disponible'}",
+                      "Tipo Cliente: ${datosJson.tipoCliente.compareTo('1') == 0 ? 'Comercial' : 'General'}",
                     ),
-                    Text("País: ${datosJson?.pais ?? 'No disponible'}"),
-                    Text(
-                      "Departamento: ${datosJson?.departamento ?? 'No disponible'}",
-                    ),
-
-                    Text("Ciudad: ${datosJson?.ciudad ?? 'No disponible'}"),
-
-                    Text(
-                      "Tipo Cliente: ${datosJson?.tipoCliente.compareTo('1') == 0 ? 'Comercial' : 'General'}",
-                    ),
-                    Text(
-                      "Documento: ${datosJson?.numeroDocumento ?? 'No disponible'}",
-                    ),
+                    Text("Documento: ${datosJson.numeroDocumento}"),
                   ],
                 ),
               ),

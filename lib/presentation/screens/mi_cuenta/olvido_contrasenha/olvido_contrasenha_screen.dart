@@ -3,6 +3,7 @@ import 'package:form/config/constantes.dart';
 import 'package:form/config/tipo_tramite_model.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/presentation/auth/login_screen.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/widgets/dropdown_custom.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,6 @@ class OlvidoContrasenhaScreen extends StatefulWidget {
 class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  String? _selectedOpcion; // Dropdown
   String? _selectedRadio; // RadioButton
 
   bool _isLoadingOlvidoContrasenha = false;
@@ -44,9 +44,13 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
     try {
       if (_formKey.currentState!.validate()) {
         if (_selectedRadio == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Seleccione medio de notificación')),
+          CustomSnackbar.show(
+            context,
+            message: "Seleccione medio de notificación",
+            type: MessageType.error,
+            duration: Durations.long4,
           );
+
           return;
         }
 
@@ -59,13 +63,19 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
               documentoIdentificacionController.text,
               _selectedRadio!,
               documentoIdentificacionRepresentanteController.text,
-              selectedTipoSolicitante!.id!
+              selectedTipoSolicitante!.id!,
             );
 
         if (!mounted) return;
         if (olvidoContrasenhaResponse.error) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(style: TextStyle(color: Colors.white), olvidoContrasenhaResponse.errorValList![0]),backgroundColor: Colors.red,),
+            SnackBar(
+              content: Text(
+                style: TextStyle(color: Colors.white),
+                olvidoContrasenhaResponse.errorValList![0],
+              ),
+              backgroundColor: Colors.red,
+            ),
           );
           return;
         } else {
@@ -78,6 +88,7 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
         }
       }
     } catch (e) {
+      debugPrint("Error: $e");
     } finally {
       setState(() {
         _isLoadingOlvidoContrasenha = false;
@@ -194,18 +205,25 @@ class _OlvidoContrasenhaScreenState extends State<OlvidoContrasenhaScreen> {
                 'Seleccione medio de notificación:',
                 style: TextStyle(fontSize: 16),
               ),
-              RadioListTile<String>(
-                title: const Text('Mensaje de Texto (SMS)'),
-                value: 'S',
+              RadioGroup<String>(
                 groupValue: _selectedRadio,
-                onChanged: (valor) => setState(() => _selectedRadio = valor),
+                onChanged: (value) {
+                  setState(() => _selectedRadio = value!);
+                },
+                child: Column(
+                  children: const [
+                    RadioListTile(
+                      value: 'S',
+                      title: Text('Mensaje de Texto (SMS)'),
+                    ),
+                    RadioListTile(
+                      value: 'E',
+                      title: Text('Correo Electrónico (Email)'),
+                    ),
+                  ],
+                ),
               ),
-              RadioListTile<String>(
-                title: const Text('Correo Electrónico (Email)'),
-                value: 'E',
-                groupValue: _selectedRadio,
-                onChanged: (valor) => setState(() => _selectedRadio = valor),
-              ),
+
               const SizedBox(height: 24),
 
               // Botón

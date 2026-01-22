@@ -7,9 +7,7 @@ import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
-import 'package:form/presentation/components/common/custom_map_modal.dart';
 import 'package:form/presentation/components/common/map_selector_inline.dart';
-import 'package:form/presentation/components/common/media_selector.list.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
@@ -50,35 +48,26 @@ class _SolicitudAbastecimientoScreenState
   // ------------------------- FUNCIONES -------------------------
 
   Future<Position?> determinePosition() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return null;
 
     LocationPermission permission = await Geolocator.checkPermission();
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) return null;
     }
-    if (permission == LocationPermission.deniedForever) return null;
+
+    if (permission == LocationPermission.deniedForever) {
+      return null;
+    }
 
     return await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      ),
     );
-  }
-
-  void _openMapModalWithPermission() async {
-    Position? position = await determinePosition();
-    LatLng initialPosition = position != null
-        ? LatLng(position.latitude, position.longitude)
-        : const LatLng(-25.2637, -57.5759);
-
-    LatLng? selectedLocation = await showDialog<LatLng>(
-      context: context,
-      builder: (context) => CustomMapModal(initialPosition: initialPosition),
-    );
-
-    if (selectedLocation != null) {
-      setState(() => ubicacion = selectedLocation);
-    }
   }
 
   void limpiarTodo() {
@@ -173,7 +162,9 @@ class _SolicitudAbastecimientoScreenState
         title: "Éxito.",
         type: DialogType.success,
       ).then((_) {
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -278,8 +269,9 @@ class _SolicitudAbastecimientoScreenState
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Ingrese Correo';
-                    if (!emailRegex.hasMatch(v))
+                    if (!emailRegex.hasMatch(v)) {
                       return 'Ingrese un correo válido';
+                    }
                     return null;
                   },
                 ),

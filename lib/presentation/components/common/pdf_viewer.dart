@@ -25,7 +25,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       final result = await SharePlus.instance.share(params);
 
       if (result.status == ShareResultStatus.success) {
-        print('Thank you for sharing my website!');
+        //print('Thank you for sharing my website!');
       }
     }
 
@@ -42,17 +42,17 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
         enableSwipe: true,
         swipeHorizontal: true,
         backgroundColor: Colors.grey,
-        onRender: (_pages) {
+        onRender: (pages) {
           setState(() {
             //pages = _pages;
             //isReady = true;
           });
         },
         onError: (error) {
-          print(error.toString());
+         // print(error.toString());
         },
         onPageError: (page, error) {
-          print('$page: ${error.toString()}');
+          //print('$page: ${error.toString()}');
         },
         onViewCreated: (PDFViewController pdfViewController) {
           //   _controller.complete(pdfViewController);

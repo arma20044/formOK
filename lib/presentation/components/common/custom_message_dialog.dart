@@ -3,7 +3,6 @@ import 'package:form/config/constantes.dart';
 
 /// Tipos de mensaje disponibles
 
-
 /// Widget del diálogo reutilizable
 class CustomMessageDialog extends StatelessWidget {
   final MessageType type;
@@ -51,7 +50,7 @@ class CustomMessageDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 6,
-      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         child: Column(

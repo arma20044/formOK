@@ -61,12 +61,14 @@ class _SolicitudFacturaFijaScreenState
       final result = await _fetchFacturaFija(nisController.text);
 
       if (result.error!) {
-        DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList?.first ?? 'Error desconocido',
-        );
+        if (mounted) {
+          DialogHelper.showMessage(
+            context,
+            MessageType.error,
+            'Error',
+            result.errorValList?.first ?? 'Error desconocido',
+          );
+        }
         return;
       }
 
@@ -80,15 +82,22 @@ class _SolicitudFacturaFijaScreenState
         'Éxito',
         result.resultado!.consumoPromedio.toString(),
       );*/
-      CustomSnackbar.show(context, message: "Simulacion Correcta.",type: MessageType.success);
-
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: "Simulacion Correcta.",
+          type: MessageType.success,
+        );
+      }
     } catch (e) {
-      DialogHelper.showMessage(
-        context,
-        MessageType.error,
-        'Error',
-        'Ocurrió un error inesperado',
-      );
+      if (mounted) {
+        DialogHelper.showMessage(
+          context,
+          MessageType.error,
+          'Error',
+          'Ocurrió un error inesperado',
+        );
+      }
     } finally {
       setState(() => _isLoadingSolicitud = false);
     }
@@ -129,7 +138,7 @@ class _SolicitudFacturaFijaScreenState
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isActive ? baseColor : baseColor.withOpacity(0.4),
+          color: isActive ? baseColor : baseColor.withValues(alpha:  0.4),
           borderRadius: BorderRadius.circular(6),
           border: Border(
             bottom: BorderSide(
@@ -343,7 +352,6 @@ class _SolicitudFacturaFijaScreenState
   }
 
   Widget _resultadoBox() {
-    final theme = Theme.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(

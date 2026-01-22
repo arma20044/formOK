@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
-import 'package:form/provider/theme_provider.dart';
 
 class AuthHeaderSection extends ConsumerWidget {
   const AuthHeaderSection({super.key});
@@ -11,8 +10,7 @@ class AuthHeaderSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
-    final themeNotifier = ref.watch(themeNotifierProvider.notifier);
-    final themeState = ref.watch(themeNotifierProvider);
+  
 
     return DrawerHeader(
       //decoration: const BoxDecoration(color: Colors.blue),

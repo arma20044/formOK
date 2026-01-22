@@ -102,12 +102,14 @@ class _SolicitudAlumbradoPublicoState extends State<SolicitudAlumbradoPublico> {
       final result = await _fecthSolicitudAlumbradoPublico();
 
       if (result.error!) {
-        DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList?.first ?? 'Error desconocido',
-        );
+        if (mounted) {
+          DialogHelper.showMessage(
+            context,
+            MessageType.error,
+            'Error',
+            result.errorValList?.first ?? 'Error desconocido',
+          );
+        }
         return;
       }
 
@@ -115,22 +117,24 @@ class _SolicitudAlumbradoPublicoState extends State<SolicitudAlumbradoPublico> {
         solicitudAbastecimientoResult = result.resultado;
       });
 
-      
       limpiarTodo();
-
-      DialogHelper.showMessage(
-        context,
-        MessageType.success,
-        'Éxito',
-        result.mensaje!,
-      );
+      if (mounted) {
+        DialogHelper.showMessage(
+          context,
+          MessageType.success,
+          'Éxito',
+          result.mensaje!,
+        );
+      }
     } catch (e) {
-      DialogHelper.showMessage(
-        context,
-        MessageType.error,
-        'Error',
-        'Ocurrió un error inesperado',
-      );
+      if (mounted) {
+        DialogHelper.showMessage(
+          context,
+          MessageType.error,
+          'Error',
+          'Ocurrió un error inesperado',
+        );
+      }
     } finally {
       setState(() => _isLoadingSolicitud = false);
     }
@@ -159,7 +163,7 @@ class _SolicitudAlumbradoPublicoState extends State<SolicitudAlumbradoPublico> {
       ubicacion,
       "",
       "",
-      ""
+      "",
     );
   }
 

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
-import 'widgets/maps/LocationInfo.dart';
-import 'widgets/maps/MapSelector.dart';
+import 'widgets/maps/location_info.dart';
+import 'widgets/maps/map_selector.dart';
 
 class Tab3 extends StatefulWidget {
   final double? lat;

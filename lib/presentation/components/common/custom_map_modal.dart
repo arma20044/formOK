@@ -6,17 +6,16 @@ class CustomMapModal extends StatefulWidget {
   final LatLng? selectedLocation;
 
   const CustomMapModal({
-    Key? key,
+    super.key,
     required this.initialPosition,
     this.selectedLocation,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomMapModal> createState() => _CustomMapModalState();
 }
 
 class _CustomMapModalState extends State<CustomMapModal> {
-  late GoogleMapController _mapController;
   LatLng? _selectedLocation;
   bool _mapReady = false;
 
@@ -30,6 +29,8 @@ class _CustomMapModalState extends State<CustomMapModal> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width * 0.9;
     final height = MediaQuery.of(context).size.height * 0.7;
+
+    late GoogleMapController _mapController;
 
     return Dialog(
       insetPadding: const EdgeInsets.all(10),
@@ -67,9 +68,7 @@ class _CustomMapModalState extends State<CustomMapModal> {
                         : {},
                   ),
                   if (!_mapReady)
-                    const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    const Center(child: CircularProgressIndicator()),
                 ],
               ),
             ),

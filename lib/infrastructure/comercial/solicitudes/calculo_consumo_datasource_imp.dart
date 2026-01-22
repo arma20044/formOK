@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:form/core/api/mi_ande_api.dart';
-import 'package:form/core/enviromens/Enrivoment.dart';
+import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/datasources/datasources.dart';
 import 'package:form/model/model.dart';
 
@@ -20,21 +20,21 @@ class CalculoConsumoDatasourceImp
     final Map<String, Object> formMap = {
       'nis': nis,
       'lecturaActual':lecturaActual,
-      'clientKey': Environment.clientKey,
+      'clientKey': environment.clientKey,
     };
 
     // Crear FormData
     final data = FormData.fromMap(formMap);
 
     final response = await dio.post(
-      "${Environment.hostCtxOpen}/v4/suministro/calcularConsumo",
+      "${environment.hostCtxOpen}/v4/suministro/calcularConsumo",
       data: data,
       options: Options(
-        contentType: Headers.formUrlEncodedContentType, // 👈 importante
+        contentType: Headers.formUrlEncodedContentType, 
       ),
     );
 
-    print('URL llamada: ${response.requestOptions.uri}');
+    //debugPrint('URL llamada: ${response.requestOptions.uri}');
 
     if (response.statusCode == 200) {
       // Dio ya devuelve un Map

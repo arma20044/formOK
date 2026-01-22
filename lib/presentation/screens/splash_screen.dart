@@ -74,8 +74,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   const SizedBox(height: 20),
               
                   Platform.isAndroid
-                      ? Text('Ver. ${Environment.appVersion.android.version}')
-                      : Text('Ver. ${Environment.appVersion.ios.version}'),
+                      ? Text('Ver. ${environment.appVersion.android.version}')
+                      : Text('Ver. ${environment.appVersion.ios.version}'),
              
             
           ],

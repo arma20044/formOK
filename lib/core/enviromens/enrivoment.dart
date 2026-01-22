@@ -71,7 +71,7 @@ const appVersions = AppVersions(
   web: AppVersion(version: "0.0.0", fecha: "10/06/2022"),
 );
 
-const Environments = {
+const environments = {
   "produccion": EnvironmentConfig(
     name: "produccion",
     clientKey: "19fec632c1c0f45372ce62dd525addc1437d3b74",
@@ -115,5 +115,5 @@ const Environments = {
 // ----------------- USO -----------------
 const String environmentActual = "desarrollo";
 
-final EnvironmentConfig Environment = Environments[environmentActual]!;
+final EnvironmentConfig environment = environments[environmentActual]!;
 

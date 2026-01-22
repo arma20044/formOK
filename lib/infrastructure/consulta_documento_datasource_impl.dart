@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:form/core/enviromens/Enrivoment.dart';
+import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/model/model.dart';
 
 import '../core/api/mi_ande_api.dart';
@@ -35,10 +35,10 @@ class ConsultaDocumentoDatasourceImpl extends ConsultaDocumentoDatasource {
         : '/v4/mitic/consultaSetMobile';
 
     final response = await dio.post(
-      "${Environment.hostCtxOpen}$urlConsulta",
+      "${environment.hostCtxOpen}$urlConsulta",
       data: data,
       options: Options(
-        contentType: Headers.formUrlEncodedContentType, // 👈 importante
+        contentType: Headers.formUrlEncodedContentType, 
       ),
     );
 

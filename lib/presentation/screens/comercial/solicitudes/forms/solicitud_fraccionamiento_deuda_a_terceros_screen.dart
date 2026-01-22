@@ -33,7 +33,7 @@ class _SolicitudFraccionamientoDeudaATercerosScreenState
   final entregaController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoadingConsultar = false;
-  bool _isLoadingSimular = false;
+  final bool _isLoadingSimular = false;
   bool _isLoadingSolicitar = false;
 
   //SuministrosList? selectedNIS;
@@ -67,13 +67,15 @@ class _SolicitudFraccionamientoDeudaATercerosScreenState
       );
 
       if (result.error!) {
-        DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList?.first ?? 'Error desconocido',
-        );
-        
+        if (mounted) {
+          DialogHelper.showMessage(
+            context,
+            MessageType.error,
+            'Error',
+            result.errorValList?.first ?? 'Error desconocido',
+          );
+        }
+
         return;
       }
 
@@ -95,7 +97,6 @@ class _SolicitudFraccionamientoDeudaATercerosScreenState
           selectedCuota = dropDownCantidadCuotas.last;
         }
         mostrarConsultar = true;
-        
       });
 
       /*DialogHelper.showMessage(
@@ -104,11 +105,13 @@ class _SolicitudFraccionamientoDeudaATercerosScreenState
         'Éxito',
         result.resultado!.consumoPromedio.toString(),
       );*/
-      CustomSnackbar.show(
-        context,
-        message: "Simulacion Correcta.",
-        type: MessageType.success,
-      );
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: "Simulacion Correcta.",
+          type: MessageType.success,
+        );
+      }
 
       setState(() {
         mostrarErrorSimular = false;
@@ -125,10 +128,9 @@ class _SolicitudFraccionamientoDeudaATercerosScreenState
       }
       // DialogHelper.showMessage(context, MessageType.error, 'Error', errorMsg);
       setState(() {
-
-if(simular == false){
-   mostrarConsultar = false;
-}
+        if (simular == false) {
+          mostrarConsultar = false;
+        }
 
         mostrarErrorSimular = true;
         mensajeError = errorMsg.contains("tokenerror")
@@ -187,7 +189,7 @@ if(simular == false){
           child: CustomTitle(
             size: 'large',
             text:
-                "NIS: ${nisController.text ?? 'sin datos'} - ${solicitudFraccionamientoResponse?.resultado?.nombreApellido ?? "sin datos"}",
+                "NIS: ${nisController.text} - ${solicitudFraccionamientoResponse?.resultado?.nombreApellido ?? "sin datos"}",
           ),
         ),
         SizedBox(
@@ -214,7 +216,7 @@ if(simular == false){
           child: DropdownButtonFormField<int>(
             initialValue: selectedCuota,
             hint: const Text("Seleccionar Cantidad de cuotas"),
-            items: (dropDownCantidadCuotas ?? [])
+            items: (dropDownCantidadCuotas)
                 .map(
                   (item) => DropdownMenuItem<int>(
                     value: item,
@@ -249,8 +251,8 @@ if(simular == false){
             ? CustomCard(
                 title: "Atención",
                 titleColor: Colors.red,
-                child: CustomText(mensajeError, overflow: TextOverflow.clip),
                 borderColor: Colors.red,
+                child: CustomText(mensajeError, overflow: TextOverflow.clip),
               )
             : Text(""),
         //CustomCard(child: CustomText(solicitudFraccionamientoResponse?.resultado?.deuda ?? "no hay datos").toString())
@@ -393,24 +395,28 @@ if(simular == false){
       final result = await _fetchSolicitarFraccionamiento(solicitarOTP);
 
       if (result.error!) {
-        DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList?.first ?? 'Error desconocido',
-        );
+        if (mounted) {
+          DialogHelper.showMessage(
+            context,
+            MessageType.error,
+            'Error',
+            result.errorValList?.first ?? 'Error desconocido',
+          );
+        }
         return;
       }
 
       setState(() {});
-
-      CustomSnackbar.show(
-        context,
-        message: result.mensaje!,
-        type: MessageType.success,
-      );
-      Navigator.of(context).pop();
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: result.mensaje!,
+          type: MessageType.success,
+        );
+        Navigator.of(context).pop();
+      }
     } catch (e) {
+      debugPrint("Error: $e");
     } finally {
       setState(() => _isLoadingSolicitar = false);
     }
@@ -418,7 +424,7 @@ if(simular == false){
 
   List<SuministrosList?>? dropDownItemsSuministro;
 
-  late final tipoCliente;
+  late final String? tipoCliente;
 
   @override
   void initState() {

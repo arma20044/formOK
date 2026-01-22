@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import '../../model/archivo_adjunto_model.dart';
-import 'widgets/media/MediaPickerButton.dart';
-import 'widgets/media/MediaPreview.dart';
+import 'widgets/media/media_picker_button.dart';
+import 'widgets/media/media_preview.dart';
 import 'package:mime/mime.dart';
 
 
@@ -38,8 +38,7 @@ class _MediaPicker extends StatefulWidget {
   final ArchivoAdjunto? file;
   final ValueChanged<ArchivoAdjunto?> onChanged;
 
-  const _MediaPicker({Key? key, this.file, required this.onChanged})
-    : super(key: key);
+  const _MediaPicker({this.file, required this.onChanged});
 
   @override
   State<_MediaPicker> createState() => _MediaPickerState();

@@ -85,10 +85,10 @@ class _FileWithCaptionPickerState extends State<FileWithCaptionPicker> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? theme.colorScheme.surfaceVariant : theme.colorScheme.surface,
+        color: isDark ? theme.colorScheme.surfaceContainerHighest  : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.dividerColor.withOpacity(0.3),
+          color: theme.dividerColor.withValues(alpha:  0.3),
         ),
       ),
       child: Column(

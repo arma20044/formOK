@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../core/api/mi_ande_api.dart';
-import '../core/enviromens/Enrivoment.dart';
+import '../core/enviromens/enrivoment.dart';
 import '../datasources/datasources.dart';
 import '../model/model.dart';
 
@@ -14,22 +14,16 @@ class ServiciosNisDatasourceImpl extends ServiciosNisDatasource {
 
   @override
   Future<ServiciosNisTelefonoResponse> getServiciosNis(
-   String nis,String token
+    String nis,
+    String token,
   ) async {
-    var data = FormData.fromMap({
-      'nis': nis,     
-      'kwfxtoken': token,
-    });
+    var data = FormData.fromMap({'nis': nis, 'kwfxtoken': token});
 
     final response = await dio.post(
-      "${Environment.hostCtxMiCuenta}/v3/serviciosNisTelefono/listar",
+      "${environment.hostCtxMiCuenta}/v3/serviciosNisTelefono/listar",
       data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType, // 👈 importante
-      ),
+      options: Options(contentType: Headers.formUrlEncodedContentType),
     );
- 
-    print('URL llamada: ${response.requestOptions.uri}');
 
     if (response.statusCode == 200) {
       final serviciosNisResponse = ServiciosNisTelefonoResponse.fromJson(

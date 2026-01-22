@@ -41,9 +41,7 @@ class _ReclamosScreenState extends State<ReclamosScreen>
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       // Aquí puedes enviar todos los datos juntos
-      print('Tab1: ${tab1Controller.text}');
-      print('Tab2: ${tab2Controller.text}');
-      print('Tab3: ${tab3Controller.text}');
+      
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Formulario enviado')));
       _formKey.currentState!.reset();

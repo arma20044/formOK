@@ -2,8 +2,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:form/model/model.dart';
-import 'package:form/presentation/components/widgets/media/MediaPickerButton.dart';
-import 'package:form/presentation/components/widgets/media/MediaPreview.dart';
+import 'package:form/presentation/components/widgets/media/media_picker_button.dart';
+import 'package:form/presentation/components/widgets/media/media_preview.dart';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
@@ -12,17 +12,13 @@ import 'package:video_thumbnail/video_thumbnail.dart';
 /// Componente reutilizable para seleccionar imagen o video
 class Adjuntos extends FormField<ArchivoAdjunto?> {
   Adjuntos({
-    Key? key,
-    ArchivoAdjunto? initialValue,
-    FormFieldSetter<ArchivoAdjunto?>? onSaved,
-    FormFieldValidator<ArchivoAdjunto?>? validator,
+    super.key,
+    super.initialValue,
+    super.onSaved,
+    super.validator,
     ValueChanged<ArchivoAdjunto?>? onChanged,
     String? label,
   }) : super(
-         key: key,
-         onSaved: onSaved,
-         validator: validator,
-         initialValue: initialValue,
          builder: (state) {
            return Column(
              crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,8 +60,7 @@ class _MediaPicker extends StatefulWidget {
   final ArchivoAdjunto? file;
   final ValueChanged<ArchivoAdjunto?> onChanged;
 
-  const _MediaPicker({Key? key, this.file, required this.onChanged})
-    : super(key: key);
+  const _MediaPicker({this.file, required this.onChanged});
 
   @override
   State<_MediaPicker> createState() => _MediaPickerState();

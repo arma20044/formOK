@@ -124,7 +124,7 @@ Future<void> showCustomDialog({
                   SnackBar(
                     content: const Text("Texto copiado al portapapeles"),
                     behavior: SnackBarBehavior.floating,
-                    backgroundColor: cs.surfaceVariant,
+                    backgroundColor: cs.surfaceContainerHigh,
                     duration: const Duration(seconds: 2),
                   ),
                 );

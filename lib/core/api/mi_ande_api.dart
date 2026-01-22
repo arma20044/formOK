@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form/core/api/auth_interceptor.dart';
+import 'package:flutter/material.dart';
+import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/core/errors/error_interceptor.dart';
 import 'package:form/core/router/app_router.dart';
 import 'package:form/main.dart';
 
-import '../enviromens/Enrivoment.dart';
+
 
 /// Clase para manejar todas las peticiones a la API
 class MiAndeApi {
@@ -52,37 +52,40 @@ class MiAndeApi {
             fd.fields.add(
               MapEntry(
                 'clientKey',
-                utf8.decode(utf8.encode(Environment.clientKey)),
+                utf8.decode(utf8.encode(environment.clientKey)),
               ),
             );
           }
 
-          print('➡️ [${Environment.name}] ${options.method} ${options.uri}');
-          print('Datos enviados: ${options.data}');
+         
 
           if (options.data is FormData) {
             final fd = options.data as FormData;
 
             for (var field in fd.fields) {
-              print('  ${field.key}: ${field.value}');
+             // print('  ${field.key}: ${field.value}');
+             debugPrint("field: $field");
             }
             for (var file in fd.files) {
-              print('  Archivo: ${file.key} -> ${file.value.filename}');
+             // print('  Archivo: ${file.key} -> ${file.value.filename}');
+              debugPrint("file: $file");
             }
           }
 
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          print('✅ [${Environment.name}] ${response.requestOptions.uri}');
-          print('Status: ${response.statusCode}');
-          print('Respuesta: ${response.data}');
+          debugPrint('✅ [${environment.name}] ${response.requestOptions.uri}');
+          debugPrint('Status: ${response.statusCode}');
+          debugPrint('Respuesta: ${response.data}');
+
+          
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          print('❌ Error en: ${e.requestOptions.uri}');
-          print('Status: ${e.response?.statusCode}');
-          print('Mensaje: ${e.message}');
+          debugPrint('❌ Error en: ${e.requestOptions.uri}');
+          debugPrint('Status: ${e.response?.statusCode}');
+          debugPrint('Mensaje: ${e.message}');
           return handler.next(e);
         },
       ),

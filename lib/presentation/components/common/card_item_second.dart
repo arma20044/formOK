@@ -31,7 +31,6 @@ class CardItemSecond extends StatelessWidget {
     final backgroundColor = isDark ? Colors.black : Colors.white;
     final borderColor = isDark ? Colors.green : Colors.black;
     final mainTextColor = isDark ? Colors.white : Colors.black;
-    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
     final accentColor = Colors.green;
 
     return Card(

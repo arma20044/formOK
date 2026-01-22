@@ -7,7 +7,7 @@ import 'package:form/model/model.dart';
 
 import '../core/api/mi_ande_api.dart';
 import '../datasources/datasources.dart';
-import '../model/storage/userDatos.dart';
+import '../model/storage/user_datos.dart';
 
 class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
   late final Dio dio;
@@ -56,7 +56,7 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
       'tipoCliente': tipoCliente,
       'tipoSolicitante': tipoSolicitante,
       'tipoDocumento': tipoDocumento,
-     
+
       'documentoIdentificacion': numeroDocumento,
       'nombre': nombre,
       'apellido': apellido,
@@ -75,8 +75,7 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
       'solicitudOTP': solicitudOTP,
       'codigoOTP': codigoOTP,
 
-       'cedulaRepresentante': cedulaRepresentante,
-       
+      'cedulaRepresentante': cedulaRepresentante,
     };
 
     // Solo agregar archivo si existe
@@ -128,8 +127,8 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
     final data = FormData.fromMap(formMap);
 
     //ver
-    final _storage = const FlutterSecureStorage();
-    String? datosSesion = await _storage.read(key: 'user_data');
+    final storage = const FlutterSecureStorage();
+    String? datosSesion = await storage.read(key: 'user_data');
 
     String token = "";
     if (datosSesion != null) {
@@ -140,23 +139,21 @@ class MiCuentaRegistroDatasourceImpl extends MiCuentaRegistroDatasource {
 
     String url = "";
     if (tipoCliente == 1 && (token != "")) {
-      url = '${Environment.hostCtxRegistroUnico}/v1/actualizarDatos';
+      url = '${environment.hostCtxRegistroUnico}/v1/actualizarDatos';
     } else {
-      url = '${Environment.hostCtxRegistroUnico}/v1/agregar';
+      url = '${environment.hostCtxRegistroUnico}/v1/agregar';
     }
 
     var headers = {
-  //'Content-Type': 'application/x-www-form-urlencoded'
-  'Content-Type': "multipart/form-data; charset=ISO-8859-1",
-};
+      //'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': "multipart/form-data; charset=ISO-8859-1",
+    };
 
     final response = await dio.post(
       url,
       data: data,
       // options: Options(contentType: Headers.formUrlEncodedContentType),
-      options: Options(
-        headers: headers
-      )
+      options: Options(headers: headers),
     );
 
     if (response.statusCode == 200) {

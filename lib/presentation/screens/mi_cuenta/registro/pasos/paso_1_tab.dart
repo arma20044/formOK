@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/config/tipo_tramite_model.dart';
 import 'package:form/model/constans/listado_checks_registro_mi_cuenta.dart';
 import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common/checkbox_group.dart';
-import 'package:form/presentation/components/common/info_card_simple.dart';
 import 'package:form/presentation/components/widgets/dropdown_custom.dart';
 
-import 'package:form/provider/terminos.dart' hide FormState;
+import 'package:form/provider/terminos.dart';
 import 'package:form/utils/utils.dart';
 
 import '../../../../../core/api/mi_ande_api.dart';
@@ -71,9 +69,9 @@ class Paso1TabState extends ConsumerState<Paso1Tab>
       "correo": correoController.text,
       "telefonoFijo": numeroTelefonoFijoController.text,
       "telefonoCelular": numeroTelefonoCelularController.text,
-       "documentoRepresentante": documentoRepresentanteController.text,
-    "nombreRepresentante": nombreRepresentanteObtenido.text,
-    "apellidoRepresentante": apellidoRepresentanteObtenido.text,
+      "documentoRepresentante": documentoRepresentanteController.text,
+      "nombreRepresentante": nombreRepresentanteObtenido.text,
+      "apellidoRepresentante": apellidoRepresentanteObtenido.text,
     };
   }
 
@@ -147,7 +145,7 @@ class Paso1TabState extends ConsumerState<Paso1Tab>
         }
       });
     } catch (e) {
-      print("Error al consultar Documento: $e");
+      debugPrint("Error al consultar Documento: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
@@ -165,7 +163,7 @@ class Paso1TabState extends ConsumerState<Paso1Tab>
     try {
       listaDepartamentos = await repoDepartamento.getDepartamento();
     } catch (e) {
-      print("Error al cargar departamentos: $e");
+      debugPrint("Error al cargar departamentos: $e");
     } finally {
       setState(() => isLoadingDepartamentos = false);
     }
@@ -176,7 +174,7 @@ class Paso1TabState extends ConsumerState<Paso1Tab>
     try {
       listaCiudades = await repoCiudad.getCiudad(idDepartamento);
     } catch (e) {
-      print("Error al cargar ciudad: $e");
+      debugPrint("Error al cargar ciudad: $e");
     } finally {
       setState(() => isLoadingCiudades = false);
     }
@@ -198,7 +196,7 @@ class Paso1TabState extends ConsumerState<Paso1Tab>
             consultaDocumentoResponse.apellido!;
       });
     } catch (e) {
-      print("Error al consultar Documento Representante: $e");
+      debugPrint("Error al consultar Documento Representante: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
@@ -646,7 +644,6 @@ class Paso1TabState extends ConsumerState<Paso1Tab>
                   : Text(""),
 
               TextFormField(
-              
                 //focusNode: _focusNode,
                 controller: direccionController,
                 // keyboardType: TextInputType.text,
@@ -678,8 +675,9 @@ class Paso1TabState extends ConsumerState<Paso1Tab>
                   if (val == null || val.isEmpty) {
                     return "Ingrese Correo";
                   }
-                  if (!emailRegex.hasMatch(val))
+                  if (!emailRegex.hasMatch(val)) {
                     return "Ingrese formato de correo válido.";
+                  }
                   return null;
                   //}
                 },

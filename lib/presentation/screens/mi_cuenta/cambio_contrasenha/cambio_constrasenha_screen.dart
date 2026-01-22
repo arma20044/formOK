@@ -32,9 +32,9 @@ class _CambioContrasenhaScreenState
 
   void _enviarFormulario(UserModel user) async {
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese todos los campos')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Ingrese todos los campos')));
       return;
     }
 
@@ -68,15 +68,18 @@ class _CambioContrasenhaScreenState
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) GoRouter.of(context).go('/');
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(cambioContrasenhaResponse.mensaje!)),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(cambioContrasenhaResponse.mensaje!)),
+          );
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -89,8 +92,6 @@ class _CambioContrasenhaScreenState
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-
-    UserModel? datosJson;
 
     if (authState.value?.state == AuthState.authenticated) {
       //datosJson = authState.value?.user;
@@ -106,15 +107,15 @@ class _CambioContrasenhaScreenState
           child: Column(
             children: [
               // Text("data"),
-               Visibility(
+              Visibility(
                 visible: authState.value?.user?.modificarPassword == 'S',
-                 child: InfoCardSimple(
+                child: InfoCardSimple(
                   title: "Debe cambiar la contraseña para continuar",
                   subtitle: "",
                   color: Colors.red,
                   size: 14,
-                               ),
-               ),
+                ),
+              ),
               const SizedBox(height: 24),
               TextFormField(
                 controller: passwordAnteriorController,

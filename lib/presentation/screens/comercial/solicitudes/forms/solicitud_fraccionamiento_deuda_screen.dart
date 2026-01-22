@@ -32,7 +32,7 @@ class _SolicitudFraccionamientoDeudaScreenState
   final entregaController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoadingConsultar = false;
-  bool _isLoadingSimular = false;
+  final bool _isLoadingSimular = false;
   bool _isLoadingSolicitar = false;
 
   SuministrosList? selectedNIS;
@@ -65,12 +65,14 @@ class _SolicitudFraccionamientoDeudaScreenState
       );
 
       if (result.error!) {
-        DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList?.first ?? 'Error desconocido',
-        );
+        if (mounted) {
+          DialogHelper.showMessage(
+            context,
+            MessageType.error,
+            'Error',
+            result.errorValList?.first ?? 'Error desconocido',
+          );
+        }
         return;
       }
 
@@ -89,11 +91,8 @@ class _SolicitudFraccionamientoDeudaScreenState
               "0";
           "";
 
-            selectedCuota = dropDownCantidadCuotas.last;
+          selectedCuota = dropDownCantidadCuotas.last;
         }
-
-       
-       
       });
 
       /*DialogHelper.showMessage(
@@ -102,11 +101,13 @@ class _SolicitudFraccionamientoDeudaScreenState
         'Éxito',
         result.resultado!.consumoPromedio.toString(),
       );*/
-      CustomSnackbar.show(
-        context,
-        message: "Simulacion Correcta.",
-        type: MessageType.success,
-      );
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: "Simulacion Correcta.",
+          type: MessageType.success,
+        );
+      }
 
       setState(() {
         mostrarErrorSimular = false;
@@ -206,7 +207,7 @@ class _SolicitudFraccionamientoDeudaScreenState
           child: DropdownButtonFormField<int>(
             initialValue: selectedCuota,
             hint: const Text("Seleccionar Cantidad de cuotas"),
-            items: (dropDownCantidadCuotas ?? [])
+            items: (dropDownCantidadCuotas)
                 .map(
                   (item) => DropdownMenuItem<int>(
                     value: item,
@@ -241,8 +242,8 @@ class _SolicitudFraccionamientoDeudaScreenState
             ? CustomCard(
                 title: "Atención",
                 titleColor: Colors.red,
-                child: CustomText(mensajeError, overflow: TextOverflow.clip),
                 borderColor: Colors.red,
+                child: CustomText(mensajeError, overflow: TextOverflow.clip),
               )
             : Text(""),
         //CustomCard(child: CustomText(solicitudFraccionamientoResponse?.resultado?.deuda ?? "no hay datos").toString())
@@ -385,24 +386,30 @@ class _SolicitudFraccionamientoDeudaScreenState
       final result = await _fetchSolicitarFraccionamiento(solicitarOTP);
 
       if (result.error!) {
-        DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList?.first ?? 'Error desconocido',
-        );
+        if (mounted) {
+          DialogHelper.showMessage(
+            context,
+            MessageType.error,
+            'Error',
+            result.errorValList?.first ?? 'Error desconocido',
+          );
+        }
         return;
       }
 
       setState(() {});
-
-      CustomSnackbar.show(
-        context,
-        message: result.mensaje!,
-        type: MessageType.success,
-      );
-      Navigator.of(context).pop();
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: result.mensaje!,
+          type: MessageType.success,
+        );
+      }
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     } catch (e) {
+      debugPrint("Error: $e");
     } finally {
       setState(() => _isLoadingSolicitar = false);
     }
@@ -418,7 +425,7 @@ class _SolicitudFraccionamientoDeudaScreenState
     dropDownItemsSuministro = authState.value?.user?.userDatosAnexos;
 
     if (dropDownItemsSuministro != null &&
-        dropDownItemsSuministro!.length > 0) {
+        dropDownItemsSuministro!.isNotEmpty) {
       selectedNIS = dropDownItemsSuministro![0]; // valor inicial
     }
   }

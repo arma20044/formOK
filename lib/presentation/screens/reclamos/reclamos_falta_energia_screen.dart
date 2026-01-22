@@ -153,7 +153,7 @@ class _ParentScreenState extends State<ReclamosScreen>
         _lng,
       );
 
-      print(reclamoResponse);
+      //print(reclamoResponse);
       return reclamoResponse;
     } catch (e) {
       throw Exception();

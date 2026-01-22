@@ -16,7 +16,7 @@ class _ExpedienteScreenState extends ConsumerState<ExpedienteScreen> {
   late final WebViewController _controller;
   bool _isLoading = true;
 
-  final String url = '${Environment.hostSitioAnde}/expedientes/';
+  final String url = '${environment.hostSitioAnde}/expedientes/';
 
    late final String usuario;
    late final String password;
@@ -44,7 +44,7 @@ class _ExpedienteScreenState extends ConsumerState<ExpedienteScreen> {
       ..addJavaScriptChannel(
         'DebugChannel',
         onMessageReceived: (message) {
-          print('🟢 JS Debug: ${message.message}');
+          debugPrint('🟢 JS Debug: ${message.message}');
           if (message.message.contains("Error de login")) {
             ScaffoldMessenger.of(
               context,

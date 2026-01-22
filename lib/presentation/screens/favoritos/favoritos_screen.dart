@@ -5,7 +5,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/model/favoritos/favoritos_model.dart';
 import 'package:form/model/favoritos/favoritos_tipo_model.dart';
-import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';

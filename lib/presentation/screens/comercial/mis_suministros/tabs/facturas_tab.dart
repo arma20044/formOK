@@ -1,9 +1,8 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form/core/enviromens/Enrivoment.dart';
+import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/presentation/components/common/UI/custom_loading.dart';
 import 'package:form/presentation/components/common/card_item_first.dart';
 
@@ -42,7 +41,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
             data: (situacionActual) {
               // Validación de nulos críticos
               final facturaDatos = situacionActual.facturaDatos;
-              final factura = situacionActual.facturaDatos;
+             
               final tieneDeuda = situacionActual.tieneDeuda ?? false;
 
               if (facturaDatos == null ||
@@ -71,7 +70,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                 num nisParcial = int.parse(
                   widget.selectedNIS!.nisRad.toString().substring(0, 3),
                 );
-                List<String> fechaObtenida = fechaVencimiento!.split('/');
+                List<String> fechaObtenida = fechaVencimiento.split('/');
                 num dia = int.parse(fechaObtenida[0]);
                 num mes = int.parse(fechaObtenida[1]);
                 num anho = int.parse(fechaObtenida[2]);
@@ -123,7 +122,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                               facturaDatos.otrosImportes?.totalconComision
                                   ?.toString() ??
                               "0",
-                          onPrimaryPressed: () => print("Ver Ultima Factura"),
+                          onPrimaryPressed: () => debugPrint("Ver Ultima Factura"),
                           onSecondaryPressed: () async {
                             setState(() {
                               _isLoadingFacturaDeudaTotal = true;
@@ -132,8 +131,8 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                             try {
                               final String urlFinal =
                                   facturaDatos.facturaElectronica == true
-                                  ? "${Environment.hostCtxOpen}/v5/suministro/ultimaFacturaElectronicaPendientePdfMobile?nis=${widget.selectedNIS?.nisRad}&clientKey=${Environment.clientKey}&fecha=$fechaVencimiento&value=$cifra&fecha=$fechaVencimiento"
-                                  : "${Environment.hostCtxOpen}/v4/suministro/ultimaFacturaPendientePdfMobile?nis=${widget.selectedNIS?.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=$fechaVencimiento";
+                                  ? "${environment.hostCtxOpen}/v5/suministro/ultimaFacturaElectronicaPendientePdfMobile?nis=${widget.selectedNIS?.nisRad}&clientKey=${environment.clientKey}&fecha=$fechaVencimiento&value=$cifra&fecha=$fechaVencimiento"
+                                  : "${environment.hostCtxOpen}/v4/suministro/ultimaFacturaPendientePdfMobile?nis=${widget.selectedNIS?.nisRad}&clientKey=${environment.clientKey}&value=$cifra&fecha=$fechaVencimiento";
 
                               final File
                               archivoDescargado = await descargarPdfConPipe(
@@ -187,7 +186,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                                   ?.toString() ??
                               "0",
                           onPrimaryPressed: () async {},
-                          onSecondaryPressed: () => print("Pagar"),
+                          onSecondaryPressed: () => debugPrint("Pagar"),
                         )
                       : const SizedBox(),
                 ],
@@ -249,12 +248,12 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                   final fechaFacturacion = DateTime.tryParse(
                     factura.fechaFacturacion ?? '',
                   );
-                  final fechaEmision = DateTime.tryParse(
+                  /*final fechaEmision = DateTime.tryParse(
                     factura.fechaEmision ?? '',
                   );
                   final fechaVencimiento = DateTime.tryParse(
                     factura.fechaVencimiento ?? '',
-                  );
+                  );*/
 
                   // Si datos de factura nulos, mostrar mensaje de error central
                   if (factura.importe == null ||
@@ -294,17 +293,17 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                           }*/
 
                           final String urlFinal = factura.facturaElectronica!
-                              ? "${Environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile"
+                              ? "${environment.hostCtxOpen}/v5/suministro/facturaElectronicaPdfMobile"
                                     "?nro_nis=${widget.selectedNIS!.nisRad}"
                                     "&sec_nis=${factura.secNis}"
                                     "&sec_rec=${factura.secRec}"
                                     "&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"
-                                    "&clientKey=${Environment.clientKey}"
+                                    "&clientKey=${environment.clientKey}"
                                     "&value=$cifra"
                                     "&fecha=${factura.fechaVencimiento}"
-                              : '${Environment.hostCtxOpen}/v4/suministro/facturaPdfMobile?nro_nis=${widget.selectedNIS?.nisRad}&clientKey=${Environment.clientKey}&value=$cifra&fecha=${factura.fechaVencimiento}&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}"&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"';
+                              : '${environment.hostCtxOpen}/v4/suministro/facturaPdfMobile?nro_nis=${widget.selectedNIS?.nisRad}&clientKey=${environment.clientKey}&value=$cifra&fecha=${factura.fechaVencimiento}&sec_nis=${factura.secNis}&sec_rec=${factura.secRec}"&f_fact=${fechaFacturacion != null ? formatoFecha.format(fechaFacturacion) : ''}"';
 
-                          print(urlFinal);
+                          debugPrint(urlFinal);
 
                           final File archivoDescargado =
                               await descargarPdfConPipe(

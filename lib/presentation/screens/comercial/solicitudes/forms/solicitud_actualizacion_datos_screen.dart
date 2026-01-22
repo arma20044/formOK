@@ -90,13 +90,15 @@ class _SolicitudActualizacionDatosScreenState
         }
       });
     } catch (e) {
-      print("Error al consultar Documento: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text("$e", style: TextStyle(color: Colors.white)),
-        ),
-      );
+      debugPrint("Error al consultar Documento: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("$e", style: TextStyle(color: Colors.white)),
+          ),
+        );
+      }
       return;
     } finally {
       setState(() => isLoadingConsultaDocumento = false);
@@ -197,12 +199,14 @@ class _SolicitudActualizacionDatosScreenState
       final result = await _fecthSolicitudActualizacionDatos();
 
       if (result.error!) {
-        DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList?.first ?? 'Error desconocido',
-        );
+        if (mounted) {
+          DialogHelper.showMessage(
+            context,
+            MessageType.error,
+            'Error',
+            result.errorValList?.first ?? 'Error desconocido',
+          );
+        }
         return;
       }
 
@@ -211,20 +215,23 @@ class _SolicitudActualizacionDatosScreenState
       });
 
       limpiarTodo();
-
-      DialogHelper.showMessage(
-        context,
-        MessageType.success,
-        'Éxito',
-        result.mensaje!,
-      );
+      if (mounted) {
+        DialogHelper.showMessage(
+          context,
+          MessageType.success,
+          'Éxito',
+          result.mensaje!,
+        );
+      }
     } catch (e) {
-      DialogHelper.showMessage(
-        context,
-        MessageType.error,
-        'Error',
-        'Ocurrió un error inesperado',
-      );
+      if (mounted) {
+        DialogHelper.showMessage(
+          context,
+          MessageType.error,
+          'Error',
+          'Ocurrió un error inesperado',
+        );
+      }
     } finally {
       setState(() => _isLoadingSolicitud = false);
     }
@@ -269,7 +276,8 @@ class _SolicitudActualizacionDatosScreenState
             hint: const Text("Seleccionar Tipo de Documento"),
             items: dropDownItems
                 .map(
-                  (item) => DropdownMenuItem(value: item, child: Text(item.name)),
+                  (item) =>
+                      DropdownMenuItem(value: item, child: Text(item.name)),
                 )
                 .toList(),
             onChanged: (value) {
@@ -277,7 +285,7 @@ class _SolicitudActualizacionDatosScreenState
               nombreObtenido.text = '';
               apellidoObtenido.text = '';
             },
-      
+
             /*onChanged: isLoading
                             ? null
                             : (value) {
@@ -301,23 +309,23 @@ class _SolicitudActualizacionDatosScreenState
               if (val == null || val.trim().isEmpty) {
                 return "Ingrese Número de CI, RUC o Pasaporte";
               }
-      
-              final tipo = selectedTipoDocumento!.id ?? '';
-      
+
+              final tipo = selectedTipoDocumento?.id ?? '';
+
               // C.I. Civil → solo números, entre 6 y 10 dígitos
               if (tipo == 'TD001' && !RegExp(r'^[0-9]{6,10}$').hasMatch(val)) {
                 return "Éste campo debe contener solo números.";
               }
-      
+
               // RUC → números, guion y dígito verificador
               if (tipo == 'TD002' && !RegExp(r'^\d{6,12}-\d$').hasMatch(val)) {
                 return "Este campo debe tener formato de RUC";
               }
-      
+
               return null;
             },
           ),
-      
+
           Visibility(
             visible:
                 selectedTipoDocumento?.id != null &&
@@ -328,9 +336,12 @@ class _SolicitudActualizacionDatosScreenState
                       const SizedBox(height: 20),
                       CustomText("Nombre(s) del Titular", color: Colors.green),
                       Text(nombreObtenido.text),
-      
+
                       const SizedBox(height: 20),
-                      CustomText("Apellido(s) del Titular", color: Colors.green),
+                      CustomText(
+                        "Apellido(s) del Titular",
+                        color: Colors.green,
+                      ),
                       Text(apellidoObtenido.text),
                     ],
                   )
@@ -342,12 +353,12 @@ class _SolicitudActualizacionDatosScreenState
                     ],
                   ),
           ),
-      
+
           const SizedBox(height: 20),
           CustomPhoneField(
             //focusNode: _focusNode,
             controller: numeroTelefonoCelularController,
-      
+
             validator: (val) {
               if (val == null || val.isEmpty) {
                 return "Ingrese Número Teléfono Celular";
@@ -385,20 +396,28 @@ class _SolicitudActualizacionDatosScreenState
                   "Actualización de datos de clientes.",
                   fontWeight: FontWeight.bold,
                 ),
-                const CustomText('1) Verificar en su factura de Energía Eléctrica su nombre y documento.', overflow: TextOverflow.clip,),
-                const CustomText('2) Adjuntar la fotografía de su documento (CI, RUC).', overflow: TextOverflow.clip,),
-                const CustomText('3) En caso de tratarse de persona jurídica deberá adjuntar los documentos respaldatorios.', overflow: TextOverflow.clip,),
-                const CustomText('4) El trámite de actualización de datos es sin costo.', overflow: TextOverflow.clip,),
-                
-                
-                
-                
+                const CustomText(
+                  '1) Verificar en su factura de Energía Eléctrica su nombre y documento.',
+                  overflow: TextOverflow.clip,
+                ),
+                const CustomText(
+                  '2) Adjuntar la fotografía de su documento (CI, RUC).',
+                  overflow: TextOverflow.clip,
+                ),
+                const CustomText(
+                  '3) En caso de tratarse de persona jurídica deberá adjuntar los documentos respaldatorios.',
+                  overflow: TextOverflow.clip,
+                ),
+                const CustomText(
+                  '4) El trámite de actualización de datos es sin costo.',
+                  overflow: TextOverflow.clip,
+                ),
               ],
             ),
           ),
-      
+
           const SizedBox(height: 24),
-      
+
           CustomCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -420,9 +439,9 @@ class _SolicitudActualizacionDatosScreenState
               ],
             ),
           ),
-      
+
           const SizedBox(height: 24),
-      
+
           buildMediaCard(
             title:
                 "a) Adjuntar fotografía del documento (Cédula de Identidad, Registro Único del Contribuyente (RUC)).",
@@ -432,7 +451,7 @@ class _SolicitudActualizacionDatosScreenState
             ayuda: "Seleccionar archivo desde la Galería o la Cámara",
             theme: theme,
           ),
-      
+
           buildMediaCard(
             title:
                 "b) Adjuntar fotografía de la factura de energía eléctrica. (En caso de poseer varios NIS será suficiente adjuntar la fotografía de al menos una).",

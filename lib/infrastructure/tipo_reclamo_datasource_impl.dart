@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 
 
 import '../core/api/mi_ande_api.dart';
-import '../core/enviromens/Enrivoment.dart';
+import '../core/enviromens/enrivoment.dart';
 import '../datasources/datasources.dart';
 import '../model/model.dart';
 
@@ -22,13 +22,13 @@ class TipoReclamoDatasourceImpl extends TipoReclamoDatasource {
     
 
      var data = FormData.fromMap({       
-        'categoriaWebAppJsonArray': '[\'${tipoReclamo}\']',
+        'categoriaWebAppJsonArray': '[\'$tipoReclamo\']',
       });
   
-    final response = await dio.post("${Environment.hostCtxGra}/v1/reclamo/listarTipoReclamoPorCategoria",
+    final response = await dio.post("${environment.hostCtxGra}/v1/reclamo/listarTipoReclamoPorCategoria",
         data: data,
         options: Options(
-          contentType: Headers.formUrlEncodedContentType, // 👈 importante
+          contentType: Headers.formUrlEncodedContentType, 
         )
     );
 
