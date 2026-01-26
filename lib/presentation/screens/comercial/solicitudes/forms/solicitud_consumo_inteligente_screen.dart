@@ -168,9 +168,10 @@ class _SolicitudConsumoInteligenteScreenState
             result.mensaje ?? "",
             //duration: const Duration(seconds: 3),
           );
-
-          Navigator.of(context).pop();
+          Navigator.pop(context);
+          //Navigator.of(context).pop();
         }
+        Navigator.pop(context);
         limpiarTodo();
       }
 
