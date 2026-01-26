@@ -5,6 +5,7 @@ import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/model/archivo_adjunto_model.dart';
 import 'package:form/model/comercial/solicitudes/solicitud_abastecimiento_model.dart';
+import 'package:form/model/consulta_documento_model.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
@@ -32,9 +33,9 @@ class _SolicitudConsumoInteligenteScreenState
   final List<ModalModel> listaTipoVerificacion = dataTipoVerificacion;
   ModalModel? selectedTipoVerificacion;
 
-  final titularNombresController = TextEditingController();
-  final titularApellidosController = TextEditingController();
-  final titularNumeroDcumentoController = TextEditingController();
+  //final titularNombresController = TextEditingController();
+  //final titularApellidosController = TextEditingController();
+  final titularNumeroDocumentoController = TextEditingController();
   final numeroTelefonoController = TextEditingController();
   final correoController = TextEditingController();
 
@@ -56,9 +57,11 @@ class _SolicitudConsumoInteligenteScreenState
   bool mostrarCargarCodigoOTP = false;
 
   void limpiarTodo() {
-    titularNombresController.clear();
-    titularApellidosController.clear();
-    titularNumeroDcumentoController.clear();
+    nombreObtenido.text = '';
+    apellidoObtenido.text = '';
+    /*titularNombresController.clear();
+    titularApellidosController.clear();*/
+    titularNumeroDocumentoController.clear();
     numeroTelefonoController.clear();
     correoController.clear();
 
@@ -89,16 +92,14 @@ class _SolicitudConsumoInteligenteScreenState
     try {
       final result = await _fecthSolicitudAlumbradoPublico(solicitarOTP);
 
-       
-
       if (result.error!) {
-        if(mounted) {
+        if (mounted) {
           DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList![0],
-        );
+            context,
+            MessageType.error,
+            'Error',
+            result.errorValList![0],
+          );
         }
 
         setState(() {
@@ -107,72 +108,83 @@ class _SolicitudConsumoInteligenteScreenState
         });
 
         return;
-      } else if(solicitarOTP){
-        if(mounted) {
+      } else if (solicitarOTP) {
+        if (mounted) {
           showModalBottomSheet<void>(
-          context: context,
-          builder: (BuildContext context) {
-            return SizedBox(
-              // Este es el widget que se convertirá en el modal
-              height: 500,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    OtpInputWidget(
-                      isLoading: _isLoadingSolicitud,
-                      tipoVerificacion: selectedTipoVerificacion!.id!,
-                      phoneNumber: numeroTelefonoController.text,
-                      correo: correoController.text,
-                      onSubmit: (otp) {
-                        setState(() {
-                          codigoOTPObtenido = otp;
+            context: context,
+            builder: (BuildContext context) {
+              return SizedBox(
+                // Este es el widget que se convertirá en el modal
+                height: 500,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      OtpInputWidget(
+                        isLoading: _isLoadingSolicitud,
+                        tipoVerificacion: selectedTipoVerificacion!.id!,
+                        phoneNumber: numeroTelefonoController.text,
+                        correo: correoController.text,
+                        onSubmit: (otp) {
+                          setState(() {
+                            codigoOTPObtenido = otp;
 
-                          this.solicitarOTP = 'N';
-                        });
+                            this.solicitarOTP = 'N';
+                          });
 
-                        _enviarFormulario(false);
-                       
-                      },
-                    ),
-                  ],
+                          _enviarFormulario(false);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        );
+              );
+            },
+          );
         }
 
         setState(() {
           this.solicitarOTP = 'S';
         });
         mostrarCargarCodigoOTP = true;
-        if(mounted) {
+        if (mounted) {
           DialogHelper.showMessage(
-          context,
-          MessageType.success,
-          'Éxito',
-          selectedTipoVerificacion!.id!.contains("CEL")
-              ? "Te enviamos un código a tu celular, favor ingresa para confirmar el registro."
-              : "Te enviamos un código a tu correo, favor ingresa para confirmar el registro.",
-          //duration: const Duration(seconds: 3),
-        );
+            context,
+            MessageType.success,
+            'Éxito',
+            selectedTipoVerificacion!.id!.contains("CEL")
+                ? "Te enviamos un código a tu celular, favor ingresa para confirmar el registro."
+                : "Te enviamos un código a tu correo, favor ingresa para confirmar el registro.",
+            //duration: const Duration(seconds: 3),
+          );
         }
+      } else {
+        if (mounted) {
+          Navigator.of(context).pop();
+          DialogHelper.showMessage(
+            context,
+            MessageType.success,
+            'Éxito',
+            result.mensaje ?? "",
+            //duration: const Duration(seconds: 3),
+          );
+
+          Navigator.of(context).pop();
+        }
+        limpiarTodo();
       }
 
       setState(() {
         solicitudAbastecimientoResult = result.resultado;
       });
-
-      
     } catch (e) {
-      if(mounted) {
+      if (mounted) {
         DialogHelper.showMessage(
-        context,
-        MessageType.error,
-        'Error',
-        'Ocurrió un error inesperado',
-      );
+          context,
+          MessageType.error,
+          'Error',
+          'Ocurrió un error inesperado',
+        );
       }
     } finally {
       setState(() => _isLoadingSolicitud = false);
@@ -187,10 +199,10 @@ class _SolicitudConsumoInteligenteScreenState
     );
 
     return await repo.getSolicitudAbastecimiento(
-      titularNombresController.text,
-      titularApellidosController.text,
+      nombreObtenido.text,
+      apellidoObtenido.text,
       '',
-      titularNumeroDcumentoController.text,
+      titularNumeroDocumentoController.text,
       numeroTelefonoController.text,
       correoController.text,
       "11",
@@ -205,6 +217,80 @@ class _SolicitudConsumoInteligenteScreenState
       codigoOTPObtenido,
       selectedTipoVerificacion?.id,
     );
+  }
+
+  final FocusNode _focusNode = FocusNode();
+  final _numeroDocumentoFieldKey = GlobalKey<FormFieldState<String>>();
+  bool isLoadingConsultaDocumento = false;
+  final TextEditingController nombreObtenido = TextEditingController();
+  final TextEditingController apellidoObtenido = TextEditingController();
+
+  late ConsultaDocumentoResultado consultaDocumentoResponse;
+
+  final repoConsultaDocumento = ConsultaDocumentoRepositoryImpl(
+    ConsultaDocumentoDatasourceImpl(MiAndeApi()),
+  );
+
+  void consultarDocumento(String documento) async {
+    setState(() {
+      isLoadingConsultaDocumento = true;
+      nombreObtenido.text = "";
+      apellidoObtenido.text = "";
+    });
+    try {
+      consultaDocumentoResponse = await repoConsultaDocumento
+          .getConsultaDocumento(
+            titularNumeroDocumentoController.text,
+            selectedTipoDocumento?.id ?? "",
+          );
+
+      setState(() {
+        if (consultaDocumentoResponse.razonSocial != null) {
+          nombreObtenido.text = consultaDocumentoResponse.razonSocial!;
+          apellidoObtenido.text = consultaDocumentoResponse.razonSocial!;
+        } else {
+          nombreObtenido.text = consultaDocumentoResponse.nombres!;
+          apellidoObtenido.text = consultaDocumentoResponse.apellido!;
+        }
+      });
+    } catch (e) {
+      debugPrint("Error al consultar Documento: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("$e", style: TextStyle(color: Colors.white)),
+          ),
+        );
+      }
+      return;
+    } finally {
+      setState(() => isLoadingConsultaDocumento = false);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _focusNode.addListener(() {
+      if (selectedTipoDocumento?.id == null) return;
+      if (selectedTipoDocumento?.id == 'TD004') return;
+      if (!_focusNode.hasFocus) {
+        // 🔹 Esperar a que se estabilice el árbol de widgets
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          final state = _numeroDocumentoFieldKey.currentState;
+          if (state != null && state.mounted) {
+            final isValid = state.validate();
+            if (isValid) {
+              // 🔹 Si pasa la validación, ejecutamos la lógica adicional
+              //   await consultarDocumento();
+              consultarDocumento(titularNumeroDocumentoController.text);
+            }
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -267,34 +353,73 @@ class _SolicitudConsumoInteligenteScreenState
 
                 const SizedBox(height: 24),
 
-                InputTextCustom(
-                  labelText: "Nombre del Titular",
-                  controller: titularNombresController,
+                TextFormField(
+                  key: _numeroDocumentoFieldKey,
+                  focusNode: _focusNode,
+                  controller: titularNumeroDocumentoController,
+                  //keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: "Número de CI, RUC o Pasaporte",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) {
+                      return "Ingrese Número de CI, RUC o Pasaporte";
+                    }
 
-                  validator: (value) => (value == null || value.isEmpty)
-                      ? 'Ingrese Nombre del Titular'
-                      : null,
+                    final tipo = selectedTipoDocumento?.id ?? '';
+
+                    // C.I. Civil → solo números, entre 6 y 10 dígitos
+                    if (tipo == 'TD001' &&
+                        !RegExp(r'^[0-9]{6,10}$').hasMatch(val)) {
+                      return "Éste campo debe contener solo números.";
+                    }
+
+                    // RUC → números, guion y dígito verificador
+                    if (tipo == 'TD002' &&
+                        !RegExp(r'^\d{6,12}-\d$').hasMatch(val)) {
+                      return "Este campo debe tener formato de RUC";
+                    }
+
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 24),
 
-                InputTextCustom(
-                  labelText: "Apellido del Titular",
-                  controller: titularApellidosController,
+              
+                
 
-                  validator: (value) => (value == null || value.isEmpty)
-                      ? 'Ingrese Apellido del Titular'
-                      : null,
+                Visibility(
+                  visible:
+                      selectedTipoDocumento?.id != null &&
+                      nombreObtenido.text.isNotEmpty,
+                  child: selectedTipoDocumento?.id == "TD001"
+                      ? Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            CustomText(
+                              "Nombre(s) del Titular",
+                              color: Colors.green,
+                            ),
+                            Text(nombreObtenido.text),
+
+                            const SizedBox(height: 20),
+                            CustomText(
+                              "Apellido(s) del Titular",
+                              color: Colors.green,
+                            ),
+                            Text(apellidoObtenido.text),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            CustomText("Razón Social", color: Colors.green),
+                            Text(nombreObtenido.text),
+                          ],
+                        ),
                 ),
-                const SizedBox(height: 24),
 
-                InputTextCustom(
-                  labelText: "Número de Documento del Titular",
-                  controller: titularNumeroDcumentoController,
-
-                  validator: (value) => (value == null || value.isEmpty)
-                      ? 'Ingrese Número de Documento del Titular'
-                      : null,
-                ),
                 const SizedBox(height: 24),
 
                 CustomPhoneField(

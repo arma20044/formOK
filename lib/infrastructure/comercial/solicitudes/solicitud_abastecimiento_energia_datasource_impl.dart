@@ -115,7 +115,7 @@ class SolicitudAbastecimientoDatasourceImp
       }
     }
 
-    if (selectedFileTituloPropiedadList!.isNotEmpty) {
+    if (selectedFileTituloPropiedadList != null && selectedFileTituloPropiedadList.isNotEmpty) {
       int pos = 0;
       for (var foto in selectedFileTituloPropiedadList) {
         pos++;
