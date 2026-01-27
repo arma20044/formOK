@@ -74,7 +74,7 @@ final List<InfoItem> itemsSolicitudesComerciales = [
     description: "Comunique la avería de electrodomésticos.",
     buttonText: "Solicitar",
     necesitaAuth: false,
-    path: "/solicitudComunicacionAveria",
+    path: "/solicitudAveriaElestrodomesticos",
     comercial: false,
     
   ),

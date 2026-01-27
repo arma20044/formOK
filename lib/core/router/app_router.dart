@@ -11,6 +11,7 @@ import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_actualizacion_carga_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_actualizacion_datos_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_alumbrado_publico_screen.dart';
+import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_averia_electrodomestios_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_consulta_previa_superior_41kw_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_consumo_inteligente_screen.dart';
 import 'package:form/presentation/screens/comercial/solicitudes/forms/solicitud_extension_baja_tension_screen.dart';
@@ -42,7 +43,8 @@ final publicRoutes = [
   '/registroNumeroCelular',
   '/solicitudConsultaPreviaSuperior40kw',
   '/solicitudRetiroMedidor',
-  '/olvidoContrasenha'
+  '/olvidoContrasenha',
+  '/solicitudAveriaElestrodomesticos'
 ];
 final privateRoutes = [
   '/miCuenta',
@@ -207,6 +209,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             const SolicitudCRetiroMedidorScreen(),
       ),
+
+      GoRoute(
+        path: '/solicitudAveriaElestrodomesticos',
+        builder: (context, state) =>
+            const SolicitudAveriaElectrodomesticosScreen(),
+      ),
+
     ],
 
     redirect: (context, state) {
