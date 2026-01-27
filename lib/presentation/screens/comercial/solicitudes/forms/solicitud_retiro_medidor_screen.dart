@@ -477,9 +477,9 @@ class _SolicitudCRetiroMedidorScreenState
 
           buildMediaCard(
             title: "b) Fotocopia de cedula del titular del suministro.",
-            files: selectedFileFotocopiaSimpleCedulaSolicitanteList,
+            files: selectedFileFotocopiaAutenticadaList,
             onChanged: (lista) => setState(
-              () => selectedFileFotocopiaSimpleCedulaSolicitanteList = lista,
+              () => selectedFileFotocopiaAutenticadaList = lista,
             ),
             ayuda: "Seleccionar archivo desde la Galería o la Cámara",
             theme: theme,
@@ -487,9 +487,9 @@ class _SolicitudCRetiroMedidorScreenState
 
           buildMediaCard(
             title: "c) Fotocopia del Último Recibo pagado.",
-            files: selectedFileFotocopiaSimpleCedulaSolicitanteList,
+            files: selectedFileOtrosDocumentosList,
             onChanged: (lista) => setState(
-              () => selectedFileFotocopiaSimpleCedulaSolicitanteList = lista,
+              () => selectedFileOtrosDocumentosList = lista,
             ),
             ayuda: "Seleccionar archivo desde la Galería o la Cámara",
             theme: theme,
