@@ -159,20 +159,20 @@ class _SolicitudConsumoInteligenteScreenState
           );
         }
       } else {
-        if (mounted) {
-          Navigator.of(context).pop();
+        if (!mounted) return;
+
+        Navigator.of(context).pop(); // cerrar BottomSheet
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
           DialogHelper.showMessage(
             context,
             MessageType.success,
             'Éxito',
-            result.mensaje ?? "",
-            //duration: const Duration(seconds: 3),
+            result.mensaje ?? '',
           );
-          Navigator.pop(context);
-          //Navigator.of(context).pop();
-        }
-        Navigator.pop(context);
-        limpiarTodo();
+
+          limpiarTodo();
+        });
       }
 
       setState(() {
@@ -386,9 +386,6 @@ class _SolicitudConsumoInteligenteScreenState
                   },
                 ),
                 const SizedBox(height: 24),
-
-              
-                
 
                 Visibility(
                   visible:

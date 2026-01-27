@@ -96,13 +96,13 @@ class _SolicitudCRetiroMedidorScreenState
         }
       });
     } catch (e) {
-      if(mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text("$e", style: TextStyle(color: Colors.white)),
-        ),
-      );
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("$e", style: TextStyle(color: Colors.white)),
+          ),
+        );
       }
       return;
     } finally {
@@ -178,6 +178,13 @@ class _SolicitudCRetiroMedidorScreenState
       return;
     }
 
+    if (selectedFileSolicitudList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debe adjuntar archivo en el punto a).')),
+      );
+      return;
+    }
+
     try {
       setState(() => _isLoadingSolicitud = true);
 
@@ -229,9 +236,9 @@ class _SolicitudCRetiroMedidorScreenState
         title: "Éxito.",
         type: DialogType.success,
       ).then((_) {
-       if( mounted) {
-         Navigator.of(context).pop();
-       }
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -469,8 +476,7 @@ class _SolicitudCRetiroMedidorScreenState
           ),
 
           buildMediaCard(
-            title:
-                "b) Fotocopia de cedula del titular del suministro.",
+            title: "b) Fotocopia de cedula del titular del suministro.",
             files: selectedFileFotocopiaSimpleCedulaSolicitanteList,
             onChanged: (lista) => setState(
               () => selectedFileFotocopiaSimpleCedulaSolicitanteList = lista,

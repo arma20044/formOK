@@ -184,6 +184,13 @@ class _SolicitudConsultaPreviaSuperior41KwScreenState
       return;
     }
 
+    if (selectedFileSolicitudList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debe adjuntar archivo en el punto a).')),
+      );
+      return;
+    }
+
     try {
       setState(() => _isLoadingSolicitud = true);
 
