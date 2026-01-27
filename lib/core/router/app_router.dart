@@ -45,7 +45,8 @@ final publicRoutes = [
   '/solicitudRetiroMedidor',
   '/olvidoContrasenha',
   '/solicitudAveriaElestrodomesticos',
-  '/solicitudExtencionBajaTension'
+  '/solicitudExtencionBajaTension',
+  '/solicitudAlumbradoPublico'
 ];
 final privateRoutes = [
   '/miCuenta',
