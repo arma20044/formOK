@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/model/model.dart';
+import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
@@ -27,10 +28,21 @@ class _SolicitudAbastecimientoScreenState
   final _formKey = GlobalKey<FormState>();
   bool _isLoadingSolicitud = false;
 
+  final _numeroDocumentoFieldKey = GlobalKey<FormFieldState<String>>();
+
+  final FocusNode _focusNode = FocusNode();
+
+  late ConsultaDocumentoResultado consultaDocumentoResponse;
+
+  DropdownItem? selectedTipoDocumento;
+  bool isLoadingConsultaDocumento = false;
+  final TextEditingController nombreObtenido = TextEditingController();
+  final TextEditingController apellidoObtenido = TextEditingController();
+  final TextEditingController numeroDocumentoController =
+      TextEditingController();
   // Controllers
-  final nombreController = TextEditingController();
-  final apellidoController = TextEditingController();
-  final numeroDocumentoController = TextEditingController();
+  final TextEditingController numeroTelefonoCelularController =
+      TextEditingController();
   final numeroCelularController = TextEditingController();
   final correoController = TextEditingController();
 
@@ -70,9 +82,74 @@ class _SolicitudAbastecimientoScreenState
     );
   }
 
+  final repoConsultaDocumento = ConsultaDocumentoRepositoryImpl(
+    ConsultaDocumentoDatasourceImpl(MiAndeApi()),
+  );
+
+  void consultarDocumento(String documento) async {
+    setState(() {
+      isLoadingConsultaDocumento = true;
+      nombreObtenido.text = "";
+      apellidoObtenido.text = "";
+    });
+    try {
+      consultaDocumentoResponse = await repoConsultaDocumento
+          .getConsultaDocumento(
+            numeroDocumentoController.text,
+            selectedTipoDocumento?.id ?? "",
+          );
+
+      setState(() {
+        if (consultaDocumentoResponse.razonSocial != null) {
+          nombreObtenido.text = consultaDocumentoResponse.razonSocial!;
+          apellidoObtenido.text = consultaDocumentoResponse.razonSocial!;
+        } else {
+          nombreObtenido.text = consultaDocumentoResponse.nombres!;
+          apellidoObtenido.text = consultaDocumentoResponse.apellido!;
+        }
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("$e", style: TextStyle(color: Colors.white)),
+          ),
+        );
+      }
+      return;
+    } finally {
+      setState(() => isLoadingConsultaDocumento = false);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _focusNode.addListener(() {
+      if (selectedTipoDocumento?.id == null) return;
+      if (selectedTipoDocumento?.id == 'TD004') return;
+      if (!_focusNode.hasFocus) {
+        // 🔹 Esperar a que se estabilice el árbol de widgets
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          final state = _numeroDocumentoFieldKey.currentState;
+          if (state != null && state.mounted) {
+            final isValid = state.validate();
+            if (isValid) {
+              // 🔹 Si pasa la validación, ejecutamos la lógica adicional
+              //   await consultarDocumento();
+              consultarDocumento(numeroDocumentoController.text);
+            }
+          }
+        });
+      }
+    });
+  }
+
   void limpiarTodo() {
-    nombreController.clear();
-    apellidoController.clear();
+    nombreObtenido.clear();
+    apellidoObtenido.clear();
     numeroDocumentoController.clear();
     numeroCelularController.clear();
     correoController.clear();
@@ -98,16 +175,16 @@ class _SolicitudAbastecimientoScreenState
       return;
     }
 
-    if (selectedFileSolicitudList.isEmpty) {
+    if (ubicacion == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debe adjuntar archivo en el punto a).')),
+        const SnackBar(content: Text('Agregue ubicación en el Mapa.')),
       );
       return;
     }
 
-    if (ubicacion == null) {
+    if (selectedFileSolicitudList.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Agregue ubicación en el Mapa.')),
+        const SnackBar(content: Text('Debe adjuntar archivo en el punto a).')),
       );
       return;
     }
@@ -120,8 +197,8 @@ class _SolicitudAbastecimientoScreenState
       );
 
       final result = await repo.getSolicitudAbastecimiento(
-        nombreController.text,
-        apellidoController.text,
+        nombreObtenido.text,
+        apellidoObtenido.text,
         '',
         numeroDocumentoController.text,
         numeroCelularController.text,
@@ -222,35 +299,138 @@ class _SolicitudAbastecimientoScreenState
                 const SizedBox(height: 24),
 
                 // ------------------------- CAMPOS -------------------------
-                TextFormField(
-                  controller: nombreController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre(s) del Titular',
-                  ),
-                  validator: (v) =>
-                      (v == null || v.isEmpty) ? 'Ingrese Nombre(s)' : null,
+                CustomComment(
+                  text: "Solicitud de extensión de línea en Baja Tensión.",
                 ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: apellidoController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: const InputDecoration(
-                    labelText: 'Apellido(s) del Titular',
-                  ),
-                  validator: (v) =>
-                      (v == null || v.isEmpty) ? 'Ingrese Apellido(s)' : null,
+                DropdownButtonFormField<DropdownItem>(
+                  initialValue: selectedTipoDocumento,
+                  hint: const Text("Seleccionar Tipo de Documento"),
+                  items: dropDownItems
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item,
+                          child: Text(item.name),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() => selectedTipoDocumento = value);
+                    nombreObtenido.text = '';
+                    apellidoObtenido.text = '';
+                  },
+
+                  /*onChanged: isLoading
+                            ? null
+                            : (value) {
+                                setState(() => selectedTipoDocumento = value);
+                                numeroController.text = "";
+                              },*/
+                  validator: (value) =>
+                      value == null ? 'Seleccione un tipo de documento' : null,
                 ),
+
                 const SizedBox(height: 24),
+
                 TextFormField(
+                  key: _numeroDocumentoFieldKey,
+                  focusNode: _focusNode,
                   controller: numeroDocumentoController,
+                  //keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                    labelText: 'Número de Documento del Titular',
+                    labelText: "Número de CI, RUC o Pasaporte",
+                    border: OutlineInputBorder(),
                   ),
-                  validator: (v) => (v == null || v.isEmpty)
-                      ? 'Ingrese Número de Documento'
-                      : null,
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) {
+                      return "Ingrese Número de CI, RUC o Pasaporte";
+                    }
+
+                    final tipo = selectedTipoDocumento?.id ?? '';
+
+                    // C.I. Civil → solo números, entre 6 y 10 dígitos
+                    if (tipo == 'TD001' &&
+                        !RegExp(r'^[0-9]{6,10}$').hasMatch(val)) {
+                      return "Éste campo debe contener solo números.";
+                    }
+
+                    // RUC → números, guion y dígito verificador
+                    if (tipo == 'TD002' &&
+                        !RegExp(r'^\d{6,12}-\d$').hasMatch(val)) {
+                      return "Este campo debe tener formato de RUC";
+                    }
+
+                    return null;
+                  },
                 ),
+
+                Visibility(
+                  visible:
+                      selectedTipoDocumento?.id != null &&
+                      nombreObtenido.text.isNotEmpty,
+                  child: selectedTipoDocumento?.id == "TD001"
+                      ? Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            CustomText(
+                              "Nombre(s) del Titular",
+                              color: Colors.green,
+                            ),
+                            Text(nombreObtenido.text),
+
+                            const SizedBox(height: 20),
+                            CustomText(
+                              "Apellido(s) del Titular",
+                              color: Colors.green,
+                            ),
+                            Text(apellidoObtenido.text),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            CustomText("Razón Social", color: Colors.green),
+                            Text(nombreObtenido.text),
+                          ],
+                        ),
+                ),
+
+                const SizedBox(height: 20),
+
+                CustomPhoneField(
+                  //focusNode: _focusNode,
+                  controller: numeroTelefonoCelularController,
+
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return "Ingrese Número Teléfono Celular";
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 20),
+                TextFormField(
+                  //focusNode: _focusNode,
+                  controller: correoController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: "Correo del Titular",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (val) {
+                    //if (selectedTipoReclamo?.nisObligatorio == 'S') {
+                    if (val == null || val.isEmpty) {
+                      return "Ingrese Correo";
+                    }
+                    if (!emailRegex.hasMatch(val)) {
+                      return "Ingrese formato de correo válido.";
+                    }
+                    return null;
+                    //}
+                  },
+                ),
+                const SizedBox(height: 24),
+
                 const SizedBox(height: 24),
                 CustomPhoneField(
                   controller: numeroCelularController,
@@ -259,22 +439,7 @@ class _SolicitudAbastecimientoScreenState
                   required: true,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                 ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: correoController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Correo del Titular',
-                  ),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return 'Ingrese Correo';
-                    if (!emailRegex.hasMatch(v)) {
-                      return 'Ingrese un correo válido';
-                    }
-                    return null;
-                  },
-                ),
+
                 const SizedBox(height: 24),
 
                 // ------------------------- UBICACIÓN -------------------------
