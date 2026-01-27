@@ -4,7 +4,10 @@ import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/model/archivo_adjunto_model.dart';
 import 'package:form/model/comercial/solicitudes/solicitud_abastecimiento_model.dart';
+import 'package:form/model/consulta_documento_model.dart';
+import 'package:form/presentation/auth/login_screen.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
+import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
 import 'package:form/presentation/components/common/custom_text.dart';
@@ -28,14 +31,30 @@ class _SolicitudExtencionBajaTensionState
   final _formKey = GlobalKey<FormState>();
   bool _isLoadingSolicitud = false;
 
-  final titularNombresController = TextEditingController();
-  final titularApellidosController = TextEditingController();
-  final titularNumeroDcumentoController = TextEditingController();
-  final numeroTelefonoController = TextEditingController();
+  DropdownItem? selectedTipoDocumento;
+
+
+
   final correoController = TextEditingController();
 
   LatLng? ubicacion;
   bool showMap = false;
+
+  bool isLoadingConsultaDocumento = false;
+  final TextEditingController nombreObtenido = TextEditingController();
+  final TextEditingController apellidoObtenido = TextEditingController();
+
+  final _numeroDocumentoFieldKey = GlobalKey<FormFieldState<String>>();
+
+  final FocusNode _focusNode = FocusNode();
+
+  late ConsultaDocumentoResultado consultaDocumentoResponse;
+
+  final TextEditingController numeroDocumentoController =
+      TextEditingController();
+
+  final TextEditingController numeroTelefonoCelularController =
+      TextEditingController();
 
   // Archivos adjuntos
   List<ArchivoAdjunto> selectedFileSolicitudList = [];
@@ -44,7 +63,76 @@ class _SolicitudExtencionBajaTensionState
   List<ArchivoAdjunto> selectedFileCopiaSimpleCarnetElectricistaList = [];
   List<ArchivoAdjunto> selectedFileOtrosDocumentosList = [];
 
+  List<ArchivoAdjunto> selectedFileAdjuntoTituloPropiedadList = [];
+
+  List<ArchivoAdjunto> selectedFileAdjuntoOtroList = [];
+
   dynamic solicitudAbastecimientoResult;
+
+  final repoConsultaDocumento = ConsultaDocumentoRepositoryImpl(
+    ConsultaDocumentoDatasourceImpl(MiAndeApi()),
+  );
+
+  void consultarDocumento(String documento) async {
+    setState(() {
+      isLoadingConsultaDocumento = true;
+      nombreObtenido.text = "";
+      apellidoObtenido.text = "";
+    });
+    try {
+      consultaDocumentoResponse = await repoConsultaDocumento
+          .getConsultaDocumento(
+            numeroDocumentoController.text,
+            selectedTipoDocumento?.id ?? "",
+          );
+
+      setState(() {
+        if (consultaDocumentoResponse.razonSocial != null) {
+          nombreObtenido.text = consultaDocumentoResponse.razonSocial!;
+          apellidoObtenido.text = consultaDocumentoResponse.razonSocial!;
+        } else {
+          nombreObtenido.text = consultaDocumentoResponse.nombres!;
+          apellidoObtenido.text = consultaDocumentoResponse.apellido!;
+        }
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("$e", style: TextStyle(color: Colors.white)),
+          ),
+        );
+      }
+      return;
+    } finally {
+      setState(() => isLoadingConsultaDocumento = false);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _focusNode.addListener(() {
+      if (selectedTipoDocumento?.id == null) return;
+      if (selectedTipoDocumento?.id == 'TD004') return;
+      if (!_focusNode.hasFocus) {
+        // 🔹 Esperar a que se estabilice el árbol de widgets
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          final state = _numeroDocumentoFieldKey.currentState;
+          if (state != null && state.mounted) {
+            final isValid = state.validate();
+            if (isValid) {
+              // 🔹 Si pasa la validación, ejecutamos la lógica adicional
+              //   await consultarDocumento();
+              consultarDocumento(numeroDocumentoController.text);
+            }
+          }
+        });
+      }
+    });
+  }
 
   void _mostrarMapa() {
     setState(() {
@@ -53,10 +141,10 @@ class _SolicitudExtencionBajaTensionState
   }
 
   void limpiarTodo() {
-    titularNombresController.clear();
-    titularApellidosController.clear();
-    titularNumeroDcumentoController.clear();
-    numeroTelefonoController.clear();
+    nombreObtenido.clear();
+    apellidoObtenido.clear();
+    numeroDocumentoController.clear();
+    numeroTelefonoCelularController.clear();
     correoController.clear();
 
     setState(() {
@@ -83,16 +171,16 @@ class _SolicitudExtencionBajaTensionState
       return;
     }
 
-    if (selectedFileSolicitudList.isEmpty) {
+    if (ubicacion == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debe adjuntar archivo en el punto a).')),
+        const SnackBar(content: Text('Agregue ubicación en el Mapa.')),
       );
       return;
     }
 
-    if (ubicacion == null) {
+    if (selectedFileSolicitudList.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Agregue ubicación en el Mapa.')),
+        const SnackBar(content: Text('Debe adjuntar archivo en el punto a).')),
       );
       return;
     }
@@ -153,11 +241,11 @@ class _SolicitudExtencionBajaTensionState
     );
 
     return await repo.getSolicitudAbastecimiento(
-      titularNombresController.text,
-      titularApellidosController.text,
+      nombreObtenido.text,
+      apellidoObtenido.text,
       '',
-      titularNumeroDcumentoController.text,
-      numeroTelefonoController.text,
+      numeroDocumentoController.text,
+      numeroTelefonoCelularController.text,
       correoController.text,
       "6",
       selectedFileSolicitudList,
@@ -185,6 +273,9 @@ class _SolicitudExtencionBajaTensionState
         ),
       ),
       endDrawer: CustomDrawer(),
+      body: SingleChildScrollView(
+        child: Form(key: _formKey, child: cuerpo(context, theme)),
+      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ElevatedButton(
@@ -198,164 +289,206 @@ class _SolicitudExtencionBajaTensionState
               : const Text("Enviar Solicitud"),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
+    );
+  }
+
+  Widget cuerpo(BuildContext context, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          CustomComment(
+            text: "Solicitud de extensión de línea en Baja Tensión.",
+          ),
+          DropdownButtonFormField<DropdownItem>(
+            initialValue: selectedTipoDocumento,
+            hint: const Text("Seleccionar Tipo de Documento"),
+            items: dropDownItems
+                .map(
+                  (item) =>
+                      DropdownMenuItem(value: item, child: Text(item.name)),
+                )
+                .toList(),
+            onChanged: (value) {
+              setState(() => selectedTipoDocumento = value);
+              nombreObtenido.text = '';
+              apellidoObtenido.text = '';
+            },
+
+            /*onChanged: isLoading
+                            ? null
+                            : (value) {
+                                setState(() => selectedTipoDocumento = value);
+                                numeroController.text = "";
+                              },*/
+            validator: (value) =>
+                value == null ? 'Seleccione un tipo de documento' : null,
+          ),
+
+          const SizedBox(height: 20),
+          TextFormField(
+            key: _numeroDocumentoFieldKey,
+            focusNode: _focusNode,
+            controller: numeroDocumentoController,
+            //keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: "Número de CI, RUC o Pasaporte",
+              border: OutlineInputBorder(),
+            ),
+            validator: (val) {
+              if (val == null || val.trim().isEmpty) {
+                return "Ingrese Número de CI, RUC o Pasaporte";
+              }
+
+              final tipo = selectedTipoDocumento?.id ?? '';
+
+              // C.I. Civil → solo números, entre 6 y 10 dígitos
+              if (tipo == 'TD001' && !RegExp(r'^[0-9]{6,10}$').hasMatch(val)) {
+                return "Éste campo debe contener solo números.";
+              }
+
+              // RUC → números, guion y dígito verificador
+              if (tipo == 'TD002' && !RegExp(r'^\d{6,12}-\d$').hasMatch(val)) {
+                return "Este campo debe tener formato de RUC";
+              }
+
+              return null;
+            },
+          ),
+
+          Visibility(
+            visible:
+                selectedTipoDocumento?.id != null &&
+                nombreObtenido.text.isNotEmpty,
+            child: selectedTipoDocumento?.id == "TD001"
+                ? Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      CustomText("Nombre(s) del Titular", color: Colors.green),
+                      Text(nombreObtenido.text),
+
+                      const SizedBox(height: 20),
+                      CustomText(
+                        "Apellido(s) del Titular",
+                        color: Colors.green,
+                      ),
+                      Text(apellidoObtenido.text),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      CustomText("Razón Social", color: Colors.green),
+                      Text(nombreObtenido.text),
+                    ],
+                  ),
+          ),
+
+          const SizedBox(height: 20),
+
+          CustomPhoneField(
+            //focusNode: _focusNode,
+            controller: numeroTelefonoCelularController,
+
+            validator: (val) {
+              if (val == null || val.isEmpty) {
+                return "Ingrese Número Teléfono Celular";
+              }
+              return null;
+            },
+          ),
+
+          const SizedBox(height: 20),
+          TextFormField(
+            //focusNode: _focusNode,
+            controller: correoController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              labelText: "Correo del Titular",
+              border: OutlineInputBorder(),
+            ),
+            validator: (val) {
+              //if (selectedTipoReclamo?.nisObligatorio == 'S') {
+              if (val == null || val.isEmpty) {
+                return "Ingrese Correo";
+              }
+              if (!emailRegex.hasMatch(val)) {
+                return "Ingrese formato de correo válido.";
+              }
+              return null;
+              //}
+            },
+          ),
+          const SizedBox(height: 24),
+
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.location_on),
+              label: const Text("Agregar punto en Mapa"),
+              onPressed: _mostrarMapa,
+            ),
+          ),
+
+          const SizedBox(height: 24),
+          Visibility(
+            visible: showMap,
             child: Column(
               children: [
-                const SizedBox(height: 24),
-
-                InputTextCustom(
-                  labelText: "Nombre del Titular",
-                  controller: titularNombresController,
-
-                  validator: (value) => (value == null || value.isEmpty)
-                      ? 'Ingrese Nombre del Titular'
-                      : null,
+                MapSelectorInline(
+                  initialLocation: ubicacion,
+                  onLocationSelected: (loc) {
+                    setState(() => ubicacion = loc);
+                  },
                 ),
                 const SizedBox(height: 24),
-
-                InputTextCustom(
-                  labelText: "Apellido del Titular",
-                  controller: titularApellidosController,
-
-                  validator: (value) => (value == null || value.isEmpty)
-                      ? 'Ingrese Apellido del Titular'
-                      : null,
-                ),
-                const SizedBox(height: 24),
-
-                InputTextCustom(
-                  labelText: "Número de Documento del Titular",
-                  controller: titularNumeroDcumentoController,
-
-                  validator: (value) => (value == null || value.isEmpty)
-                      ? 'Ingrese Número de Documento del Titular'
-                      : null,
-                ),
-                const SizedBox(height: 24),
-
-                CustomPhoneField(
-                  controller: numeroTelefonoController,
-                  label: 'Número de Celular del Titular',
-                  onChanged: (v) {},
-                  required: true,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                ),
-                const SizedBox(height: 24),
-
-                InputTextCustom(
-                  labelText: "Correo del Titular",
-                  controller: correoController,
-
-                  validator: (value) => (value == null || value.isEmpty)
-                      ? 'Ingrese Correo del Titular'
-                      : null,
-                ),
-                const SizedBox(height: 24),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.location_on),
-                    label: const Text("Agregar punto en Mapa"),
-                    onPressed: _mostrarMapa,
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-                Visibility(
-                  visible: showMap,
-                  child: Column(
-                    children: [
-                      MapSelectorInline(
-                        initialLocation: ubicacion,
-                        onLocationSelected: (loc) {
-                          setState(() => ubicacion = loc);
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-
-                CustomCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const CustomText(
-                        "Formulario de Solicitud de extensión de línea en Baja Tensión.",
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.clip,
-                      ),
-                      const CustomText(
-                        '1) Descargar formulario y completar.',
-                        fontWeight: FontWeight.bold,
-                      ),
-                      TextButton(
-                        onPressed: () =>
-                            lanzarUrl('URL_SOLICITUD_EXTENSON_BAJA_TENSION'),
-                        child: const Text(
-                          "Descargar Formulario de Solicitud de extensión de línea en Baja Tensión.",
-                        ),
-                      ),
-                      const CustomText(
-                        '2) Adjuntar como documento de respaldo.',
-                      ),
-                    ],
-                  ),
-                ),
-
-                CustomCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      CustomText(
-                        'PASO 2: Adjuntar Documentos requeridos para poder tratar la solicitud, leer las condiciones a continuación:',
-                        overflow: TextOverflow.clip,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      CustomText(
-                        '1) Se puede adjuntar documentos en formato PDF o imágenes JPG, JPEG, PNG.',
-                      ),
-                      CustomText(
-                        '2) El tamaño máximo de cada archivo es de 10 MB.',
-                      ),
-                      CustomText('3) Los documentos deben estar legibles.'),
-                      CustomText(
-                        '4) Mientras el tamaño de archivo sea más grande, la transacción tardará más y podría cortarse por condiciones de internet fluctuantes.',
-                        overflow: TextOverflow.clip,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                buildMediaCard(
-                  title: "a) Solicitud de extensión de línea en Baja Tensión.",
-                  files: selectedFileSolicitudList,
-                  onChanged: (lista) =>
-                      setState(() => selectedFileSolicitudList = lista),
-                  ayuda: "Seleccionar archivo desde la Galería o la Cámara",
-                  theme: theme,
-                ),
-
-                buildMediaCard(
-                  title: "b) Fotocopia de cedula simple de los firmantes.",
-                  files: selectedFileFotocopiaSimpleCedulaSolicitanteList,
-                  onChanged: (lista) => setState(
-                    () => selectedFileFotocopiaSimpleCedulaSolicitanteList =
-                        lista,
-                  ),
-                  ayuda: "Seleccionar archivo desde la Galería o la Cámara",
-                  theme: theme,
-                ),
               ],
             ),
           ),
-        ),
+
+          CustomCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CustomText(
+                  "Formulario de Solicitud de Consulta previa superior a 41,58 KW.",
+                  fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.clip,
+                ),
+                const CustomText(
+                  '1) Descargar formulario y completar.',
+                  fontWeight: FontWeight.bold,
+                ),
+                TextButton(
+                  onPressed: () => lanzarUrl('URL_SOLICITUD_CONSULTA_PREVIA'),
+                  child: const Text(
+                    "Descargar Formulario de Solicitud de Consulta previa superior a 41,58 KW.",
+                  ),
+                ),
+                const CustomText('2) Adjuntar como documento de respaldo.'),
+              ],
+            ),
+          ),
+
+          buildMediaCard(
+            title: "a) Solicitud de extensión de línea en Baja Tensión.",
+            files: selectedFileSolicitudList,
+            onChanged: (lista) =>
+                setState(() => selectedFileSolicitudList = lista),
+            ayuda: "Seleccionar archivo desde la Galería o la Cámara",
+            theme: theme,
+          ),
+
+          buildMediaCard(
+            title: "b) Fotocopia de cedula simple de los firmantes.",
+            files: selectedFileFotocopiaSimpleCedulaSolicitanteList,
+            onChanged: (lista) => setState(
+              () => selectedFileFotocopiaSimpleCedulaSolicitanteList = lista,
+            ),
+            ayuda: "Seleccionar archivo desde la Galería o la Cámara",
+            theme: theme,
+          ),
+        ],
       ),
     );
   }

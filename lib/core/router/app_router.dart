@@ -44,7 +44,8 @@ final publicRoutes = [
   '/solicitudConsultaPreviaSuperior40kw',
   '/solicitudRetiroMedidor',
   '/olvidoContrasenha',
-  '/solicitudAveriaElestrodomesticos'
+  '/solicitudAveriaElestrodomesticos',
+  '/solicitudExtencionBajaTension'
 ];
 final privateRoutes = [
   '/miCuenta',
@@ -215,6 +216,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             const SolicitudAveriaElectrodomesticosScreen(),
       ),
+
+      GoRoute(
+        path: '/solicitudExtencionBajaTension',
+        builder: (context, state) =>
+            const SolicitudExtencionBajaTension(),
+      ),
+
+
 
     ],
 
