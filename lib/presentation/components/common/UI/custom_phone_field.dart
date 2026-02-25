@@ -9,8 +9,11 @@ class CustomPhoneField extends StatelessWidget {
   final bool required;
   final bool enabled;
   final Function(String)? onChanged;
-  final AutovalidateMode autovalidateMode; // 👈 nuevo parámetro
+  final AutovalidateMode autovalidateMode;  
   final FormFieldValidator<String>? validator;
+
+    final FocusNode? focusNode;
+
 
   const CustomPhoneField({
     super.key,
@@ -21,6 +24,7 @@ class CustomPhoneField extends StatelessWidget {
     this.onChanged,
     this.autovalidateMode = AutovalidateMode.disabled,
     this.validator,
+    this.focusNode,
   });
 
   @override
@@ -45,6 +49,7 @@ class CustomPhoneField extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             IntlPhoneField(
+              focusNode: focusNode,
               invalidNumberMessage: "Número de teléfono inválido",
               controller: controller,
               enabled: enabled,

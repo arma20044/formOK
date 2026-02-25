@@ -41,3 +41,11 @@ flutter pub get
 flutter run
 
 En la mayoría de los casos, con eso desaparece el error.
+
+
+
+_______________
+
+Cuidado con el ciclo de vida. siempre que verificar si el widget esta montado, especialmente con eventos asincronos
+
+` if (mounted) `

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form/config/constantes.dart';
 import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/model/archivo_adjunto_model.dart';
@@ -9,6 +10,7 @@ import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/UI/custom_submit_button.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/common/custom_text.dart';
 import 'package:form/presentation/components/common/map_selector_inline.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
@@ -106,7 +108,9 @@ class _SolicitudCRetiroMedidorScreenState
       }
       return;
     } finally {
-      setState(() => isLoadingConsultaDocumento = false);
+      if (mounted) {
+        setState(() => isLoadingConsultaDocumento = false);
+      }
     }
   }
 
@@ -165,23 +169,35 @@ class _SolicitudCRetiroMedidorScreenState
     if (_isLoadingSolicitud) return;
 
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese los campos obligatorios')),
-      );
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: "Ingrese los campos obligatorios",
+          type: MessageType.error,
+        );
+      }
       return;
     }
 
     if (ubicacion == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Agregue ubicación en el Mapa.')),
-      );
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: "Agregue ubicación en el Mapa.",
+          type: MessageType.error,
+        );
+      }
       return;
     }
 
     if (selectedFileSolicitudList.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debe adjuntar archivo en el punto a).')),
-      );
+      
+        CustomSnackbar.show(
+          context,
+          message: "Debe adjuntar archivo en el punto a).",
+          type: MessageType.error,
+        );
+      
       return;
     }
 
@@ -245,7 +261,9 @@ class _SolicitudCRetiroMedidorScreenState
         const SnackBar(content: Text("Error al enviar la solicitud")),
       );
     } finally {
-      setState(() => _isLoadingSolicitud = false);
+      if (mounted) {
+        setState(() => _isLoadingSolicitud = false);
+      }
     }
   }
 
@@ -478,9 +496,8 @@ class _SolicitudCRetiroMedidorScreenState
           buildMediaCard(
             title: "b) Fotocopia de cedula del titular del suministro.",
             files: selectedFileFotocopiaAutenticadaList,
-            onChanged: (lista) => setState(
-              () => selectedFileFotocopiaAutenticadaList = lista,
-            ),
+            onChanged: (lista) =>
+                setState(() => selectedFileFotocopiaAutenticadaList = lista),
             ayuda: "Seleccionar archivo desde la Galería o la Cámara",
             theme: theme,
           ),
@@ -488,9 +505,8 @@ class _SolicitudCRetiroMedidorScreenState
           buildMediaCard(
             title: "c) Fotocopia del Último Recibo pagado.",
             files: selectedFileOtrosDocumentosList,
-            onChanged: (lista) => setState(
-              () => selectedFileOtrosDocumentosList = lista,
-            ),
+            onChanged: (lista) =>
+                setState(() => selectedFileOtrosDocumentosList = lista),
             ayuda: "Seleccionar archivo desde la Galería o la Cámara",
             theme: theme,
           ),

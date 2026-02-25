@@ -49,10 +49,13 @@ class _SolicitudFacturaFijaScreenState
     if (_isLoadingSolicitud) return;
 
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese los campos obligatorios')),
-      );
-      return;
+    if (mounted) {
+          CustomSnackbar.show(
+            context,
+            message: "Ingrese los campos obligatorios",
+            type: MessageType.error,
+          );
+        }
     }
 
     setState(() => _isLoadingSolicitud = true);
@@ -90,16 +93,18 @@ class _SolicitudFacturaFijaScreenState
         );
       }
     } catch (e) {
-      if (mounted) {
+     /*if (mounted) {
         DialogHelper.showMessage(
           context,
           MessageType.error,
           'Error',
           'Ocurrió un error inesperado',
         );
-      }
+      }*/
     } finally {
-      setState(() => _isLoadingSolicitud = false);
+      if (mounted) {
+        setState(() => _isLoadingSolicitud = false);
+      }
     }
   }
 

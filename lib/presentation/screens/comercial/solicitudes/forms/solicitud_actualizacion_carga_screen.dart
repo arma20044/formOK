@@ -150,7 +150,9 @@ class _SolicitudActualizacionCargaScreenState
     } catch (e) {
       debugPrint("Error obteniendo ubicación: $e");
       setState(() {
-        _currentPosition = const LatLng(-25.2882897, -57.6120394); // fallback
+        if (mounted) {
+          _currentPosition = const LatLng(-25.2882897, -57.6120394); // fallback
+        }
       });
     }
   }
@@ -239,7 +241,9 @@ class _SolicitudActualizacionCargaScreenState
         const SnackBar(content: Text("Error al enviar la solicitud")),
       );
     } finally {
-      setState(() => _isLoadingSolicitud = false);
+      if (mounted) {
+        setState(() => _isLoadingSolicitud = false);
+      }
     }
   }
 
@@ -281,7 +285,9 @@ class _SolicitudActualizacionCargaScreenState
       );
       return;
     } finally {
-      setState(() => isLoadingConsultaDocumento = false);
+      if (mounted) {
+        setState(() => isLoadingConsultaDocumento = false);
+      }
     }
   }
 

@@ -6,6 +6,7 @@ import 'package:form/model/comercial/solicitudes/registro_numero_celular_model.d
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/common/otp_verification_widget.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/repositories/comercial/solicitudes/registro_numero_celular_repository_impl.dart';
@@ -40,10 +41,15 @@ class _RegistroNumeroCelularScreenState
     if (_isLoadingSolicitud) return;
 
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese los campos obligatorios')),
-      );
-      return;
+      
+          if (mounted) {
+          CustomSnackbar.show(
+            context,
+            message: "Ingrese los campos obligatorios",
+            type: MessageType.error,
+          );
+        }
+      
     }
 
     setState(() => _isLoadingSolicitud = true);
@@ -52,13 +58,13 @@ class _RegistroNumeroCelularScreenState
       final result = await _fetchRegistroNumeroCelular(solicitarOTP);
 
       if (result.error) {
-        if(mounted) {
+        if (mounted) {
           DialogHelper.showMessage(
-          context,
-          MessageType.error,
-          'Error',
-          result.errorValList?.first ?? 'Error desconocido',
-        );
+            context,
+            MessageType.error,
+            'Error',
+            result.errorValList?.first ?? 'Error desconocido',
+          );
         }
         return;
       }
@@ -69,13 +75,13 @@ class _RegistroNumeroCelularScreenState
       } else {
         // Si fue verificación final exitosa
         if (mounted) Navigator.of(context).pop(); // Cierra el BottomSheet
-        if(mounted) {
+        if (mounted) {
           DialogHelper.showMessage(
-          context,
-          MessageType.success,
-          'Éxito',
-          'Número de celular registrado correctamente.',
-        );
+            context,
+            MessageType.success,
+            'Éxito',
+            'Número de celular registrado correctamente.',
+          );
         }
       }
     } catch (e) {
@@ -192,8 +198,9 @@ class _RegistroNumeroCelularScreenState
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed:
-                      _isLoadingSolicitud ? null : () => _enviarFormulario('S'),
+                  onPressed: _isLoadingSolicitud
+                      ? null
+                      : () => _enviarFormulario('S'),
                   child: _isLoadingSolicitud
                       ? const SizedBox(
                           height: 20,

@@ -266,7 +266,9 @@ class _SolicitudConsumoInteligenteScreenState
       }
       return;
     } finally {
-      setState(() => isLoadingConsultaDocumento = false);
+    if (mounted) {
+        setState(() => isLoadingConsultaDocumento = false);
+      }
     }
   }
 
@@ -292,6 +294,15 @@ class _SolicitudConsumoInteligenteScreenState
         });
       }
     });
+  }
+
+    @override
+  void dispose() {
+    _focusNode.dispose();
+    nombreObtenido.dispose();
+    apellidoObtenido.dispose();     
+    correoController.dispose();
+    super.dispose();
   }
 
   @override

@@ -80,6 +80,8 @@ class _SolicitudConsultaPreviaSuperior41KwScreenState
   );
 
   void consultarDocumento(String documento) async {
+    if (!mounted) return;
+
     setState(() {
       isLoadingConsultaDocumento = true;
       nombreObtenido.text = "";
@@ -112,7 +114,9 @@ class _SolicitudConsultaPreviaSuperior41KwScreenState
       }
       return;
     } finally {
-      setState(() => isLoadingConsultaDocumento = false);
+      if (mounted) {
+        setState(() => isLoadingConsultaDocumento = false);
+      }
     }
   }
 
@@ -138,6 +142,17 @@ class _SolicitudConsultaPreviaSuperior41KwScreenState
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    nombreObtenido.dispose();
+    apellidoObtenido.dispose();
+    numeroDocumentoController.dispose();
+    numeroTelefonoCelularController.dispose();
+    correoController.dispose();
+    super.dispose();
   }
 
   void _mostrarMapa() {
@@ -251,7 +266,9 @@ class _SolicitudConsultaPreviaSuperior41KwScreenState
         const SnackBar(content: Text("Error al enviar la solicitud")),
       );
     } finally {
-      setState(() => _isLoadingSolicitud = false);
+      if (mounted) {
+        setState(() => _isLoadingSolicitud = false);
+      }
     }
   }
 

@@ -101,7 +101,9 @@ class _SolicitudActualizacionDatosScreenState
       }
       return;
     } finally {
-      setState(() => isLoadingConsultaDocumento = false);
+      if (mounted) {
+        setState(() => isLoadingConsultaDocumento = false);
+      }
     }
   }
 
@@ -147,6 +149,17 @@ class _SolicitudActualizacionDatosScreenState
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    nombreObtenido.dispose();
+    apellidoObtenido.dispose();
+    numeroDocumentoController.dispose();
+    numeroTelefonoCelularController.dispose();
+    correoController.dispose();
+    super.dispose();
   }
 
   Future<SolicitudAbastecimientoResponse>

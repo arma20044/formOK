@@ -5,6 +5,7 @@ import 'package:form/model/favoritos/favoritos_model.dart';
 import 'package:form/model/favoritos/favoritos_tipo_model.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog.dart';
 import 'package:form/presentation/components/common/UI/custom_dialog_confirm.dart';
+import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/screens/favoritos/favoritos_screen.dart';
 import 'package:form/utils/utils.dart';
@@ -307,13 +308,15 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
                 "\n✓ Referencia: ${datos.referencia}" +
                 "\n\nCargar reclamo con los datos obtenidos?",
             onConfirm: () async {
-              setState(() {
+              if (mounted) {
+                setState(() {
                 nombreApellidoController.text = datos.nombreApellido ?? '';
                 nisController.text = datos.nis.toString();
                 correoController.text = datos.correo ?? '';
                 direccionController.text = datos.direccion ?? '';
                 referenciaController.text = datos.referencia ?? '';
               });
+              }
 
               selectedDept = listaDepartamentos.firstWhere(
                 (d) => d.idDepartamento == datos.departamentoIdDepartamento,
@@ -340,7 +343,9 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
     } catch (e) {
       debugPrint("Error al cargar UltimosReclamos: $e");
     } finally {
-      setState(() => isLoadingUltimosReclamos = false);
+      if (mounted) {
+        setState(() => isLoadingUltimosReclamos = false);
+      }
     }
   }
 
@@ -352,7 +357,7 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          TextFormField(
+         /* TextFormField(
             focusNode: _focusNode,
             controller: telefonoController,
             keyboardType: TextInputType.phone,
@@ -361,7 +366,20 @@ class Tab1State extends State<Tab1> with AutomaticKeepAliveClientMixin {
               border: OutlineInputBorder(),
             ),
             validator: validators['telefono'],
-          ),
+          ),*/
+
+                  CustomPhoneField(
+                  focusNode: _focusNode,
+                  //focusNode: _focusNode,
+                  controller: telefonoController,
+
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return "Ingrese Número Teléfono Celular";
+                    }
+                    return null;
+                  },
+                ),
 
           const SizedBox(height: 20),
           DropdownCustom<TipoReclamo>(

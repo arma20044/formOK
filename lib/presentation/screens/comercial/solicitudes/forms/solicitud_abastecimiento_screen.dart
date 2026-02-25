@@ -119,7 +119,9 @@ class _SolicitudAbastecimientoScreenState
       }
       return;
     } finally {
-      setState(() => isLoadingConsultaDocumento = false);
+      if (mounted) {
+        setState(() => isLoadingConsultaDocumento = false);
+      }
     }
   }
 
@@ -248,7 +250,9 @@ class _SolicitudAbastecimientoScreenState
         const SnackBar(content: Text("Error al enviar la solicitud")),
       );
     } finally {
-      setState(() => _isLoadingSolicitud = false);
+      if (mounted) {
+        setState(() => _isLoadingSolicitud = false);
+      }
     }
   }
 
@@ -394,20 +398,7 @@ class _SolicitudAbastecimientoScreenState
                         ),
                 ),
 
-                const SizedBox(height: 20),
-
-                CustomPhoneField(
-                  //focusNode: _focusNode,
-                  controller: numeroTelefonoCelularController,
-
-                  validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return "Ingrese Número Teléfono Celular";
-                    }
-                    return null;
-                  },
-                ),
-
+                
                 const SizedBox(height: 20),
                 TextFormField(
                   //focusNode: _focusNode,
@@ -429,7 +420,7 @@ class _SolicitudAbastecimientoScreenState
                     //}
                   },
                 ),
-                const SizedBox(height: 24),
+               
 
                 const SizedBox(height: 24),
                 CustomPhoneField(

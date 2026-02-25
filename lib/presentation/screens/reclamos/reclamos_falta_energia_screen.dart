@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:form/config/constantes.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/tab3.dart';
 import 'package:form/utils/utils.dart';
@@ -12,7 +14,8 @@ import '../../components/components.dart';
 class ReclamosScreen extends StatefulWidget {
   const ReclamosScreen({
     super.key,
-    required this.tipoReclamo,  this.telefono,
+    required this.tipoReclamo,
+    this.telefono,
     //required String tipo
   });
   final String tipoReclamo; // FE, CO, AP
@@ -34,8 +37,6 @@ class _ParentScreenState extends State<ReclamosScreen>
 
   final repoReclamo = ReclamoRepositoryImpl(ReclamoDatasourceImpl(MiAndeApi()));
   bool _isLoadingReclamo = false;
-
-  
 
   @override
   void initState() {
@@ -62,33 +63,42 @@ class _ParentScreenState extends State<ReclamosScreen>
     //validar adjuntos si es el caso
     if (tab1Key.currentState?.selectedTipoReclamo?.adjuntoObligatorio == 'S') {
       if (_archivo == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Es necesario anexar foto o video.")),
-        );
+        if (mounted) {
+          CustomSnackbar.show(
+            context,
+            message: "Es necesario anexar foto o video.",
+            type: MessageType.error,
+          );
+        }
         return;
       }
     }
 
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          duration: Duration(seconds: 1),
-          content: Text(
-            //"Complete todos los campos obligatorios del paso ${i + 1}",
-            "Complete todos los campos obligatorios",
-          ),
-        ),
-      );
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: "Complete todos los campos obligatorios.",
+          type: MessageType.error,
+        );
+      }
+
       return;
     }
 
     ReclamoResponse result = await _fetchReclamo();
     if (!mounted) return;
     if (result.error) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result.errorValList == null ? result.errorValList![0] : result.mensaje)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result.errorValList == null
+                ? result.errorValList![0]
+                : result.mensaje,
+          ),
+        ),
+      );
       return;
     }
 
@@ -115,7 +125,7 @@ class _ParentScreenState extends State<ReclamosScreen>
             ),
             TextButton(
               onPressed: () {
-                copyTextToClipboard(mensajeExitoso,context);
+                copyTextToClipboard(mensajeExitoso, context);
               },
               child: const Text('Copiar'),
             ),
@@ -126,7 +136,6 @@ class _ParentScreenState extends State<ReclamosScreen>
   }
 
   // Envía los datos
-
 
   Future<ReclamoResponse> _fetchReclamo() async {
     try {
@@ -201,13 +210,18 @@ class _ParentScreenState extends State<ReclamosScreen>
               physics: NeverScrollableScrollPhysics(),
               controller: _tabController,
               children: [
-                Tab1(key: tab1Key, tipoReclamo: widget.tipoReclamo,telefono: widget.telefono,),
+                Tab1(
+                  key: tab1Key,
+                  tipoReclamo: widget.tipoReclamo,
+                  telefono: widget.telefono,
+                ),
                 Tab2(
                   onSaved: (newValue) => {_archivo = newValue},
 
                   validator: (archivo) {
                     //if (archivo == null) return 'Debe adjuntar un archivo';
-                    if (archivo != null && archivo.file.lengthSync() > 5 * 1024 * 1024) {
+                    if (archivo != null &&
+                        archivo.file.lengthSync() > 5 * 1024 * 1024) {
                       return 'El archivo no debe superar los 5 MB';
                     }
                     return null;
