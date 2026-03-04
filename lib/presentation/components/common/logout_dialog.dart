@@ -16,16 +16,25 @@ class LogoutDialog extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return AlertDialog(
+      clipBehavior: Clip.antiAlias,
       backgroundColor: theme.colorScheme.surface,
+
+      // ✅ sombra
+      elevation: 12,
+      shadowColor: Colors.black.withOpacity(0.4),
+
+      // ✅ borde + esquinas redondeadas
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant,
+          width: 1.2,
+        ),
       ),
+
       title: Row(
         children: [
-          Icon(
-            Icons.logout,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(Icons.logout, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
           Text(
             'Cerrar sesión',
@@ -35,17 +44,19 @@ class LogoutDialog extends StatelessWidget {
           ),
         ],
       ),
+
       content: Text(
         '¿Desea cerrar su sesión?',
         style: theme.textTheme.bodyMedium?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),
       ),
+
       actionsAlignment: MainAxisAlignment.end,
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop(); // cierra el diálogo
+            Navigator.of(context).pop();
             onCancel?.call();
           },
           style: TextButton.styleFrom(

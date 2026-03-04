@@ -51,9 +51,13 @@ class _SolicitudFraccionamientoDeudaScreenState
     if (_isLoadingConsultar) return;
 
     if (simular && !_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese los campos obligatorios')),
-      );
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: 'Ingrese los campos obligatorios',
+          type: MessageType.error,
+        );
+      }
       return;
     }
 
@@ -374,9 +378,13 @@ class _SolicitudFraccionamientoDeudaScreenState
     if (_isLoadingSolicitar) return;
 
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese los campos obligatorios')),
-      );
+      if (mounted) {
+        CustomSnackbar.show(
+          context,
+          message: 'Ingrese los campos obligatorios',
+          type: MessageType.error,
+        );
+      }
       return;
     }
 

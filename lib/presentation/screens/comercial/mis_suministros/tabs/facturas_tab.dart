@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/presentation/components/common/UI/custom_loading.dart';
+import 'package:form/presentation/components/common/UI/custom_title.dart';
 import 'package:form/presentation/components/common/card_item_first.dart';
 
 import 'package:form/presentation/components/common/card_item_second.dart';
@@ -36,7 +37,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
       children: [
         const SizedBox(height: 10),
 
-        Expanded(
+        /*Expanded(
           child: asyncSituacionActual.when(
             data: (situacionActual) {
               // Validación de nulos críticos
@@ -206,11 +207,17 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
             ),
           ),
         ),
-
+*/
         const SizedBox(height: 16),
-
-        // Agregamos título antes del segundo scroll
+          // Agregamos título antes del segundo scroll
         Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            alignment: Alignment.centerLeft,
+            child: CustomTitle(text: "Últimos Comprobantes")),
+        ),
+      
+        /*Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Align(
             alignment: Alignment.centerLeft,
@@ -223,7 +230,7 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
               ),
             ),
           ),
-        ),
+        ),*/
 
         Expanded(
           child: asyncFacturas.when(

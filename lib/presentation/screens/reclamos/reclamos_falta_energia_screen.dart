@@ -103,9 +103,7 @@ class _ParentScreenState extends State<ReclamosScreen>
     }
 
     limpiarTodo();
-    //ScaffoldMessenger.of(context).showSnackBar(
-    // const SnackBar(content: Text("Formulario enviado correctamente!")),
-    //);
+    
 
     showDialog(
       context: context,
