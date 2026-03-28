@@ -111,31 +111,42 @@ class _SolicitudConsumoInteligenteScreenState
       } else if (solicitarOTP) {
         if (mounted) {
           showModalBottomSheet<void>(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
             context: context,
+            isScrollControlled: true,
             builder: (BuildContext context) {
-              return SizedBox(
-                // Este es el widget que se convertirá en el modal
-                height: 500,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      OtpInputWidget(
-                        isLoading: _isLoadingSolicitud,
-                        tipoVerificacion: selectedTipoVerificacion!.id!,
-                        phoneNumber: numeroTelefonoController.text,
-                        correo: correoController.text,
-                        onSubmit: (otp) {
-                          setState(() {
-                            codigoOTPObtenido = otp;
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom, // ✅ clave
+                ),
+                child: SingleChildScrollView(
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      maxHeight: 500, // 👈 en vez de height fijo
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min, // ✅ importante
+                        children: <Widget>[
+                          OtpInputWidget(
+                            isLoading: _isLoadingSolicitud,
+                            tipoVerificacion: selectedTipoVerificacion!.id!,
+                            phoneNumber: numeroTelefonoController.text,
+                            correo: correoController.text,
+                            onSubmit: (otp) {
+                              setState(() {
+                                codigoOTPObtenido = otp;
+                                this.solicitarOTP = 'N';
+                              });
 
-                            this.solicitarOTP = 'N';
-                          });
-
-                          _enviarFormulario(false);
-                        },
+                              _enviarFormulario(false);
+                            },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               );
@@ -266,7 +277,7 @@ class _SolicitudConsumoInteligenteScreenState
       }
       return;
     } finally {
-    if (mounted) {
+      if (mounted) {
         setState(() => isLoadingConsultaDocumento = false);
       }
     }
@@ -296,11 +307,11 @@ class _SolicitudConsumoInteligenteScreenState
     });
   }
 
-    @override
+  @override
   void dispose() {
     _focusNode.dispose();
     nombreObtenido.dispose();
-    apellidoObtenido.dispose();     
+    apellidoObtenido.dispose();
     correoController.dispose();
     super.dispose();
   }
@@ -441,6 +452,7 @@ class _SolicitudConsumoInteligenteScreenState
                 const SizedBox(height: 24),
 
                 InputTextCustom(
+                  keyboardType: TextInputType.emailAddress,
                   labelText: "Correo del Titular",
                   controller: correoController,
 

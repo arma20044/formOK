@@ -52,6 +52,7 @@ class CustomPdfModal extends StatelessWidget {
 
       debugPrint('Status code: ${response.statusCode}');
       debugPrint('Headers: ${response.headers}');
+      
 
       final sink = archivo.openWrite();
 
@@ -88,61 +89,87 @@ class CustomPdfModal extends StatelessWidget {
       files: [XFile(pdfFile.path)],
     );
 
-    void compartir() async {
-      final result = await SharePlus.instance.share(params);
+   void compartir(BuildContext context) async {
+  final box = context.findRenderObject() as RenderBox;
 
-      if (result.status == ShareResultStatus.success) {
-        debugPrint('Thank you for sharing my website!');
-      }
-    }
+  final params = ShareParams(
+    files: [XFile(pdfFile.path)],
+    sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+  );
+
+  final result = await SharePlus.instance.share(params);
+
+  if (result.status == ShareResultStatus.success) {
+    debugPrint('Archivo compartido correctamente');
+  }
+}
 
   
 
-    return Dialog(
-      insetPadding: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Scaffold(
-        // appBar: AppBar(title: const Text('PDF Viewer with Button')),
-        body: Stack(
-          children: [
-            PDFView(
-              filePath: pdfFile.path,
-              onViewCreated: (PDFViewController pdfViewController) {
-                //_pdfViewController = pdfViewController;
-              },
-              // Other PDFView options as needed
+  return Dialog(
+  insetPadding: EdgeInsets.zero,
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  child: SizedBox.expand( // ✅ fuerza tamaño válido
+    child: Stack(
+      children: [
+        SizedBox.expand(
+          child: PDFView(
+            filePath: pdfFile.path,
+            onError: (error) {
+              debugPrint('PDF error: $error');
+            },
+            onRender: (pages) {
+              debugPrint('PDF renderizado: $pages páginas');
+            },
+          ),
+        ),
+
+        /// BOTÓN CERRAR
+        Positioned(
+          top: 20.0,
+          right: 20.0,
+          child: IconButton(
+            icon: const Icon(Icons.close),
+            style: ButtonStyle(
+              iconColor: WidgetStateProperty.all(Colors.white),
+              backgroundColor: WidgetStateProperty.all(Colors.red),
             ),
-            Positioned(
-              top: 20.0,
-              right: 20.0,
-              child: IconButton(
-                icon: Icon(Icons.close),
-                style: ButtonStyle(
-                  iconColor: WidgetStateProperty.all(Colors.white),
-                  backgroundColor: WidgetStateProperty.all(Colors.red),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-            Positioned(
-              bottom: 20.0,
-              right: 20.0,
-              child: IconButton(
-                icon: Icon(Icons.share),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+
+        /// BOTÓN COMPARTIR (con contexto correcto)
+        Positioned(
+          bottom: 20.0,
+          right: 20.0,
+          child: Builder(
+            builder: (btnContext) {
+              return IconButton(
+                icon: const Icon(Icons.share),
                 style: ButtonStyle(
                   iconColor: WidgetStateProperty.all(Colors.white),
                   backgroundColor: WidgetStateProperty.all(Colors.green),
                 ),
                 onPressed: () {
-                  compartir();
+                  final box =
+                      btnContext.findRenderObject() as RenderBox;
+
+                  final params = ShareParams(
+                    files: [XFile(pdfFile.path)],
+                    sharePositionOrigin:
+                        box.localToGlobal(Offset.zero) & box.size,
+                  );
+
+                  SharePlus.instance.share(params);
                 },
-              ),
-            ),
-          ],
+              );
+            },
+          ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  ),
+); }
 }
