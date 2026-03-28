@@ -49,6 +49,10 @@
 	<string>Necesitamos acceso a tu ubicación para mostrar el mapa centrado en tu posición actual.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Necesitamos acceso a tu ubicación para mostrar el mapa centrado en tu posición actual.</string>
+<key>NSCameraUsageDescription</key>
+<string>Se necesita acceso a camara para los archivos adjuntos (tomar fotografías).</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Se necesita acceso al almacenamiento para los archivos adjuntos(seleccionar imágenes).</string>
 
 </dict>
 </plist>
