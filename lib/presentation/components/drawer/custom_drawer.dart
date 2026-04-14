@@ -73,34 +73,34 @@ class CustomDrawer extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: const FaIcon(
+                  icon:  FaIcon(
                     FontAwesomeIcons.youtube,
                     color: Colors.red,
-                    size: 50,
+                    size: 40,
                   ),
                   onPressed: () => lanzarUrl("YOUTUBE_URL"),
                 ),
                 IconButton(
-                  icon: const FaIcon(
+                  icon:  FaIcon(
                     FontAwesomeIcons.facebook,
                     color: Colors.blue,
-                    size: 50,
+                   size: 40,
                   ),
                   onPressed: () => lanzarUrl("FACEBOOK_URL"),
                 ),
                 IconButton(
-                  icon: const FaIcon(
+                  icon:  FaIcon(
                     FontAwesomeIcons.xTwitter,
                     color: Colors.black,
-                    size: 50,
+                    size: 40,
                   ),
                   onPressed: () => lanzarUrl("X_URL"),
                 ),
                 IconButton(
-                  icon: const FaIcon(
+                  icon: FaIcon(
                     FontAwesomeIcons.instagram,
                     color: Colors.orange,
-                    size: 50,
+                    size:40,
                   ),
                   onPressed: () => lanzarUrl('INSTAGRAM_URL'),
                 ),

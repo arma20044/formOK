@@ -467,3 +467,31 @@ Widget buildGroupedMediaCard({
     ),
   );
 }
+
+
+
+TextTheme responsiveTextTheme(TextTheme textTheme) {
+  const scale = 1.1; // ← aumentas o reduces TODO
+
+  return const TextTheme(
+    displayLarge: TextStyle(fontSize: 57 * scale),
+    displayMedium: TextStyle(fontSize: 45 * scale),
+    displaySmall: TextStyle(fontSize: 36 * scale),
+
+    headlineLarge: TextStyle(fontSize: 32 * scale),
+    headlineMedium: TextStyle(fontSize: 28 * scale),
+    headlineSmall: TextStyle(fontSize: 24 * scale),
+
+    titleLarge: TextStyle(fontSize: 22 * scale),
+    titleMedium: TextStyle(fontSize: 16 * scale),
+    titleSmall: TextStyle(fontSize: 14 * scale),
+
+    bodyLarge: TextStyle(fontSize: 16 * scale),
+    bodyMedium: TextStyle(fontSize: 14 * scale),
+    bodySmall: TextStyle(fontSize: 12 * scale),
+
+    labelLarge: TextStyle(fontSize: 14 * scale),
+    labelMedium: TextStyle(fontSize: 12 * scale),
+    labelSmall: TextStyle(fontSize: 11 * scale),
+  );
+}

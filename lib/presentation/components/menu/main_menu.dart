@@ -1,5 +1,6 @@
 // lib/presentation/components/menu/main_menu.dart
 import 'package:flutter/material.dart';
+import 'package:form/main.dart';
 import 'menu_models.dart';
 
 class MenuButton extends StatelessWidget {
@@ -19,7 +20,13 @@ class MenuButton extends StatelessWidget {
     final theme = Theme.of(context);
     final enabled = item.enabled && item.onTap != null;
     final iconColor = enabled ? theme.colorScheme.primary : theme.disabledColor;
-    final textStyle = labelStyle ?? theme.textTheme.bodySmall;
+    //final textStyle = labelStyle ?? theme.textTheme.bodySmall;
+
+final baseStyle = labelStyle ?? theme.textTheme.bodySmall!;
+
+final textStyle = baseStyle.copyWith(
+  fontSize: responsiveFontSize(context,12),
+);
 
     Widget icon = Icon(item.icon, size: iconSize, color: iconColor);
 
@@ -66,7 +73,7 @@ class MenuButton extends StatelessWidget {
               Text(
                 item.label,
                 textAlign: TextAlign.center,
-                style: textStyle?.copyWith(
+                style: textStyle.copyWith(
                   color: enabled ? textStyle.color : theme.disabledColor,
                 ),
               ),
@@ -95,7 +102,7 @@ class MainMenu extends StatelessWidget {
     return Column(
       children: groups.map((group) {
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 1.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -128,5 +135,24 @@ class MainMenu extends StatelessWidget {
         );
       }).toList(),
     );
+  }
+}
+
+
+
+ 
+
+double responsiveFontSize(BuildContext context, double baseSize) {
+  final screenWidth = MediaQuery.of(context).size.width;
+
+  if (screenWidth >= 1200) {
+    // Desktop
+    return baseSize * 1.5;
+  } else if (screenWidth >= 800) {
+    // Tablet
+    return baseSize * 1.3;
+  } else {
+    // Móvil
+    return baseSize;
   }
 }

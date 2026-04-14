@@ -109,7 +109,27 @@ const environments = {
     mensajeErrorRequestStatus: "No se pudo realizar la acción, intente de nuevo.",
     mensajeErrorRequestGrave: "NO se pudo realizar la acción, intente de nuevo.",
   ),
-  // ⚡️ Puedes agregar localhost y localhostEmulador igual que arriba
+
+"localhost": EnvironmentConfig(
+  name: "localhost",
+    clientKey: "19fec632c1c0f45372ce62dd525addc1437d3b74",
+    hostSitioAnde: "https://www.ande.gov.py/desarrollo/servicios",
+    hostCtxSiga: "http://10.0.2.2:8082/siga_middle/api/siga",
+    hostCtxSara: "http://10.0.2.2:8082/siga_middle//api/sara",
+    hostCtxGra: "http://10.0.2.2:8082/siga_middle//api/gra",
+    hostCtxOpen: "http://10.0.2.2:8082/siga_middle//api/open",
+    hostCtxGc: "https://desa1.ande.gov.py:8481/gcWs/api/gc",
+    hostCtxMiCuenta: "http://10.0.2.2:8082/siga_middle//api/miCuenta",
+    hostCtxAndroid: "http://10.0.2.2:8082/siga_middle//api/android",
+    tigoCallback: "https://www.ande.gov.py/desarrollo/servicios/tigoMoney.html",
+    keyGoogleMaps: "AIzaSyBZgldJmaElcgbgWVt8gFBrdsybsMIKHVg",
+    hostCtxRegistroUnico: "http://10.0.2.2:8082/siga_middle//api/registroUnico",
+    appVersion: appVersions,
+    mensajeErrorRequestStatus: "No se pudo realizar la acción, intente de nuevo.",
+    mensajeErrorRequestGrave: "NO se pudo realizar la acción, intente de nuevo.",
+)
+
+  // ⚡️ Puedes agregar 10.0.2.2 y 10.0.2.2Emulador igual que arriba
 };
 
 // ----------------- USO -----------------

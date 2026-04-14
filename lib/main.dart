@@ -38,7 +38,6 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
 
-    
       themeMode: ref.watch(themeNotifierProvider.notifier).themeMode,
 
       routerConfig: router,
@@ -74,7 +73,12 @@ class HomeScreen extends StatelessWidget {
       endDrawer: const CustomDrawer(),
       appBar: AppBar(
         title: Center(
-          child: Image.asset('assets/images/logoande.png', height: 50),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.white, width: 2),
+            ),
+            child: Image.asset('assets/images/logoande.png', height: 50),
+          ),
         ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 12),
@@ -86,8 +90,104 @@ class HomeScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
-        child: MainMenu(groups: menuGroups, iconSize: 44),
+        child: MainMenu(groups: menuGroups, iconSize: responsiveIconSize(44)),
       ),
     );
   }
+}
+
+class HomeScreenResponsive extends StatelessWidget {
+  const HomeScreenResponsive({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      //endDrawer: const CustomDrawer(),
+      appBar: _buildAppBar(context),
+      endDrawer: const CustomDrawer(),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+
+          // 📱 MOBILE
+          if (width < 600) {
+            return _mobileLayout(width);
+          }
+
+          // 💻 TABLET / DESKTOP
+          return _desktopLayout(width);
+        },
+      ),
+    );
+  }
+}
+
+Widget _mobileLayout(double width) {
+  return SingleChildScrollView(
+    padding: const EdgeInsets.all(12),
+    child: MainMenu(groups: menuGroups, iconSize: responsiveIconSize(width)),
+  );
+}
+
+Widget _desktopLayout(double width) {
+  return Row(
+    children: [
+      const VerticalDivider(width: 1),
+
+      Expanded(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1000),
+              child: MainMenu(
+                groups: menuGroups,
+                iconSize: responsiveIconSize(width), // más grande en desktop
+              ),
+            ),
+          ),
+        ),
+      ),
+
+      const SizedBox(width: 260, child: CustomDrawer()),
+    ],
+  );
+}
+
+PreferredSizeWidget _buildAppBar(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
+
+  return AppBar(
+    toolbarHeight: width < 600 ? 70 : 100,
+    title: Center(
+      child: Container(
+        padding: const EdgeInsets.all(2), // grosor del borde
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 2),
+        ),
+        child: Image.asset(
+          'assets/images/logoande.png',
+          height: responsiveIconSize(width),
+          fit: BoxFit.contain,
+        ),
+      ),
+    ),
+    leading: Padding(
+      padding: const EdgeInsets.only(left: 12),
+      child: IconButton(
+        icon: Icon(
+          Icons.star,
+          color: Colors.yellow[600],
+          size: responsiveIconSize(width),
+        ),
+        onPressed: () => GoRouter.of(context).push('/favoritos'),
+      ),
+    ),
+  );
+}
+
+double responsiveIconSize(double width) {
+  if (width < 600) return 45;
+  if (width < 1024) return 80;
+  return width;
 }

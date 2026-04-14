@@ -81,7 +81,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           return LoginScreen(from: from);
         },
       ),
-      GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+      GoRoute(path: '/', builder: (context, state) => const HomeScreenResponsive()),
       GoRoute(path: '/misDatos', builder: (context, state) => const MisDatos()),
       GoRoute(
         path: '/expediente',
