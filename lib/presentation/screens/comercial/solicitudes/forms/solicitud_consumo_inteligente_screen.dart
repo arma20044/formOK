@@ -119,16 +119,16 @@ class _SolicitudConsumoInteligenteScreenState
             builder: (BuildContext context) {
               return Padding(
                 padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom, // ✅ clave
+                  bottom: MediaQuery.of(context).viewInsets.bottom, 
                 ),
                 child: SingleChildScrollView(
                   child: Container(
                     constraints: const BoxConstraints(
-                      maxHeight: 500, // 👈 en vez de height fijo
+                      maxHeight: 500, 
                     ),
                     child: Center(
                       child: Column(
-                        mainAxisSize: MainAxisSize.min, // ✅ importante
+                        mainAxisSize: MainAxisSize.min, 
                         children: <Widget>[
                           OtpInputWidget(
                             isLoading: _isLoadingSolicitud,

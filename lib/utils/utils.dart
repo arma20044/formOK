@@ -495,3 +495,23 @@ TextTheme responsiveTextTheme(TextTheme textTheme) {
     labelSmall: TextStyle(fontSize: 11 * scale),
   );
 }
+
+
+String extraerMensajeError(dynamic data) {
+  if (data is Map<String, dynamic>) {
+    final errores = data['errorValList'];
+
+    if (errores is List && errores.isNotEmpty) {
+      return errores
+          .where((e) => e != null)
+          .map((e) => e.toString())
+          .join('\n'); // junta todos los errores
+    }
+
+    if (data['message'] != null) {
+      return data['message'].toString();
+    }
+  }
+
+  return 'Ocurrió un error inesperado';
+}

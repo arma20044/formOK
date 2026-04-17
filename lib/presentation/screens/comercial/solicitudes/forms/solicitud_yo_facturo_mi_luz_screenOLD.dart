@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/config/constantes.dart';
@@ -17,23 +16,22 @@ import 'package:form/presentation/components/common/adjuntos.dart';
 import 'package:form/presentation/components/common/custom_bottom_sheet_image.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
-import 'package:form/presentation/components/common/custom_snackbarNEW.dart';
 import 'package:form/presentation/components/common/otp_verification_widget.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/youtube_webview.dart';
 import 'package:form/repositories/repositories.dart';
 import 'package:form/utils/utils.dart';
 
-class SolicitudYoFacturoMiLuzScreen extends ConsumerStatefulWidget {
-  const SolicitudYoFacturoMiLuzScreen({super.key});
+class SolicitudYoFacturoMiLuz extends ConsumerStatefulWidget {
+  const SolicitudYoFacturoMiLuz({super.key});
 
   @override
-  ConsumerState<SolicitudYoFacturoMiLuzScreen> createState() =>
+  ConsumerState<SolicitudYoFacturoMiLuz> createState() =>
       _SolicitudYoFacturoMiLuzState();
 }
 
 class _SolicitudYoFacturoMiLuzState
-    extends ConsumerState<SolicitudYoFacturoMiLuzScreen> {
+    extends ConsumerState<SolicitudYoFacturoMiLuz> {
   final _formKey = GlobalKey<FormState>();
   final _formKeyCalculoConsumo = GlobalKey<FormState>();
   final _formKeyConfirmarLectura = GlobalKey<FormState>();
@@ -44,11 +42,14 @@ class _SolicitudYoFacturoMiLuzState
 
   final TextEditingController telefonoController = TextEditingController();
 
+ 
+
   bool isLoading = false;
   bool isLoadingCalcularConsumo = false;
   bool isLoadingConfirmarLectura = false;
 
-  SituacionActualResultado? situacionActualResultado;
+  SituacionActualResultado?
+  situacionActualResultado;  
   ResultadoCalculoConsumo? calculoConsumoResultado;
   DatosCliente? datosCliente;
 
@@ -171,22 +172,18 @@ class _SolicitudYoFacturoMiLuzState
   }
 
   Future<void> confirmacionLectura(bool solicitarOTP) async {
-    if (isLoadingConfirmarLectura) return;
+    if(isLoadingConfirmarLectura) return;
 
-    if (
-    //!_formKey.currentState!.validate()
-    //||
-    solicitarOTP && !_formKeyConfirmarLectura.currentState!.validate()
-    //|| !_formKeyCalculoConsumo.currentState!.validate()
-    ) {
+  if (
+    //!_formKey.currentState!.validate() 
+  //||
+ solicitarOTP &&  !_formKeyConfirmarLectura.currentState!.validate() 
+  //|| !_formKeyCalculoConsumo.currentState!.validate()
+  ) {
       /*ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ingrese los campos obligatorios')),
       );*/
-      CustomSnackbar.show(
-        context,
-        message: 'Ingrese los campos obligatorios',
-        type: MessageType.error,
-      );
+      CustomSnackbar.show(context, message: 'Ingrese los campos obligatorios', type: MessageType.error);
       return;
     }
 
@@ -203,9 +200,11 @@ class _SolicitudYoFacturoMiLuzState
     });
 
     try {
-      final result = await _fetchSolicitudYoFacturoMiLuz(solicitarOTP);
+        final result = await _fetchSolicitudYoFacturoMiLuz(solicitarOTP);
 
-      if (result.error!) {
+    
+
+    if (result.error!) {
         if (mounted) {
           DialogHelper.showMessage(
             context,
@@ -230,16 +229,19 @@ class _SolicitudYoFacturoMiLuzState
             context: context,
             isScrollControlled: true,
             builder: (BuildContext context) {
+               
               return Padding(
                 padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                  bottom: MediaQuery.of(context).viewInsets.bottom, 
                 ),
                 child: SingleChildScrollView(
                   child: Container(
-                    constraints: const BoxConstraints(maxHeight: 500),
+                    constraints: const BoxConstraints(
+                      maxHeight: 500, 
+                    ),
                     child: Center(
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.min, 
                         children: <Widget>[
                           OtpInputWidget(
                             isLoading: _isLoadingSolicitud,
@@ -274,8 +276,9 @@ class _SolicitudYoFacturoMiLuzState
             context,
             MessageType.success,
             'Éxito',
-            "Te enviamos un código a tu celular, favor ingresa para confirmar el registro.",
-
+            selectedTipoVerificacion!.id!.contains("CEL")
+                ? "Te enviamos un código a tu celular, favor ingresa para confirmar el registro."
+                : "Te enviamos un código a tu correo, favor ingresa para confirmar el registro.",
             //duration: const Duration(seconds: 3),
           );
         }
@@ -293,33 +296,26 @@ class _SolicitudYoFacturoMiLuzState
           );
 
           limpiarTodo();
-          Navigator.of(context).pop();
         });
       }
     } catch (e, stack) {
-      print(e);
-      print(stack);
+      print("ERROR: $e");
+      print("STACK: $stack");
       setState(() {
         calculoConsumoResultado = null;
       });
 
       if (mounted) {
-        String mensaje;
-        if (e is DioException) {
-          final data = e.response?.data;
-
-          if (data is Map && data['errorValList'] != null) {
-            mensaje = extraerMensajeError(data);
-          } else {
-            mensaje = data.toString();
-          }
-          DialogHelper.showMessage(
+        CustomSnackbar.show(context, message: "ERRORRRRRRRRRR");
+        print(e);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          CustomSnackbar.show(
             context,
-            MessageType.error,
-            'Error',
-            mensaje,
+            message: "Error: $e",
+            type: MessageType.error,
+            //duration: Durations.long4,
           );
-        }
+        });
       }
     } finally {
       setState(() {
@@ -328,40 +324,37 @@ class _SolicitudYoFacturoMiLuzState
     }
   }
 
-  Future<SolicitudYoFacturoMiLuzResponse> _fetchSolicitudYoFacturoMiLuz(
-    bool solicitarOTP,
-  ) async {
-    final repoConfirmacionLectura = SolicitudYoFacturoMiLuzRepositoryImpl(
-      SolicitudYoFacturoMiLuzDatasourceImp(MiAndeApi()),
-    );
+  Future<SolicitudYoFacturoMiLuzResponse> _fetchSolicitudYoFacturoMiLuz(bool solicitarOTP) async {
+ 
+  final repoConfirmacionLectura = SolicitudYoFacturoMiLuzRepositoryImpl(
+        SolicitudYoFacturoMiLuzDatasourceImp(MiAndeApi()),
+      );
 
-    return await repoConfirmacionLectura.getSolicitudYoFacturoMiLuz(
-      situacionActualResultado?.tipoTension ?? 'BT',
-      _nisController.text,
-      _lecturaActualController.text,
-      telefonoController.text,
-      selectedFileSolicitudList.isEmpty ? [] : selectedFileSolicitudList,
-      [],
-      [],
-      [],
-      [],
-      [],
-      solicitarOTP ? 'S' : 'N',
-      codigoOTPObtenido,
-    );
+    return await    repoConfirmacionLectura
+          .getSolicitudYoFacturoMiLuz(
+            situacionActualResultado?.tipoTension ?? 'BT',
+            _nisController.text,
+            _lecturaActualController.text,
+            telefonoController.text,
+            selectedFileSolicitudList.isEmpty ? [] : selectedFileSolicitudList,
+            [],
+            [],
+            [],
+            [],
+            [],
+            solicitarOTP ? 'S' : 'N',
+            codigoOTPObtenido,
+          );
+
   }
 
   Future<void> _calcularConsumo() async {
-    if (!_formKey.currentState!.validate() ||
-        !_formKeyCalculoConsumo.currentState!.validate()) {
+    if (!_formKey.currentState!.validate() ||  !_formKeyCalculoConsumo.currentState!.validate()) {
+      
       // ScaffoldMessenger.of(context).showSnackBar(
-      //const SnackBar(content: Text('Ingrese los campos obligatorios')),
-      CustomSnackbar.show(
-        context,
-        message: 'Ingrese los campos obligatorios',
-        type: MessageType.error,
-      );
-      //  );
+        //const SnackBar(content: Text('Ingrese los campos obligatorios')),
+        CustomSnackbar.show(context, message: 'Ingrese los campos obligatorios', type: MessageType.error);
+    //  );
       return;
     }
 
@@ -457,7 +450,7 @@ class _SolicitudYoFacturoMiLuzState
     );
   }
 
-  Widget mostrarResultadoConsultaBT(BuildContext context) {
+  Widget mostrarResultadoConsultaBT() {
     if (situacionActualResultado == null) return const SizedBox();
 
     if (situacionActualResultado?.habilitarAporteLectura?.habilitado == 'N') {
@@ -1010,16 +1003,14 @@ class _SolicitudYoFacturoMiLuzState
 
   @override
   Widget build(BuildContext context) {
-     
-
     return Scaffold(
       appBar: AppBar(title: Text("Yo Facturo Mi Luz")),
       endDrawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
             child: Column(
               children: [
                 CustomComment(
@@ -1060,7 +1051,7 @@ class _SolicitudYoFacturoMiLuzState
                 ),
 
                 situacionActualResultado?.tipoTension == 'BT'
-                    ? mostrarResultadoConsultaBT(context)
+                    ? mostrarResultadoConsultaBT()
                     : mostrarResultadoConsultaMT(),
                 mostrarResultadoCalularConsumo(),
               ],
@@ -1068,6 +1059,9 @@ class _SolicitudYoFacturoMiLuzState
           ),
         ),
       ),
+        bottomSheet: Visibility(
+          visible: mostrarCargarCodigoOTP,
+          child: Text("HOLA")),    
     );
   }
 }

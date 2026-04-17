@@ -17,3 +17,4 @@ export 'comercial/solicitudes/calculo_consumo_repository_impl.dart';
 export 'comercial/solicitudes/solicitud_fraccionamiento_repository_impl.dart';
 export 'comercial/solicitudes/solicitar_fraccionamiento_deuda_repository_impl.dart';
 export 'reclamo_recuperado_repository_impl.dart';
+export 'comercial/solicitudes/solicitud_yo_facturo_mi_luz_repository_impl.dart';

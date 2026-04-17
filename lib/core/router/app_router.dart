@@ -164,7 +164,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/solicitudYoFacturoMiLuz',
-        builder: (context, state) => const SolicitudYoFacturoMiLuz(),
+        builder: (context, state) => const SolicitudYoFacturoMiLuzScreen(),
       ),
       GoRoute(
         path: '/solicitudFraccionamientoDeuda',

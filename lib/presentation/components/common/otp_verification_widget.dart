@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 
 class OtpInputWidget extends StatefulWidget {
   final String? phoneNumber;
@@ -41,7 +42,7 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
 
   void _onChanged(String value, int index) {
     if (value.isNotEmpty && index < 3) {
-        _focusNodes[index + 1].requestFocus();
+      _focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
       //_focusNodes[index - 1].requestFocus();
     }
@@ -77,10 +78,9 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
           const SizedBox(height: 8),
 
           Text(
-             widget.tipoVerificacion.contains("CEL")
+            widget.tipoVerificacion.contains("CEL")
                 ? widget.phoneNumber!
-                : widget.correo!
-                ,
+                : widget.correo!,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.grey[700],
             ),
@@ -126,6 +126,18 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
                     final otp = _controllers.map((c) => c.text).join();
                     if (otp.length == 4 && widget.onSubmit != null) {
                       widget.onSubmit!(otp);
+                    } else {
+                      ScaffoldMessenger.of( this.context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Action completed!'),
+                          action: SnackBarAction(
+                            label: 'Undo',
+                            onPressed: () {
+                              // Code to undo the change.
+                            },
+                          ),
+                        ),
+                      );
                     }
                   },
             style: ElevatedButton.styleFrom(

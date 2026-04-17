@@ -19,3 +19,4 @@ export 'comercial/solicitudes/factura_fija_datasource_impl.dart';
 export 'comercial/solicitudes/solicitud_fraccionamiento_datasource_imp.dart';
 export 'comercial/solicitudes/solicitar_fraccionamiento_deuda_datasource_imp.dart';
 export 'reclamo_recuperado_datasource_impl.dart';
+export 'comercial/solicitudes/solicitud_yo_facturo_mi_luz_datasource_impl.dart';

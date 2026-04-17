@@ -21,3 +21,5 @@ export 'comercial/solicitudes/solicitud_fraccionamiento_datasource.dart';
 export 'comercial/solicitudes/solicitar_fraccionamiento_deuda_datasource.dart';
 
 export 'reclamo_recuperado_datasource.dart';
+
+export 'comercial/solicitudes/solicitud_yo_facturo_mi_luz_datasource.dart';

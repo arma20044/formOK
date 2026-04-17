@@ -840,98 +840,117 @@ class Recibo {
 }
 
 class CalculoConsumo {
-  final bool? tieneCalculo;
-  final num? consumo;
-  final num? tarifa;
-  final bool? tieneLectura;
-  final num? monto;
+  final num? consumoReactiva;
   final num? cantidadDias;
-  final num? consumoEstimado;
-  final num? leturaAnterior;
+  final num? consumoFinalActiva;
+  final num? lecturaAnteriorActiva;
+  final num? consumoFinalReactiva;
+  final num? consumoActiva;
   final String? ultimaFechaLectura;
+  final num? lecturaAnteriorPotencia;
+  final num? consumoMinimo;
+  final bool? tieneCalculo;
+  final num? tarifaReactiva;
+  final num? montoReactiva;
+  final num? consumoXcteXperdidaReactiva;
+  final bool? tieneLectura;
+  final num? tarifaActiva;
+  final num? lecturaAnteriorReactiva;
+  final num? consumoEstimadoActiva;
+  final num? consumoEstimadoReactiva;
+  final num? montoActiva;
   final bool? tienePrecio;
   final String? lecturaAnomala;
-  final num? consumoFinal;
+  final num? montoTotal;
+  final num? consumoXcteXperdidaActiva;
+  final num? leturaAnterior;
+  
 
   CalculoConsumo({
-    this.tieneCalculo,
-    this.consumo,
-    this.tarifa,
-    this.tieneLectura,
-    this.monto,
+    this.consumoReactiva,
     this.cantidadDias,
-    this.consumoEstimado,
-    this.leturaAnterior,
+    this.consumoFinalActiva,
+    this.lecturaAnteriorActiva,
+    this.consumoFinalReactiva,
+    this.consumoActiva,
     this.ultimaFechaLectura,
+    this.lecturaAnteriorPotencia,
+    this.consumoMinimo,
+    this.tieneCalculo,
+    this.tarifaReactiva,
+    this.montoReactiva,
+    this.consumoXcteXperdidaReactiva,
+    this.tieneLectura,
+    this.tarifaActiva,
+    this.lecturaAnteriorReactiva,
+    this.consumoEstimadoActiva,
+    this.consumoEstimadoReactiva,
+    this.montoActiva,
     this.tienePrecio,
     this.lecturaAnomala,
-    this.consumoFinal,
+    this.montoTotal,
+    this.consumoXcteXperdidaActiva, this.leturaAnterior,
   });
 
   factory CalculoConsumo.fromJson(Map<String, dynamic>? json) {
     json ??= {};
     return CalculoConsumo(
-      tieneCalculo: json['tieneCalculo'],
-      consumo: json['consumo'],
-      tarifa: json['tarifa'],
-      tieneLectura: json['tieneLectura'],
-      monto: json['monto'],
+      consumoReactiva: json['consumoReactiva'],
       cantidadDias: json['cantidadDias'],
-      consumoEstimado: json['consumoEstimado'],
-      leturaAnterior: json['leturaAnterior'],
+      consumoFinalActiva: json['consumoFinalActiva'],
+      lecturaAnteriorActiva: json['lecturaAnteriorActiva'],
+      consumoFinalReactiva: json['consumoFinalReactiva'],
+      consumoActiva: json['consumoActiva'],
       ultimaFechaLectura: json['ultimaFechaLectura'],
+      lecturaAnteriorPotencia: json['lecturaAnteriorPotencia'],
+      consumoMinimo: json['consumoMinimo'],
+      tieneCalculo: json['tieneCalculo'],
+      tarifaReactiva: json['tarifaReactiva'],
+      montoReactiva: json['montoReactiva'],
+      consumoXcteXperdidaReactiva: json['consumoXcteXperdidaReactiva'],
+      tieneLectura: json['tieneLectura'],
+      tarifaActiva: json['tarifaActiva'],
+      lecturaAnteriorReactiva: json['lecturaAnteriorReactiva'],
+      consumoEstimadoActiva: json['consumoEstimadoActiva'],
+      consumoEstimadoReactiva: json['consumoEstimadoReactiva'],
+      montoActiva: json['montoActiva'],
       tienePrecio: json['tienePrecio'],
       lecturaAnomala: json['lecturaAnomala'],
-      consumoFinal: json['consumoFinal'],
+      montoTotal: json['montoTotal'],
+      consumoXcteXperdidaActiva: json['consumoXcteXperdidaActiva'],
+      leturaAnterior: json['leturaAnterior'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'tieneCalculo': tieneCalculo,
-      'consumo': consumo,
-      'tarifa': tarifa,
-      'tieneLectura': tieneLectura,
-      'monto': monto,
+      'consumoReactiva': consumoReactiva,
       'cantidadDias': cantidadDias,
-      'consumoEstimado': consumoEstimado,
-      'leturaAnterior': leturaAnterior,
+      'consumoFinalActiva': consumoFinalActiva,
+      'lecturaAnteriorActiva': lecturaAnteriorActiva,
+      'consumoFinalReactiva': consumoFinalReactiva,
+      'consumoActiva': consumoActiva,
       'ultimaFechaLectura': ultimaFechaLectura,
+      'lecturaAnteriorPotencia': lecturaAnteriorPotencia,
+      'consumoMinimo': consumoMinimo,
+      'tieneCalculo': tieneCalculo,
+      'tarifaReactiva': tarifaReactiva,
+      'montoReactiva': montoReactiva,
+      'consumoXcteXperdidaReactiva': consumoXcteXperdidaReactiva,
+      'tieneLectura': tieneLectura,
+      'tarifaActiva': tarifaActiva,
+      'lecturaAnteriorReactiva': lecturaAnteriorReactiva,
+      'consumoEstimadoActiva': consumoEstimadoActiva,
+      'consumoEstimadoReactiva': consumoEstimadoReactiva,
+      'montoActiva': montoActiva,
       'tienePrecio': tienePrecio,
       'lecturaAnomala': lecturaAnomala,
-      'consumoFinal': consumoFinal,
+      'montoTotal': montoTotal,
+      'consumoXcteXperdidaActiva': consumoXcteXperdidaActiva,
+      'leturaAnterior': leturaAnterior,
     };
   }
 
-  CalculoConsumo copyWith({
-    bool? tieneCalculo,
-    num? consumo,
-    num? tarifa,
-    bool? tieneLectura,
-    num? monto,
-    num? cantidadDias,
-    num? consumoEstimado,
-    num? leturaAnterior,
-    String? ultimaFechaLectura,
-    bool? tienePrecio,
-    String? lecturaAnomala,
-    num? consumoFinal,
-  }) {
-    return CalculoConsumo(
-      tieneCalculo: tieneCalculo ?? this.tieneCalculo,
-      consumo: consumo ?? this.consumo,
-      tarifa: tarifa ?? this.tarifa,
-      tieneLectura: tieneLectura ?? this.tieneLectura,
-      monto: monto ?? this.monto,
-      cantidadDias: cantidadDias ?? this.cantidadDias,
-      consumoEstimado: consumoEstimado ?? this.consumoEstimado,
-      leturaAnterior: leturaAnterior ?? this.leturaAnterior,
-      ultimaFechaLectura: ultimaFechaLectura ?? this.ultimaFechaLectura,
-      tienePrecio: tienePrecio ?? this.tienePrecio,
-      lecturaAnomala: lecturaAnomala ?? this.lecturaAnomala,
-      consumoFinal: consumoFinal ?? this.consumoFinal,
-    );
-  }
 }
 
 class HabilitarAporteLectura {
