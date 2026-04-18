@@ -385,6 +385,7 @@ Widget buildMediaCard({
   required ValueChanged<List<ArchivoAdjunto>> onChanged,
   required String ayuda,
   required ThemeData theme,
+  int? cantidadAdjuntos,
 }) {
   return CustomCard(
     child: Column(
@@ -398,7 +399,7 @@ Widget buildMediaCard({
         ),
         const SizedBox(height: 8),
         MediaSelectorList(
-          maxAdjuntos: 2,
+          maxAdjuntos: cantidadAdjuntos ?? 2,
           ayuda: ayuda,
           type: MediaType.foto,
           files: files,

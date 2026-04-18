@@ -52,7 +52,7 @@ class _MediaSelectorListState extends State<MediaSelectorList>
 
     final pickedFile = isVideo
         ? await _picker.pickVideo(source: source)
-        : await _picker.pickImage(source: source);
+        : await _picker.pickImage(source: source,imageQuality: 70, maxHeight: 1280, maxWidth: 1280);
 
     if (pickedFile == null) return;
 

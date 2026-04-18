@@ -847,6 +847,7 @@ class _SolicitudYoFacturoMiLuzState
                         setState(() => selectedFileSolicitudList = lista),
                     ayuda: "Seleccionar archivo desde la Galería o la Cámara",
                     theme: theme,
+                    cantidadAdjuntos: 1
                   ),
                 ),
 
