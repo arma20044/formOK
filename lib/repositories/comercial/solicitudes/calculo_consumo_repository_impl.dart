@@ -11,11 +11,20 @@ class CalculoConsumoRepositoryImpl
   @override
   Future<CalculoConsumoResponse> getCalculoConsumo(
     String nis,
-    String lecturaActual
+    String? lecturaActual,
+    String? tension,
+    String? lecturaActualActiva,
+    String? lecturaActualReactiva,
+    String? lecturaActualPotencia,
+
   ) {
     return datasource.getCalculoConsumo(
      nis,
-     lecturaActual
+     lecturaActual,
+     tension,
+     lecturaActualActiva,
+     lecturaActualReactiva,
+     lecturaActualPotencia
     );
   }
 }

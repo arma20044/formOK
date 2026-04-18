@@ -29,7 +29,12 @@ class SolicitudYoFacturoMiLuzDatasourceImp
     List<ArchivoAdjunto>? selectedFileTituloPropiedadList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
     String? solicitudOTP,
-    String? codigoOTP
+    String? codigoOTP,
+
+   
+    String? lecturaActualActiva,
+    String? lecturaActualReactiva,
+    String? lecturaActualPotencia,
   ) async {
     final Map<String, Object> formMap = {
       'nis': nis,
@@ -38,6 +43,11 @@ class SolicitudYoFacturoMiLuzDatasourceImp
       'clientKey': environment.clientKey,     
       'solicitudOTP': solicitudOTP ?? 'N',
       'codigoOTP': codigoOTP ?? '00',
+
+      'lecturaActiva':lecturaActualActiva!,
+      'lecturaReactiva':lecturaActualReactiva!,
+      'lecturaPotencia':lecturaActualPotencia!,
+
     };
     try {
       if (selectedFileSolicitudList!.isNotEmpty) {

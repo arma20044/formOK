@@ -22,7 +22,12 @@ class SolicitudYoFacturoMiLuzRepositoryImpl
     List<ArchivoAdjunto>? selectedFileTituloPropiedadList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
     String? solicitudOTP,
-    String? codigoOTP
+    String? codigoOTP,
+
+   
+    String? lecturaActualActiva,
+    String? lecturaActualReactiva,
+    String? lecturaActualPotencia,
   ) {
     return datasource.getSolicitudYoFacturoMiLuz(
       tipoTension,
@@ -36,7 +41,12 @@ class SolicitudYoFacturoMiLuzRepositoryImpl
       selectedFileTituloPropiedadList,
       selectedFileOtrosDocumentosList,
       solicitudOTP,
-      codigoOTP
+      codigoOTP,
+
+      
+    lecturaActualActiva,
+     lecturaActualReactiva,
+     lecturaActualPotencia,
      
     );
   }

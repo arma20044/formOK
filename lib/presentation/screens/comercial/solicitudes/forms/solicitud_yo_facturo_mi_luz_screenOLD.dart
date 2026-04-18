@@ -370,6 +370,7 @@ class _SolicitudYoFacturoMiLuzState
           .getCalculoConsumo(
             _nisController.text,
             _lecturaActualController.text,
+            situacionActualResultado!.tipoTension
           );
 
       if (consultaCalculoConsumoResponse.error == true) {

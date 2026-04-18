@@ -14,5 +14,10 @@ abstract class SolicitudYoFacturoMiLuzRepository {
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
     String? solicitudOTP,
     String? codigoOTP,
+
+
+    String? lecturaActualActiva,
+    String? lecturaActualReactiva,
+    String? lecturaActualPotencia,
   );
 }

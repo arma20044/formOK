@@ -4,8 +4,7 @@ import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/datasources/datasources.dart';
 import 'package:form/model/model.dart';
 
-class CalculoConsumoDatasourceImp
-    extends CalculoConsumoDatasource {
+class CalculoConsumoDatasourceImp extends CalculoConsumoDatasource {
   late final Dio dio;
 
   //   OlicitudAbastecimiento(MiAndeApi api) : dio = api.dio;
@@ -15,23 +14,40 @@ class CalculoConsumoDatasourceImp
   @override
   Future<CalculoConsumoResponse> getCalculoConsumo(
     String nis,
-    String lecturaActual
+    String? lecturaActual,
+    String? tension,
+    String? lecturaActualActiva,
+    String? lecturaActualReactiva,
+    String? lecturaActualPotencia,
   ) async {
-    final Map<String, Object> formMap = {
-      'nis': nis,
-      'lecturaActual':lecturaActual,
-      'clientKey': environment.clientKey,
-    };
+    late Map<String, Object> formMap;
+    if (tension!.contains('BT')) {
+      formMap = {
+        'nis': nis,
+        'lecturaActual': lecturaActual!,
+        'clientKey': environment.clientKey,
+      };
+    } else {
+      formMap = {
+        'nis': nis,
+        'lecturaActualActiva': lecturaActualActiva!,
+        'lecturaActualReactiva': lecturaActualReactiva!,
+        'lecturaActualPotencia': lecturaActualPotencia!,
+        'clientKey': environment.clientKey,
+      };
+    }
 
     // Crear FormData
     final data = FormData.fromMap(formMap);
 
+    String urlFinal = tension!.contains("BT")
+        ? "${environment.hostCtxOpen}/v4/suministro/calcularConsumo"
+        : "${environment.hostCtxOpen}/v4/suministro/calcularConsumoMT";
+
     final response = await dio.post(
-      "${environment.hostCtxOpen}/v4/suministro/calcularConsumo",
+      urlFinal,
       data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType, 
-      ),
+      options: Options(contentType: Headers.formUrlEncodedContentType),
     );
 
     //debugPrint('URL llamada: ${response.requestOptions.uri}');

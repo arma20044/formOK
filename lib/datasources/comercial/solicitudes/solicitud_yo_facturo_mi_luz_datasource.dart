@@ -13,6 +13,11 @@ abstract class SolicitudYoFacturoMiLuzDatasource {
     List<ArchivoAdjunto>? selectedFileTituloPropiedadList,
     List<ArchivoAdjunto>? selectedFileOtrosDocumentosList,
     String? solicitudOTP,
-    String? codigoOTP
+    String? codigoOTP,
+  
+  
+    String? lecturaActualActiva,
+    String? lecturaActualReactiva,
+    String? lecturaActualPotencia,
   );
 }

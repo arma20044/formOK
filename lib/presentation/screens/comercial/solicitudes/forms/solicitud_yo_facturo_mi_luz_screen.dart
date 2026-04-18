@@ -13,6 +13,7 @@ import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
+import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
 import 'package:form/presentation/components/common/adjuntos.dart';
 import 'package:form/presentation/components/common/custom_bottom_sheet_image.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
@@ -35,11 +36,22 @@ class SolicitudYoFacturoMiLuzScreen extends ConsumerStatefulWidget {
 class _SolicitudYoFacturoMiLuzState
     extends ConsumerState<SolicitudYoFacturoMiLuzScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _formKeyCalculoConsumo = GlobalKey<FormState>();
+  final _formKeyCalculoConsumoBT = GlobalKey<FormState>();
+  final _formKeyCalculoConsumoMT = GlobalKey<FormState>();
   final _formKeyConfirmarLectura = GlobalKey<FormState>();
 
   final TextEditingController _nisController = TextEditingController();
+
+  //BT
   final TextEditingController _lecturaActualController =
+      TextEditingController();
+
+  //MT
+  final TextEditingController _lecturaEnergiaActivaController =
+      TextEditingController();
+  final TextEditingController _lecturaEnergiaReactivaController =
+      TextEditingController();
+  final TextEditingController _lecturaPotencioaController =
       TextEditingController();
 
   final TextEditingController telefonoController = TextEditingController();
@@ -174,8 +186,8 @@ class _SolicitudYoFacturoMiLuzState
     if (isLoadingConfirmarLectura) return;
 
     if (
-    //!_formKey.currentState!.validate()
-    //||
+    !_formKey.currentState!.validate()
+    ||
     solicitarOTP && !_formKeyConfirmarLectura.currentState!.validate()
     //|| !_formKeyCalculoConsumo.currentState!.validate()
     ) {
@@ -218,6 +230,7 @@ class _SolicitudYoFacturoMiLuzState
         setState(() {
           codigoOTPObtenido = "";
           this.solicitarOTP = "N";
+         
         });
 
         return;
@@ -300,7 +313,7 @@ class _SolicitudYoFacturoMiLuzState
       print(e);
       print(stack);
       setState(() {
-        calculoConsumoResultado = null;
+        //calculoConsumoResultado = null;
       });
 
       if (mounted) {
@@ -319,6 +332,13 @@ class _SolicitudYoFacturoMiLuzState
             'Error',
             mensaje,
           );
+
+          /*if(mensaje.contains("Ya se aportó")){
+
+          }
+
+           telefonoController.text = '';
+          telefonoController.clear();*/
         }
       }
     } finally {
@@ -348,21 +368,43 @@ class _SolicitudYoFacturoMiLuzState
       [],
       solicitarOTP ? 'S' : 'N',
       codigoOTPObtenido,
+
+
+      _lecturaEnergiaActivaController.text,
+      _lecturaEnergiaReactivaController.text,
+      _lecturaPotencioaController.text
     );
   }
 
   Future<void> _calcularConsumo() async {
-    if (!_formKey.currentState!.validate() ||
-        !_formKeyCalculoConsumo.currentState!.validate()) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //const SnackBar(content: Text('Ingrese los campos obligatorios')),
-      CustomSnackbar.show(
-        context,
-        message: 'Ingrese los campos obligatorios',
-        type: MessageType.error,
-      );
-      //  );
-      return;
+    final String tipoTension = situacionActualResultado?.tipoTension ?? 'BT';
+
+    if (tipoTension.contains('BT')) {
+      if (!_formKey.currentState!.validate() ||
+          !_formKeyCalculoConsumoBT.currentState!.validate()) {
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //const SnackBar(content: Text('Ingrese los campos obligatorios')),
+        CustomSnackbar.show(
+          context,
+          message: 'Ingrese los campos obligatorios',
+          type: MessageType.error,
+        );
+        //  );
+        return;
+      }
+    } else {
+      if (!_formKey.currentState!.validate() ||
+          !_formKeyCalculoConsumoMT.currentState!.validate()) {
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //const SnackBar(content: Text('Ingrese los campos obligatorios')),
+        CustomSnackbar.show(
+          context,
+          message: 'Ingrese los campos obligatorios',
+          type: MessageType.error,
+        );
+        //  );
+        return;
+      }
     }
 
     setState(() {
@@ -377,6 +419,10 @@ class _SolicitudYoFacturoMiLuzState
           .getCalculoConsumo(
             _nisController.text,
             _lecturaActualController.text,
+            tipoTension,
+            _lecturaEnergiaActivaController.text,
+            _lecturaEnergiaReactivaController.text,
+            _lecturaPotencioaController.text,
           );
 
       if (consultaCalculoConsumoResponse.error == true) {
@@ -510,7 +556,7 @@ class _SolicitudYoFacturoMiLuzState
 
         const SizedBox(height: 10),
         Form(
-          key: _formKeyCalculoConsumo,
+          key: _formKeyCalculoConsumoBT,
           child: TextFormField(
             controller: _lecturaActualController,
             keyboardType: TextInputType.number,
@@ -618,13 +664,20 @@ class _SolicitudYoFacturoMiLuzState
                 "Número del Medidor: ${situacionActualResultado!.numeroAparato}",
               ),
               CustomText(
+                fontWeight: FontWeight.bold,
                 "Última lectura activa: ${situacionActualResultado!.calculoConsumo?.lecturaAnteriorActiva}",
               ),
               CustomText(
+                fontWeight: FontWeight.bold,
                 "Última lectura reactiva: ${situacionActualResultado!.calculoConsumo?.lecturaAnteriorReactiva}",
               ),
               CustomText(
+                fontWeight: FontWeight.bold,
                 "Última lectura potencia: ${situacionActualResultado!.calculoConsumo?.lecturaAnteriorPotencia}",
+              ),
+              CustomText(
+                fontWeight: FontWeight.bold,
+                "Consumo Mínimo: ${situacionActualResultado!.calculoConsumo?.consumoMinimo} kWh",
               ),
               if (situacionActualResultado!.tipoTension!.contains("BT"))
                 CustomText(
@@ -640,33 +693,66 @@ class _SolicitudYoFacturoMiLuzState
           ),
         ),
 
-        const SizedBox(height: 10),
+        /*const SizedBox(height: 10),
         CustomComment(
           text:
               "Antes de ingresar su lectura, por favor vea el video demostrativo de cómo leer su medidor",
           bold: true,
-        ),
-
+        ),*/
         const SizedBox(height: 10),
         Form(
-          key: _formKeyCalculoConsumo,
-          child: TextFormField(
-            controller: _lecturaActualController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Lectura Actual del Medidor',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingresa Lectura Actual del Medidor';
-              }
-              return null;
-            },
+          key: _formKeyCalculoConsumoMT,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _lecturaEnergiaActivaController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Lectura Energía Activa',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingresa Lectura Energía Activa';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _lecturaEnergiaReactivaController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Lectura Energía Reactiva',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingresa Lectura Energía Reactiva';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _lecturaPotencioaController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Lectura Potencia',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingresa Lectura Potencia';
+                  }
+                  return null;
+                },
+              ),
+            ],
           ),
         ),
 
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
@@ -767,7 +853,13 @@ class _SolicitudYoFacturoMiLuzState
                   overflow: TextOverflow.clip,
                 ),
               ),
-              _resultadoBox(),
+
+              if (situacionActualResultado!.tipoTension!.contains('BT'))
+                _resultadoBoxBT(),
+
+              if (situacionActualResultado!.tipoTension!.contains('MT'))
+                _resultadoBoxMT(),
+
               CustomCard(
                 title: "Atención",
                 child: CustomText(
@@ -779,22 +871,29 @@ class _SolicitudYoFacturoMiLuzState
 
               Form(
                 key: _formKeyConfirmarLectura,
-                child: TextFormField(
+                child:
+                    /*TextFormField(
                   // focusNode: _focusNode,
                   controller: telefonoController,
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(
-                    labelText: "Titular Número de Teléfono",
+                    labelText: "Número Teléfono Celular",
                     border: OutlineInputBorder(),
                   ),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
-                      return "Debe ingresar teléfono";
+                      return "Debe ingresar Número Teléfono Celular";
                     }
 
                     return null;
                   },
-                ),
+                ),*/
+                    CustomPhoneField(
+                      label: "Número Teléfono Celular",
+                      controller: telefonoController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      required: true,
+                    ),
               ),
               const SizedBox(height: 10),
               SizedBox(
@@ -816,7 +915,7 @@ class _SolicitudYoFacturoMiLuzState
     //Text("${calculoConsumoResultado!.cantidadDias}");
   }
 
-  Widget _resultadoBox() {
+  Widget _resultadoBoxBT() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
@@ -1008,10 +1107,393 @@ class _SolicitudYoFacturoMiLuzState
     );
   }
 
+  Widget _resultadoBoxMT() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            // color: theme.colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(8),
+            border: BoxBorder.all(color: isDark ? Colors.green : Colors.black),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Mostramos los datos
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[600] : Colors.grey[300],
+                ),
+                width: double.infinity,
+                child: CustomText("Cálculo del Consumo en kWh"),
+              ),
+
+              Row(children: [
+        
+         
+        
+
+        ],
+      ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero("Activa"),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero("Reactiva"),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(_lecturaEnergiaActivaController.text),
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(_lecturaEnergiaReactivaController.text),
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Lectura Actual.',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(
+                        calculoConsumoResultado!.lecturaAnteriorActiva,
+                      ),
+                      textAlign: TextAlign.right,
+                      underline: true,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(
+                        calculoConsumoResultado!.lecturaAnteriorReactiva,
+                      ),
+                      textAlign: TextAlign.right,
+                      underline: true,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Lectura Anterior.',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(
+                        int.parse(_lecturaEnergiaActivaController.text) -
+                            calculoConsumoResultado!.lecturaAnteriorActiva!
+                                .toInt(),
+                      ),
+
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(
+                        int.parse(_lecturaEnergiaReactivaController.text) -
+                            calculoConsumoResultado!.lecturaAnteriorReactiva!
+                                .toInt(),
+                      ),
+
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Lectura Actual menos \n Lectura Anterior.',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      "${formatNumero(int.parse(_lecturaEnergiaActivaController.text) - calculoConsumoResultado!.lecturaAnteriorActiva!.toInt())}*",
+
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(
+                        int.parse(_lecturaEnergiaReactivaController.text) -
+                            calculoConsumoResultado!.lecturaAnteriorReactiva!
+                                .toInt(),
+                      ),
+
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Consumo Resultante.',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[600] : Colors.grey[300],
+                ),
+                width: double.infinity,
+                child: CustomText("Importe del Consumo en Gs."),
+              ),
+
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero("Activa"),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero("Reactiva"),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero("(kWh)"),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero("(kVARh)	"),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(
+                        int.parse(_lecturaEnergiaActivaController.text) -
+                            calculoConsumoResultado!.lecturaAnteriorActiva!
+                                .toInt(),
+                      ),
+
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(
+                        int.parse(_lecturaEnergiaReactivaController.text) -
+                            calculoConsumoResultado!.lecturaAnteriorReactiva!
+                                .toInt(),
+                      ),
+
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Consumo Resultante',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(
+                        calculoConsumoResultado!.tarifaActiva!.toInt(),
+                      ),
+
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      "**",
+
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomText(
+                      'Tarifa Gs.',
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(calculoConsumoResultado!.montoActiva),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(calculoConsumoResultado!.montoReactiva),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        //color: Colors.black,
+                      ), // Estilo por defecto para todo el texto
+                      children: <TextSpan>[
+                        // TextSpan(text: 'Este es texto normal, '),
+                        TextSpan(
+                          text: 'Importe Gs.',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: '\n (Consumo multiplicado\n por Tarifa)',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 16),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 90,
+                    child: CustomText(
+                      formatNumero(calculoConsumoResultado!.montoTotal),
+                      textAlign: TextAlign.right,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        //color: Colors.black,
+                      ), // Estilo por defecto para todo el texto
+                      children: <TextSpan>[
+                        // TextSpan(text: 'Este es texto normal, '),
+                        TextSpan(
+                          text: 'Importe Parcial Gs.',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(text: ' (Monto Activa más\n Monto Reactiva))'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        CustomCard(
+          child: Text(
+            "* Resultado de diferencia de lectura multiplicado por la constante y el coeficiente de pérdida \n** 4% del costo de la energía activa por cada centésimo por debajo del factor de potencia 0,92",
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-     
-
     return Scaffold(
       appBar: AppBar(title: Text("Yo Facturo Mi Luz")),
       endDrawer: CustomDrawer(),

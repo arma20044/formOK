@@ -16,11 +16,17 @@ class CalculoConsumoResponse {
   factory CalculoConsumoResponse.fromJson(Map<String, dynamic>? json) {
     json ??= {};
     return CalculoConsumoResponse(
-      resultado: json['resultado'] != null ? ResultadoCalculoConsumo.fromJson(json['resultado']) : null,
-       mensajeList: json['mensajeList'] != null ? List<dynamic>.from(json['mensajeList'].map((item) => item)) : null,
+      resultado: json['resultado'] != null
+          ? ResultadoCalculoConsumo.fromJson(json['resultado'])
+          : null,
+      mensajeList: json['mensajeList'] != null
+          ? List<dynamic>.from(json['mensajeList'].map((item) => item))
+          : null,
       mensaje: json['mensaje'],
       error: json['error'],
-       errorValList: json['errorValList'] != null ? List<dynamic>.from(json['errorValList'].map((item) => item)) : null,
+      errorValList: json['errorValList'] != null
+          ? List<dynamic>.from(json['errorValList'].map((item) => item))
+          : null,
     );
   }
 
@@ -64,6 +70,23 @@ class ResultadoCalculoConsumo {
   final bool? tienePrecio;
   final dynamic lecturaAnomala;
   final num? consumoFinal;
+  final num? consumoReactiva;
+  final num? consumoFinalActiva;
+  final num? lecturaAnteriorActiva;
+  final num? consumoFinalReactiva;
+  final num? consumoActiva;
+  final num? lecturaAnteriorPotencia;
+  final num? consumoMinimo;
+  final num? tarifaReactiva;
+  final num? montoReactiva;
+  final num? consumoXcteXperdidaReactiva;
+  final num? tarifaActiva;
+  final num? lecturaAnteriorReactiva;
+  final num? consumoEstimadoActiva;
+  final num? consumoEstimadoReactiva;
+  final num? montoActiva;
+  final num? montoTotal;
+  final num? consumoXcteXperdidaActiva;
 
   ResultadoCalculoConsumo({
     this.tieneCalculo,
@@ -78,6 +101,23 @@ class ResultadoCalculoConsumo {
     this.tienePrecio,
     this.lecturaAnomala,
     this.consumoFinal,
+     this.consumoReactiva,
+    this.consumoFinalActiva,
+    this.lecturaAnteriorActiva,
+    this.consumoFinalReactiva,
+    this.consumoActiva,
+    this.lecturaAnteriorPotencia,
+    this.consumoMinimo,
+    this.tarifaReactiva,
+    this.montoReactiva,
+    this.consumoXcteXperdidaReactiva,
+    this.tarifaActiva,
+    this.lecturaAnteriorReactiva,
+    this.consumoEstimadoActiva,
+    this.consumoEstimadoReactiva,
+    this.montoActiva,
+    this.montoTotal,
+    this.consumoXcteXperdidaActiva,
   });
 
   factory ResultadoCalculoConsumo.fromJson(Map<String, dynamic>? json) {
@@ -95,6 +135,23 @@ class ResultadoCalculoConsumo {
       tienePrecio: json['tienePrecio'],
       lecturaAnomala: json['lecturaAnomala'],
       consumoFinal: json['consumoFinal'],
+       consumoReactiva: json['consumoReactiva'],
+      consumoFinalActiva: json['consumoFinalActiva'],
+      lecturaAnteriorActiva: json['lecturaAnteriorActiva'],
+      consumoFinalReactiva: json['consumoFinalReactiva'],
+      consumoActiva: json['consumoActiva'],
+      lecturaAnteriorPotencia: json['lecturaAnteriorPotencia'],
+      consumoMinimo: json['consumoMinimo'],
+      tarifaReactiva: json['tarifaReactiva'],
+      montoReactiva: json['montoReactiva'],
+      consumoXcteXperdidaReactiva: json['consumoXcteXperdidaReactiva'],
+      tarifaActiva: json['tarifaActiva'],
+      lecturaAnteriorReactiva: json['lecturaAnteriorReactiva'],
+      consumoEstimadoActiva: json['consumoEstimadoActiva'],
+      consumoEstimadoReactiva: json['consumoEstimadoReactiva'],
+      montoActiva: json['montoActiva'],
+      montoTotal: json['montoTotal'],
+      consumoXcteXperdidaActiva: json['consumoXcteXperdidaActiva'],
     );
   }
 
@@ -112,6 +169,23 @@ class ResultadoCalculoConsumo {
       'tienePrecio': tienePrecio,
       'lecturaAnomala': lecturaAnomala,
       'consumoFinal': consumoFinal,
+      'consumoReactiva': consumoReactiva,
+      'consumoFinalActiva': consumoFinalActiva,
+      'lecturaAnteriorActiva': lecturaAnteriorActiva,
+      'consumoFinalReactiva': consumoFinalReactiva,
+      'consumoActiva': consumoActiva,
+      'lecturaAnteriorPotencia': lecturaAnteriorPotencia,
+      'consumoMinimo': consumoMinimo,
+      'tarifaReactiva': tarifaReactiva,
+      'montoReactiva': montoReactiva,
+      'consumoXcteXperdidaReactiva': consumoXcteXperdidaReactiva,
+      'tarifaActiva': tarifaActiva,
+      'lecturaAnteriorReactiva': lecturaAnteriorReactiva,
+      'consumoEstimadoActiva': consumoEstimadoActiva,
+      'consumoEstimadoReactiva': consumoEstimadoReactiva,
+      'montoActiva': montoActiva,
+      'montoTotal': montoTotal,
+      'consumoXcteXperdidaActiva': consumoXcteXperdidaActiva,
     };
   }
 
