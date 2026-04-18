@@ -297,17 +297,19 @@ class _SolicitudYoFacturoMiLuzState
 
         Navigator.of(context).pop(); // cerrar BottomSheet
 
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+       /* WidgetsBinding.instance.addPostFrameCallback((_) {
           DialogHelper.showMessage(
             context,
             MessageType.success,
             'Éxito',
-            "Operación Exitosa.",
+            result.mensaje!,
           );
 
           limpiarTodo();
           Navigator.of(context).pop();
-        });
+        });*/
+        CustomSnackbar.show(context, message: result.mensaje!);
+        Navigator.of(context).pop();
       }
     } catch (e, stack) {
       print(e);
@@ -326,6 +328,7 @@ class _SolicitudYoFacturoMiLuzState
           } else {
             mensaje = data.toString();
           }
+          
           DialogHelper.showMessage(
             context,
             MessageType.error,

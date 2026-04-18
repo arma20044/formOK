@@ -142,6 +142,21 @@ class SolicitudYoFacturoMiLuzDatasourceImp
         formMap['saee_adjuntoOtro${pos}Extra'] = jsonEncode(foto.info);
       }
     }
+
+
+    if (selectedFileSolicitudList!.isNotEmpty) {
+      int pos = 0;
+      for (var foto in selectedFileSolicitudList) {
+        pos++;
+        formMap['multimedia'] = [
+          await MultipartFile.fromFile(
+            foto.file.path,
+            filename: foto.file.path.split('/').last,
+          ),
+        ];
+        formMap['multimediaExtra'] = jsonEncode(foto.info);
+      }
+    }
     // Crear FormData
     final data = FormData.fromMap(formMap);
 

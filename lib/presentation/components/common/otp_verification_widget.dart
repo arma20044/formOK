@@ -126,18 +126,6 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
                     final otp = _controllers.map((c) => c.text).join();
                     if (otp.length == 4 && widget.onSubmit != null) {
                       widget.onSubmit!(otp);
-                    } else {
-                      ScaffoldMessenger.of( this.context).showSnackBar(
-                        SnackBar(
-                          content: const Text('Action completed!'),
-                          action: SnackBarAction(
-                            label: 'Undo',
-                            onPressed: () {
-                              // Code to undo the change.
-                            },
-                          ),
-                        ),
-                      );
                     }
                   },
             style: ElevatedButton.styleFrom(
