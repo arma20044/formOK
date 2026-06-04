@@ -14,11 +14,9 @@ import 'package:form/presentation/components/common.dart';
 import 'package:form/presentation/components/common/UI/custom_card.dart';
 import 'package:form/presentation/components/common/UI/custom_comment.dart';
 import 'package:form/presentation/components/common/UI/custom_phone_field.dart';
-import 'package:form/presentation/components/common/adjuntos.dart';
 import 'package:form/presentation/components/common/custom_bottom_sheet_image.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
-import 'package:form/presentation/components/common/custom_snackbarNEW.dart';
 import 'package:form/presentation/components/common/otp_verification_widget.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/youtube_webview.dart';
@@ -375,7 +373,9 @@ class _SolicitudYoFacturoMiLuzState
 
       _lecturaEnergiaActivaController.text,
       _lecturaEnergiaReactivaController.text,
-      _lecturaPotencioaController.text
+      _lecturaPotencioaController.text,
+
+      null
     );
   }
 

@@ -35,6 +35,8 @@ class SolicitudYoFacturoMiLuzDatasourceImp
     String? lecturaActualActiva,
     String? lecturaActualReactiva,
     String? lecturaActualPotencia,
+
+    String? token
   ) async {
     final Map<String, Object> formMap = {
       'nis': nis,
@@ -47,6 +49,8 @@ class SolicitudYoFacturoMiLuzDatasourceImp
       'lecturaActiva':lecturaActualActiva!,
       'lecturaReactiva':lecturaActualReactiva!,
       'lecturaPotencia':lecturaActualPotencia!,
+
+      'kwfxtoken' : token ?? ''
 
     };
     try {
@@ -160,12 +164,29 @@ class SolicitudYoFacturoMiLuzDatasourceImp
     // Crear FormData
     final data = FormData.fromMap(formMap);
 
+    
+
     String urlFinal = tipoTension == 'BT' 
     ? "v4/suministro/lecturaAportadaPublico"
     : "v4/suministro/lecturaAportadaPublicoMT";
 
+
+    
+if(tipoTension == 'BT'){
+  urlFinal = "${environment.hostCtxOpen}/v4/suministro/lecturaAportadaPublico";
+  if( titularNumeroTelefono.isEmpty){
+    urlFinal = "${environment.hostCtxMiCuenta}/v3/suministro/lecturaAportada";
+  }
+}else{
+  urlFinal = "${environment.hostCtxOpen}/v4/suministro/lecturaAportadaPublicoMT";
+  if(titularNumeroTelefono.isEmpty){
+    urlFinal = "${environment.hostCtxMiCuenta}/v3/suministro/lecturaAportadaMT";
+  }
+}
+
+
     final response = await dio.post(
-      "${environment.hostCtxOpen}/$urlFinal",
+      urlFinal,
       data: data,
       options: Options(
         contentType: Headers.formUrlEncodedContentType, 

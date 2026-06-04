@@ -19,5 +19,7 @@ abstract class SolicitudYoFacturoMiLuzRepository {
     String? lecturaActualActiva,
     String? lecturaActualReactiva,
     String? lecturaActualPotencia,
+
+    String? token
   );
 }

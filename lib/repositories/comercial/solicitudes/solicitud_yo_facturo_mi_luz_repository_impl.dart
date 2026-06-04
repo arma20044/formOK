@@ -28,6 +28,8 @@ class SolicitudYoFacturoMiLuzRepositoryImpl
     String? lecturaActualActiva,
     String? lecturaActualReactiva,
     String? lecturaActualPotencia,
+
+    String? token
   ) {
     return datasource.getSolicitudYoFacturoMiLuz(
       tipoTension,
@@ -48,6 +50,7 @@ class SolicitudYoFacturoMiLuzRepositoryImpl
      lecturaActualReactiva,
      lecturaActualPotencia,
      
+     token
     );
   }
 }

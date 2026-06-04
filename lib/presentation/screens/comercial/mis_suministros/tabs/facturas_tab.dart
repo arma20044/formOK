@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/enviromens/enrivoment.dart';
 import 'package:form/presentation/components/common/UI/custom_loading.dart';
 import 'package:form/presentation/components/common/UI/custom_title.dart';
-import 'package:form/presentation/components/common/card_item_first.dart';
 
 import 'package:form/presentation/components/common/card_item_second.dart';
 import 'package:form/provider/situacion_actual_provider.dart';
