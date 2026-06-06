@@ -50,12 +50,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Escucha el provider de inicialización
-    ref.listen(splashInitProvider, (prev, next) {
-      next.whenData((_) {
-        context.go('/'); // Ruta final luego del splash
-      });
-    });
+    ref.listen(splashInitProvider, (previous, next) {
+    next.when(
+      data: (_) {
+        context.go('/'); // Navegar si todo salió bien
+      },
+      error: (error, stack) {
+        // Aquí manejas el error: 
+        // 1. Mostrar un diálogo de error
+        // 2. O redirigir a una pantalla de login/error
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo conectar con el servidor. Revisa tu conexión.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        
+        // Opcional: Redirigir al Login si falló la carga inicial
+        // context.go('/login'); 
+      },
+      loading: () {}, // No haces nada mientras carga
+    );
+  });
 
     return Scaffold(
       body: Center(

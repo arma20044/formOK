@@ -10,8 +10,6 @@ class AuthHeaderSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
-  
-
     return DrawerHeader(
       //decoration: const BoxDecoration(color: Colors.blue),
       child: authState.when(
@@ -40,9 +38,27 @@ class AuthHeaderSection extends ConsumerWidget {
         ),
         loading: () =>
             const Center(child: CircularProgressIndicator(color: Colors.white)),
-        error: (_, __) => const Text(
-          'Error cargando usuario',
-          style: TextStyle(color: Colors.white),
+        error: (error, stackTrace) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Error cargando usuario',
+              style: TextStyle(
+                color: Colors.red,
+              ), // Un color que resalte el error
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () {
+                // Opción 1: Reintentar la carga del provider
+                ref.invalidate(authProvider);
+
+                // Opción 2: O navegar al login si lo prefieres
+                // context.push('/login');
+              },
+              child: const Text('Reintentar / Iniciar Sesión'),
+            ),
+          ],
         ),
       ),
     );

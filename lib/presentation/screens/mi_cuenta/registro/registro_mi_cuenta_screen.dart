@@ -1,9 +1,12 @@
-
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form/config/constantes.dart';
+import 'package:form/main.dart';
 import 'package:form/model/model.dart';
 import 'package:form/presentation/components/common/custom_show_dialog.dart';
+import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/api/mi_ande_api.dart';
 import '../../../../infrastructure/infrastructure.dart';
 import '../../../../repositories/repositories.dart';
@@ -123,7 +126,10 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
           tipoCliente: num.parse(datosPaso1!['tipoCliente']),
           tipoSolicitante: Uri.encodeComponent(datosPaso1['tipoSolicitante']),
           tipoDocumento: datosPaso1['tipoDocumento'],
-          cedulaRepresentante: datosPaso1['documentoRepresentante'].toString().isEmpty ? 'lteor' :datosPaso1['documentoRepresentante'],
+          cedulaRepresentante:
+              datosPaso1['documentoRepresentante'].toString().isEmpty
+              ? 'lteor'
+              : datosPaso1['documentoRepresentante'],
           numeroDocumento: datosPaso1['numeroDocumento'] ?? '',
           nombre: datosPaso1['nombre'] ?? '',
           apellido: datosPaso1['apellido'] ?? '',
@@ -215,56 +221,84 @@ class _RegistroMiCuentaScreenState extends State<RegistroMiCuentaScreen>
         });
 
         return;
-      } else {
-        showModalBottomSheet<void>(
-          context: context,
-          builder: (BuildContext context) {
-            return Container(
-              // Este es el widget que se convertirá en el modal
-              height: 500,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    OtpInputWidget(
-                      isLoading: _isLoadingRegistroMiCuenta,
-                      tipoVerificacion: tipoVerificacion!,
-                      phoneNumber: celular!,
-                      correo: correo!,
-                      onSubmit: (otp) {
-                    
+      } else if (solicitarOTP) {
+        if (mounted) {
+          showModalBottomSheet<void>(
+            context: context,
+            builder: (BuildContext context) {
+              return Container(
+                // Este es el widget que se convertirá en el modal
+                height: 500,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      OtpInputWidget(
+                        isLoading: _isLoadingRegistroMiCuenta,
+                        tipoVerificacion: tipoVerificacion!,
+                        phoneNumber: celular!,
+                        correo: correo!,
+                        onSubmit: (otp) {
+                          setState(() {
+                            codigoOTPObtenido = otp;
 
-                        setState(() {
-                          codigoOTPObtenido = otp;
+                            this.solicitarOTP = 'N';
+                          });
 
-                          this.solicitarOTP = 'N';
-                        });
-
-                        _enviarFormulario(false);
-                        print("Código ingresado: $otp");
-                      },
-                    ),
-                  ],
+                          _enviarFormulario(false);
+                          print("Código ingresado: $otp");
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        );
-        /* ScaffoldMessenger.of(context).showSnackBar(
+              );
+            },
+          );
+          /* ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Formulario enviado correctamente")),
         ); */
-        setState(() {
-          this.solicitarOTP = 'S';
+          setState(() {
+            this.solicitarOTP = 'S';
+          });
+          mostrarCargarCodigoOTP = true;
+          DialogHelper.showMessage(
+            context,
+            MessageType.success,
+            'Éxito',
+            tipoVerificacion!.contains("CEL")
+                ? "Te enviamos un código a tu celular, favor ingresa para confirmar el registro."
+                : "Te enviamos un código a tu correo, favor ingresa para confirmar el registro.",
+            //duration: const Duration(seconds: 3),
+          );
+        }
+      } else {
+        if (!mounted) return;
+
+        Navigator.of(context).pop(); // cerrar BottomSheet
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          DialogHelper.showMessage(
+            context,
+            MessageType.success,
+            'Éxito',
+            result.mensaje ?? '',
+          );
+
+          CustomSnackbar.show(context, message: result.mensaje ?? '');
+
+          //  limpiarTodo();
+          //Navigator.pop(context);
+          context.go('/');
         });
-        mostrarCargarCodigoOTP = true;
+      }
+    } catch (e) {
+      if (mounted) {
         DialogHelper.showMessage(
           context,
-          MessageType.success,
-          'Éxito',
-          tipoVerificacion!.contains("CEL")
-              ? "Te enviamos un código a tu celular, favor ingresa para confirmar el registro."
-              : "Te enviamos un código a tu correo, favor ingresa para confirmar el registro.",
-          //duration: const Duration(seconds: 3),
+          MessageType.error,
+          'Error',
+          'Ocurrió un error inesperado',
         );
       }
     } finally {

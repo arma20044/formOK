@@ -46,7 +46,8 @@ final publicRoutes = [
   '/olvidoContrasenha',
   '/solicitudAveriaElestrodomesticos',
   '/solicitudExtencionBajaTension',
-  '/solicitudAlumbradoPublico'
+  '/solicitudAlumbradoPublico',
+  '/registroMiCuenta'
 ];
 final privateRoutes = [
   '/miCuenta',

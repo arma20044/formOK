@@ -1,19 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/config/constantes.dart';
+import 'package:form/core/api/mi_ande_api.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
+import 'package:form/infrastructure/infrastructure.dart';
 import 'package:form/presentation/components/common/custom_snackbar.dart';
 import 'package:form/presentation/components/common/lista_botones.dart';
 import 'package:form/presentation/components/common/logout_dialog.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
+import 'package:form/repositories/eliminar_cuenta_repository_impl.dart';
 import 'package:go_router/go_router.dart';
 
-class MiCuentaScreen extends ConsumerWidget {
+class MiCuentaScreen extends ConsumerStatefulWidget {
   const MiCuentaScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _EliminarCuentaScreenState();
+}
+
+class _EliminarCuentaScreenState extends ConsumerState<MiCuentaScreen> {
+  Future<void> _eliminarCuenta() async {
+    bool isLoading = false;
+    final authState = ref.read(authProvider);
+    final token = authState.value?.user?.token;
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Su sesión ha expirado, debe volver a logearse'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final repoEliminarCuenta = EliminarCuentaRepositoryImpl(
+        EliminarCuentaDatasourceImpl(MiAndeApi()),
+      );
+
+      final eliminarCuentaResponse = await repoEliminarCuenta.getEliminarCuenta(
+        token,
+      );
+
+      if (eliminarCuentaResponse.error == true) {
+        CustomSnackbar.show(
+          context,
+          message: "Ocurrió un error, Favor intente nuevamente la consulta",
+          type: MessageType.error,
+        );
+
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      // Cierra sesión
+      final authNotifier = ref.read(authProvider.notifier);
+      await authNotifier.logout();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('La cuenta se eliminó Exitosamente.')),
+      );
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
     final authNotifier = ref.read(authProvider.notifier);
@@ -49,7 +111,28 @@ class MiCuentaScreen extends ConsumerWidget {
       BotonNavegacion(
         icon: Icons.delete,
         texto: 'Eliminar Cuenta',
-        ruta: '/configuracion',
+        accion: () => showDialog(
+          context: context,
+          builder: (_) =>
+              //const AlertDialog(title: Text("Info"), content: Text("¡Hola!")),
+              SizedBox(
+                height: 100,
+                child: AlertDialog(
+                  actions: [
+                    OutlinedButton(onPressed: dispose, child: Text("NO")),
+                    OutlinedButton(
+                      onPressed: () {
+                        _eliminarCuenta();
+                      },
+                      child: Text("SI"),
+                    ),
+                  ],
+                  content: Column(
+                    children: [Text("Deseas eliminar tu Cuenta MI ANDE?")],
+                  ),
+                ),
+              ),
+        ),
       ),
       /*BotonNavegacion(
         icon: Icons.logout,

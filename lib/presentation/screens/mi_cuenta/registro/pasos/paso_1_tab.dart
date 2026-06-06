@@ -277,7 +277,7 @@ class Paso1TabState extends ConsumerState<Paso1Tab>
             if (isValid) {
               // 🔹 Si pasa la validación, ejecutamos la lógica adicional
               //   await consultarDocumento();
-              consultarDocumento(numeroDocumentoController.text);
+              if(selectedTipoDocumento!.id != 'TD004') consultarDocumento(numeroDocumentoController.text);
             }
           }
         });
@@ -452,9 +452,11 @@ class Paso1TabState extends ConsumerState<Paso1Tab>
               const SizedBox(height: 20),
               selectedTipoDocumento?.id == 'TD004'
                   ? (TextFormField(
+                      controller: apellidoObtenido,
                       decoration: const InputDecoration(
                         labelText: "Apellido(s)",
                         border: OutlineInputBorder(),
+                        
                       ),
                     ))
                   : Align(
