@@ -44,10 +44,39 @@ class _MensajesTabState extends ConsumerState<MensajesTab> {
       error: (err, stack) => Center(child: Text('Error: $err')),
       data: (numbers) => NumberListWidget(
         numbers: numbers,
-        onToggleService: (number, serviceName, value) {
-          ref
+        onToggleService: (number, serviceName, value, code) async {
+          final exito = await ref
               .read(numberListAsyncProvider.notifier)
-              .toggleService(number, serviceName, value);
+              .toggleService(
+                number,
+                serviceName,
+                value,
+                widget.selectedNIS!.nisRad.toString(),
+                code,
+              );
+
+          if (!context.mounted) return;
+          if (exito) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Modificación Correcta.'),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+
+          if (!exito) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'No se pudo actualizar el servicio $serviceName. Inténtalo de nuevo.',
+                ),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
         },
         onDeleteNumber: (number) async {
           final confirmar = await showDialog<bool>(
@@ -78,8 +107,6 @@ class _MensajesTabState extends ConsumerState<MensajesTab> {
           if (confirmar != true) return;
 
           if (!context.mounted) return;
-
-
 
           final exito = await ref
               .read(numberListAsyncProvider.notifier)

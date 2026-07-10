@@ -23,4 +23,21 @@ class ServiciosNisRepositoryImpl extends ServiciosNisRepository {
   ) {
     return datasource.getServiciosBorrarCelular(nis, numeroMovil, token);
   }
+
+  @override
+  Future<ServiciosNisTelefonoResponse> getServiciosModificarServicio(
+    String nis,
+    String numeroMovil,
+    String token,
+    String codigoServicio,
+    String estado,
+  ) {
+    return datasource.getServiciosModificarServicio(
+      nis,
+      numeroMovil,
+      token,
+      codigoServicio,
+      estado,
+    );
+  }
 }

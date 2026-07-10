@@ -59,9 +59,12 @@ class NumberListAsyncNotifier extends AsyncNotifier<List<NumberItem>> {
   }
 
   // Cambiar el estado de un switch
-  void toggleService(int number, String serviceName, bool value) {
+  Future<bool> toggleService(int number, String serviceName, bool value,selectedNIS, String code) async{
     final current = state.value;
-    if (current == null) return;
+    print(serviceName);
+    print(value);
+   
+    if (current == null) return false;
 
     final updated = current.map((item) {
       if (item.number == number) {
@@ -73,10 +76,47 @@ class NumberListAsyncNotifier extends AsyncNotifier<List<NumberItem>> {
     }).toList();
 
     state = AsyncData(updated);
+
+     
+    try {
+      final token = ref.read(authProvider).value?.user?.token;
+      if (token == null) throw Exception('Token no encontrado');
+
+      final repoServicios = ServiciosNisRepositoryImpl(
+      ServiciosNisDatasourceImpl(MiAndeApi()),
+    );
+
+    await repoServicios.getServiciosModificarServicio(
+      selectedNIS,
+      number.toString(),
+      code,
+      value ? 'EM001' : 'EM002', 
+      token,
+    );
+
+    return true;
+    } catch (e) {
+
+      print('Error al actualizar servicio en la API: $e');
+
+      if (state.value != null) {
+      final reverted = state.value!.map((item) {
+        if (item.number == number) {
+          for (var s in item.services) {
+            if (s.name == serviceName) s.isSelected = !value; // Invertimos el valor al original
+          }
+        }
+        return item;
+      }).toList();
+      state = AsyncData(reverted);
+    }
+
+    return false;
+    }
   }
 
   // Eliminar un número
-  Future<bool> deleteNumber(int number, selectedNIS) async{
+  Future<bool> deleteNumber(int number, selectedNIS) async {
     final current = state.value;
     if (current == null) return false;
 

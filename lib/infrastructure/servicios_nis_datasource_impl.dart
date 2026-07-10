@@ -74,4 +74,42 @@ class ServiciosNisDatasourceImpl extends ServiciosNisDatasource {
     print('Error ${response.statusCode}: ${response.data}');
   }*/
   }
+  
+  @override
+  Future<ServiciosNisTelefonoResponse> getServiciosModificarServicio(
+    String nis,
+    String numeroMovil,
+    String codigoServicio,
+    String estado,
+    String token,
+  ) async {
+    var data = FormData.fromMap({
+      'nis': nis,
+      'kwfxtoken': token,
+      'numeroMovil': numeroMovil,
+      'codigoServicio' :codigoServicio,
+      'estado':estado
+    });
+
+    final response = await dio.post(
+      "${environment.hostCtxMiCuenta}/v3/serviciosNisTelefono/modificar",
+      data: data,
+      options: Options(contentType: Headers.formUrlEncodedContentType),
+    );
+
+    if (response.statusCode == 200) {
+      final serviciosNisResponse = ServiciosNisTelefonoResponse.fromJson(
+        response.data,
+      );
+      return serviciosNisResponse;
+    } else {
+      throw Exception('Error ${response.statusCode}');
+    }
+
+    /*if (response.statusCode == 200) {
+    print('Datos: ${response.data}');
+  } else {
+    print('Error ${response.statusCode}: ${response.data}');
+  }*/
+  }
 }

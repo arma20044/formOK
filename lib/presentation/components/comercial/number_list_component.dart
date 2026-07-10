@@ -3,7 +3,7 @@ import 'package:form/model/constans/mensajes_servicios.dart';
 
 class NumberListWidget extends StatelessWidget {
   final List<NumberItem> numbers;
-  final void Function(int number, String serviceName, bool value) onToggleService;
+  final void Function(int number, String serviceName, bool value, String code) onToggleService;
   final void Function(int number) onDeleteNumber;
 
   const NumberListWidget({
@@ -41,7 +41,7 @@ class NumberListWidget extends StatelessWidget {
                 title: Text(service.name),
                 value: service.isSelected,
                 onChanged: (value) =>
-                    onToggleService(item.number, service.name, value),
+                    onToggleService(item.number, service.name, value, service.code ),
                 secondary: Icon(
                   service.isSelected ? Icons.check_circle : Icons.cancel,
                   color: service.isSelected ? Colors.green : Colors.red,
