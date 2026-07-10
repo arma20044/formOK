@@ -67,6 +67,28 @@ class _FacturasTabState extends ConsumerState<FacturasTab> {
                 return const Center(child: Text("No hay facturas disponibles"));
               }
 
+              final tieneErrorDeDatos = facturas.any(
+                (f) => f.importe == null || f.fechaVencimiento == null,
+              );
+
+              if (tieneErrorDeDatos) {
+                // Si encuentra algún error, frena de inmediato y muestra un solo mensaje central
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      "Error de datos en facturas para el suministro NIS: ${widget.selectedNIS?.nisRad ?? 'Desconocido'}",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+
               return ListView.builder(
                 padding: const EdgeInsets.all(8),
                 itemCount: facturas.length,

@@ -12,16 +12,14 @@ class ErrorInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(
-    Response response,
-    ResponseInterceptorHandler handler,
-  ) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     final data = response.data;
 
     if (data is Map<String, dynamic> && data['error'] == true) {
       String mensaje = "Ha ocurrido un error inesperado";
 
-      final tokenError = data['tokenerror'] != null &&
+      final tokenError =
+          data['tokenerror'] != null &&
           data['tokenerror'].toString().isNotEmpty;
 
       if (tokenError) {
@@ -29,18 +27,31 @@ class ErrorInterceptor extends Interceptor {
 
         _logout();
 
+        rootScaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+        );
+
+        Future.microtask(() {
+          // Leemos el provider de GoRouter y usamos ".go" para limpiar la pila
+          container
+              .read(goRouterProvider)
+              .go('/'); // <-- Cambia '/main' por tu ruta exacta al Main/Login
+        });
       } else if (data['errorValidacion'] == true &&
           data['errorValList'] != null) {
-
-        mensaje =
-            "Errores de validación: ${data['errorValList'].join(", ")}";
+        mensaje = "Errores de validación: ${data['errorValList'].join(", ")}";
 
         rootScaffoldMessengerKey.currentState?.showSnackBar(
-          SnackBar(
-            content: Text(mensaje),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
         );
+
+         Future.microtask(() {
+          // Leemos el provider de GoRouter y usamos ".go" para limpiar la pila
+          container
+              .read(goRouterProvider)
+              .go('/'); // <-- Cambia '/main' por tu ruta exacta al Main/Login
+        });
+        
       }
 
       return handler.reject(
@@ -56,21 +67,15 @@ class ErrorInterceptor extends Interceptor {
     return handler.next(response);
   }
 
-
   Future<void> _logout() async {
-    if (_loggingOut) return;
+    // if (_loggingOut) return;
 
     _loggingOut = true;
 
     try {
-      await container
-          .read(authProvider.notifier)
-          .logout();
+      await container.read(authProvider.notifier).logout();
 
-      container
-          .read(goRouterProvider)
-          .go('/login');
-
+      container.read(goRouterProvider).go('/');
     } finally {
       // No poner false aquí
       // se libera cuando el usuario inicia sesión nuevamente

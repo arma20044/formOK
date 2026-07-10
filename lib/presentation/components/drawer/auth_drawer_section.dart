@@ -62,7 +62,7 @@ class AuthDrawerSection extends ConsumerWidget {
 
                         // Redirige luego de cerrar sesión
                         if (context.mounted) {
-                          context.go('/login');
+                          context.go('/');
                         }
                       },
                     ),

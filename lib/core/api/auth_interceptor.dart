@@ -20,9 +20,9 @@ class AuthInterceptor extends Interceptor {
           .toString();
 
       // Evitar bucle si ya estás en login
-      if (!currentLocation.startsWith('/login')) {
-        router.go('/login');
-      }
+      //if (!currentLocation.startsWith('/login')) {
+        router.go('/');
+      //}
     }
 
     super.onError(err, handler);
