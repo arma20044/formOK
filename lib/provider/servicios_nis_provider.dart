@@ -1,6 +1,7 @@
 // number_list_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/core/api/mi_ande_api.dart';
+import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/model/login_model.dart';
 import 'package:form/utils/utils.dart';
 
@@ -21,41 +22,41 @@ class NumberListAsyncNotifier extends AsyncNotifier<List<NumberItem>> {
 
   // Método público para fetch / refresh de números
   Future<List<NumberItem>> fetchNumbers(
-  SuministrosList selectedNIS,
-  String token,
-) async {
-  state = const AsyncLoading(); // marca loading
+    SuministrosList selectedNIS,
+    String token,
+  ) async {
+    state = const AsyncLoading(); // marca loading
 
-  try {
-    final repoServiciosNis = ServiciosNisRepositoryImpl(
-      ServiciosNisDatasourceImpl(MiAndeApi()),
-    );
+    try {
+      final repoServiciosNis = ServiciosNisRepositoryImpl(
+        ServiciosNisDatasourceImpl(MiAndeApi()),
+      );
 
-    // Llamada al repositorio con NIS y token
-    final serviciosNisResponse = await repoServiciosNis.getServiciosNis(
-      selectedNIS.nisRad.toString(),
-      token,
-    );
+      // Llamada al repositorio con NIS y token
+      final serviciosNisResponse = await repoServiciosNis.getServiciosNis(
+        selectedNIS.nisRad.toString(),
+        token,
+      );
 
-    if (serviciosNisResponse != null && serviciosNisResponse.resultado != null) {
-      // Procesamos la respuesta usando processServiciosClase
-      final numbers = processServiciosClase(serviciosNisResponse.resultado!);
+      if (serviciosNisResponse != null &&
+          serviciosNisResponse.resultado != null) {
+        // Procesamos la respuesta usando processServiciosClase
+        final numbers = processServiciosClase(serviciosNisResponse.resultado!);
 
-      // Actualizamos el state con los datos obtenidos
-      state = AsyncData(numbers);
-      return numbers;
-    } else {
-      // No se recibió resultado
-      state = AsyncError('No se recibió resultado', StackTrace.current);
+        // Actualizamos el state con los datos obtenidos
+        state = AsyncData(numbers);
+        return numbers;
+      } else {
+        // No se recibió resultado
+        state = AsyncError('No se recibió resultado', StackTrace.current);
+        return [];
+      }
+    } catch (e, st) {
+      // Capturamos cualquier error de la llamada al API
+      state = AsyncError(e, st);
       return [];
     }
-  } catch (e, st) {
-    // Capturamos cualquier error de la llamada al API
-    state = AsyncError(e, st);
-    return [];
   }
-}
-
 
   // Cambiar el estado de un switch
   void toggleService(int number, String serviceName, bool value) {
@@ -75,12 +76,35 @@ class NumberListAsyncNotifier extends AsyncNotifier<List<NumberItem>> {
   }
 
   // Eliminar un número
-  void deleteNumber(int number) {
+  Future<bool> deleteNumber(int number, selectedNIS) async{
     final current = state.value;
-    if (current == null) return;
+    if (current == null) return false;
+
+    final result = await eliminarNumeroMovil(number, selectedNIS);
 
     final updated = current.where((item) => item.number != number).toList();
     state = AsyncData(updated);
+
+    return result;
+  }
+
+  Future<bool> eliminarNumeroMovil(int number, String selectedNIS) async {
+    try {
+      final authState = ref.read(authProvider);
+      final token = authState.value?.user?.token;
+
+      final repoEliminarNumeroMovil = ServiciosNisRepositoryImpl(
+        ServiciosNisDatasourceImpl(MiAndeApi()),
+      );
+
+      final eliminarNumeroMovilResponse = await repoEliminarNumeroMovil
+          .getServiciosBorrarCelular(selectedNIS, number.toString(), token!);
+
+      return true;
+    } catch (e) {
+      print('Error al eliminar: $e');
+      return false;
+    }
   }
 
   // Agregar un nuevo número
