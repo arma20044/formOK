@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form/config/constantes.dart';
 import 'package:form/config/tipo_tramite_model.dart';
+import 'package:form/core/errors/error_interceptor.dart';
 import 'package:form/core/router/app_router.dart';
 import 'package:form/model/constans/textos.dart';
 import 'package:form/presentation/components/drawer/custom_drawer.dart';
 import 'package:form/presentation/components/widgets/dropdown_custom.dart';
 import 'package:form/provider/router_history_notifier.dart';
+import 'package:form/provider/situacion_actual_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:form/core/auth/auth_notifier.dart';
 import 'package:form/core/auth/model/auth_state.dart';
 import 'package:form/core/auth/model/auth_state_data.dart';
+import 'package:form/provider/ultimas_facturas_provider.dart';
 
 class DropdownItem {
   final String id;
@@ -96,14 +99,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
               if (authData.state == AuthState.authenticated) {
+                ErrorInterceptor.reset();
+
+                ref.invalidate(facturasProvider);
+                ref.invalidate(situacionActualProvider);
+
+                ref.read(goRouterProvider).go('/');
+
                 final previousUri = ref.read(routeHistoryProvider)['previous'];
+
                 if (previousUri != null) {
                   ref.read(goRouterProvider).go(previousUri.toString());
                 } else {
                   ref.read(goRouterProvider).go('/');
                 }
-
-                //GoRouter.of(context).go('/'); // Login correcto → Home
               } else if (authData.state == AuthState.error) {
                 ScaffoldMessenger.of(
                   context,

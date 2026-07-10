@@ -29,6 +29,17 @@ final facturasProvider =
     throw Exception(response.errorValList?.first ?? 'Error desconocido');
   }
 
-  final data = response.micuentaultimasfacturasresultado?.lista ?? [];
-  return data.whereType<MiCuentaUltimasFacturasLista>().toList();
+  //final data = response.micuentaultimasfacturasresultado?.lista ?? [];
+  //return data.whereType<MiCuentaUltimasFacturasLista>().toList();
+  final facturas = (response.micuentaultimasfacturasresultado?.lista ?? [])
+    .whereType<MiCuentaUltimasFacturasLista>()
+    .toList();
+
+if (facturas.any((f) =>
+    f.importe == null ||
+    f.fechaVencimiento == null)) {
+  throw Exception("Existen facturas con datos inválidos.");
+}
+
+return facturas;
 });

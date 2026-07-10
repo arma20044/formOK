@@ -26,7 +26,7 @@ class MiAndeApi {
     dio.interceptors.add(ErrorInterceptor());
 
     // Manejo global de errores (token expirado)
-    dio.interceptors.add(
+  /*  dio.interceptors.add(
       InterceptorsWrapper(
         onError: (DioException e, handler) {
           final status = e.response?.statusCode;
@@ -40,7 +40,7 @@ class MiAndeApi {
           return handler.next(e);
         },
       ),
-    );
+    );*/
 
     // Logs + agregar clientKey
     dio.interceptors.add(

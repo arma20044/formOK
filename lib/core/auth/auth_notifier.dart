@@ -101,7 +101,8 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
     String cedulaSolicitante,
     bool loginSilencioso,
   ) async {
-    state = const AsyncLoading();
+    //state = const AsyncLoading();
+    AsyncLoading<AuthStateData>();
 
     try {
       final response = await _authRepository.login(
@@ -173,18 +174,19 @@ class AuthNotifier extends AsyncNotifier<AuthStateData> {
   }
 
   Future<void> logout() async {
-    state = const AsyncValue.data(AuthStateData(state: AuthState.loading));
-
     try {
       await _authRepository.logout();
-      await _storage.delete(key: _userKey);
-
-      state = const AsyncValue.data(
-        AuthStateData(state: AuthState.unauthenticated),
-      );
-    } catch (e) {
-      state = AsyncError(e, StackTrace.current);
+    } catch (_) {
+      // aunque falle el logout remoto,
+      // igual debemos cerrar la sesión local
     }
+
+    await _storage.delete(key: _userKey);
+    await _storage.delete(key: _userDatosAnexos);
+
+    state = const AsyncValue.data(
+      AuthStateData(state: AuthState.unauthenticated),
+    );
   }
 
   void _showToast(String msg, bool success) {
